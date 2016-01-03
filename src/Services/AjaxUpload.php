@@ -74,11 +74,11 @@ abstract class AjaxUpload
     {
         $this->removeOldData($this->chunkPath());
 
-        if (! ($out = @fopen($output, $mode))) {
+        if (!($out = @fopen($output, $mode))) {
             throw new UploadException('Failed to open output stream.', 102);
         }
 
-        if (! ($in = @fopen($input, 'rb'))) {
+        if (!($in = @fopen($input, 'rb'))) {
             throw new UploadException('Failed to open input stream', 101);
         }
 
