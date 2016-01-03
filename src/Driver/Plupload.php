@@ -35,7 +35,7 @@ class Plupload extends AjaxUpload
     {
         return response()->json([
             'jsonrpc' => '2.0',
-            'result' => parent::receive($name, $handler)->getData(),
+            'result'  => parent::receive($name, $handler)->getData(),
         ]);
     }
 }
