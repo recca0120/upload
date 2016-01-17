@@ -11,24 +11,62 @@ use Symfony\Component\HttpFoundation\Response;
 
 abstract class AjaxUpload
 {
+    /**
+     * request.
+     *
+     * @var \Illuminate\Http\Request
+     */
     protected $request;
 
+    /**
+     * filesystem.
+     *
+     * @var \Illuminate\Filesystem\Filesystem
+     */
     protected $filesystem;
 
-    protected $config;
-
+    /**
+     * file age.
+     *
+     * @var int
+     */
     protected $maxFileAge = 600;
 
+    /**
+     * construct.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param \Illuminate\Filesystem\Filesystem $filesystem
+     */
     public function __construct(Request $request, Filesystem $filesystem)
     {
         $this->request = $request;
         $this->filesystem = $filesystem;
     }
 
+    /**
+     * has chunks.
+     *
+     * @return bool
+     */
     abstract protected function hasChunks();
 
+    /**
+     * handle chunks.
+     *
+     * @param  string $name
+     * @param  Closure $handler
+     * @return Symfony\Component\HttpFoundation\File\UploadedFile
+     */
     abstract protected function handleChunks($name, Closure $handler);
 
+    /**
+     * receive.
+     *
+     * @param  string $name
+     * @param  Closure $handler
+     * @return mixed
+     */
     public function receive($name, Closure $handler)
     {
         if ($this->hasChunks() === true) {
@@ -44,6 +82,13 @@ abstract class AjaxUpload
         return response()->json($response);
     }
 
+    /**
+     * handle single file.
+     *
+     * @param  string $name    [description]
+     * @param  Closure $handler [description]
+     * @return Symfony\Component\HttpFoundation\File\UploadedFile
+     */
     protected function handleSingle($name, Closure $handler)
     {
         if ($this->request->file($name)) {
@@ -51,6 +96,11 @@ abstract class AjaxUpload
         }
     }
 
+    /**
+     * chunk path.
+     *
+     * @return string
+     */
     protected function chunkPath()
     {
         $path = storage_path('chunkupload');
@@ -61,6 +111,12 @@ abstract class AjaxUpload
         return $path;
     }
 
+    /**
+     * chunk partial name.
+     *
+     * @param  string
+     * @return string
+     */
     protected function getPartialName($filename)
     {
         $extension = null;
@@ -71,6 +127,15 @@ abstract class AjaxUpload
         return $this->chunkPath().'/'.md5($filename).$extension.'.part';
     }
 
+    /**
+     * append data.
+     *
+     * @param string $output
+     * @param string $input
+     * @param float $mode
+     * @param float $offset
+     * @return void
+     */
     protected function appendData($output, $input, $mode, $offset = null)
     {
         $this->removeOldData($this->chunkPath());
@@ -95,6 +160,12 @@ abstract class AjaxUpload
         @fclose($in);
     }
 
+    /**
+     * remove old data.
+     *
+     * @param string $path
+     * @return void
+     */
     public function removeOldData($path)
     {
         $time = time();
@@ -105,6 +176,16 @@ abstract class AjaxUpload
         }
     }
 
+    /**
+     * receive handler.
+     *
+     * @param  Closure $handler
+     * @param  string $partialName
+     * @param  string $originalName
+     * @param  string $mimeType
+     * @param  int $fileSize
+     * @return Symfony\Component\HttpFoundation\File\UploadedFile
+     */
     protected function receiveHandler(Closure $handler, $partialName, $originalName, $mimeType, $fileSize = null)
     {
         $file = new UploadedFile($partialName, $originalName, $mimeType, $fileSize, UPLOAD_ERR_OK, true);
@@ -114,6 +195,12 @@ abstract class AjaxUpload
         return $result;
     }
 
+    /**
+     * is response.
+     *
+     * @param mixed $response
+     * @return bool
+     */
     protected function isResponse($response)
     {
         return $response instanceof Response;

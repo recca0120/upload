@@ -7,11 +7,23 @@ use Recca0120\Upload\UploadException;
 
 class FileApi extends AjaxUpload
 {
+    /**
+     * require chunks.
+     *
+     * @return bool
+     */
     protected function hasChunks()
     {
         return $this->request->header('content-range') !== null;
     }
 
+    /**
+     * handle chunks.
+     *
+     * @param  string $name
+     * @param  Closure $handler
+     * @return Symfony\Component\HttpFoundation\File\UploadedFile
+     */
     protected function handleChunks($name, Closure $handler)
     {
         $result = false;
