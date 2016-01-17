@@ -10,8 +10,10 @@
 | loading of any our classes "manually". Feels great to relax.
 |
 */
+require __DIR__.'/../vendor/autoload.php';
+require __DIR__.'/traits/Laravel.php';
 
-require __DIR__.'/vendor/autoload.php';
+use Carbon\Carbon;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +25,5 @@ require __DIR__.'/vendor/autoload.php';
 | the PHP date and date-time functions throughout the application.
 |
 */
-
 date_default_timezone_set('UTC');
-Carbon\Carbon::setTestNow(Carbon\Carbon::now());
+Carbon::setTestNow(Carbon::now());

@@ -11,24 +11,64 @@ use Symfony\Component\HttpFoundation\Response;
 
 abstract class AjaxUpload
 {
+    /**
+     * request.
+     *
+     * @var \Illuminate\Http\Request
+     */
     protected $request;
 
+    /**
+     * filesystem.
+     *
+     * @var \Illuminate\Filesystem\Filesystem
+     */
     protected $filesystem;
 
-    protected $config;
-
+    /**
+     * file age.
+     *
+     * @var int
+     */
     protected $maxFileAge = 600;
 
+    /**
+     * construct.
+     *
+     * @param \Illuminate\Http\Request          $request
+     * @param \Illuminate\Filesystem\Filesystem $filesystem
+     */
     public function __construct(Request $request, Filesystem $filesystem)
     {
         $this->request = $request;
         $this->filesystem = $filesystem;
     }
 
+    /**
+     * has chunks.
+     *
+     * @return bool
+     */
     abstract protected function hasChunks();
 
+    /**
+     * handle chunks.
+     *
+     * @param string  $name
+     * @param Closure $handler
+     *
+     * @return Symfony\Component\HttpFoundation\File\UploadedFile
+     */
     abstract protected function handleChunks($name, Closure $handler);
 
+    /**
+     * receive.
+     *
+     * @param string  $name
+     * @param Closure $handler
+     *
+     * @return mixed
+     */
     public function receive($name, Closure $handler)
     {
         if ($this->hasChunks() === true) {
@@ -41,9 +81,17 @@ abstract class AjaxUpload
             return $response;
         }
 
-        return response()->json($response);
+        return response()->json($response, 201);
     }
 
+    /**
+     * handle single file.
+     *
+     * @param string  $name    [description]
+     * @param Closure $handler [description]
+     *
+     * @return Symfony\Component\HttpFoundation\File\UploadedFile
+     */
     protected function handleSingle($name, Closure $handler)
     {
         if ($this->request->file($name)) {
@@ -51,9 +99,14 @@ abstract class AjaxUpload
         }
     }
 
+    /**
+     * chunk path.
+     *
+     * @return string
+     */
     protected function chunkPath()
     {
-        $path = storage_path('chunkupload');
+        $path = storage_path('uploadchunks');
         if ($this->filesystem->isDirectory($path) === false) {
             $this->filesystem->makeDirectory($path, 0755, true, true);
         }
@@ -61,6 +114,13 @@ abstract class AjaxUpload
         return $path;
     }
 
+    /**
+     * chunk partial name.
+     *
+     * @param  string $filename
+     *
+     * @return string
+     */
     protected function getPartialName($filename)
     {
         $extension = null;
@@ -68,9 +128,21 @@ abstract class AjaxUpload
             $extension = '.'.substr($filename, $pos + 1);
         }
 
-        return $this->chunkPath().'/'.md5($filename).$extension.'.part';
+        $hashKey = $this->request->get('hashKey');
+
+        return $this->chunkPath().'/'.md5($filename.$hashKey).$extension.'.part';
     }
 
+    /**
+     * append data.
+     *
+     * @param string $output
+     * @param string $input
+     * @param float  $mode
+     * @param float  $offset
+     *
+     * @return void
+     */
     protected function appendData($output, $input, $mode, $offset = null)
     {
         $this->removeOldData($this->chunkPath());
@@ -95,6 +167,13 @@ abstract class AjaxUpload
         @fclose($in);
     }
 
+    /**
+     * remove old data.
+     *
+     * @param string $path
+     *
+     * @return void
+     */
     public function removeOldData($path)
     {
         $time = time();
@@ -105,15 +184,37 @@ abstract class AjaxUpload
         }
     }
 
+    /**
+     * receive handler.
+     *
+     * @param Closure $handler
+     * @param string  $partialName
+     * @param string  $originalName
+     * @param string  $mimeType
+     * @param int     $fileSize
+     *
+     * @return Symfony\Component\HttpFoundation\File\UploadedFile
+     */
     protected function receiveHandler(Closure $handler, $partialName, $originalName, $mimeType, $fileSize = null)
     {
-        $file = new UploadedFile($partialName, $originalName, $mimeType, $fileSize, UPLOAD_ERR_OK, true);
+        $tmpName = substr($partialName, 0, -5);
+        $this->filesystem->move($partialName, $tmpName);
+        $file = new UploadedFile($tmpName, $originalName, $mimeType, $fileSize, UPLOAD_ERR_OK, true);
         $result = $handler($file);
-        $this->filesystem->delete($partialName);
+        if (is_file($tmpName) === true) {
+            $this->filesystem->delete($tmpName);
+        }
 
         return $result;
     }
 
+    /**
+     * is response.
+     *
+     * @param mixed $response
+     *
+     * @return bool
+     */
     protected function isResponse($response)
     {
         return $response instanceof Response;
