@@ -20,8 +20,9 @@ class FileApi extends AjaxUpload
     /**
      * handle chunks.
      *
-     * @param  string $name
-     * @param  Closure $handler
+     * @param string  $name
+     * @param Closure $handler
+     *
      * @return Symfony\Component\HttpFoundation\File\UploadedFile
      */
     protected function handleChunks($name, Closure $handler)
