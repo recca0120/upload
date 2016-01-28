@@ -20,8 +20,9 @@ class Plupload extends AjaxUpload
     /**
      * handle chunks.
      *
-     * @param  string $name
-     * @param  Closure $handler
+     * @param string  $name
+     * @param Closure $handler
+     *
      * @return Symfony\Component\HttpFoundation\File\UploadedFile
      */
     protected function handleChunks($name, Closure $handler)
@@ -52,8 +53,9 @@ class Plupload extends AjaxUpload
     /**
      * receive.
      *
-     * @param  string $name    [description]
-     * @param  Closure $handler [description]
+     * @param string  $name    [description]
+     * @param Closure $handler [description]
+     *
      * @return \Illuminate\Http\Response
      */
     public function receive($name, Closure $handler)
