@@ -35,7 +35,7 @@ abstract class AjaxUpload
     /**
      * construct.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \Illuminate\Http\Request          $request
      * @param \Illuminate\Filesystem\Filesystem $filesystem
      */
     public function __construct(Request $request, Filesystem $filesystem)
@@ -54,8 +54,9 @@ abstract class AjaxUpload
     /**
      * handle chunks.
      *
-     * @param  string $name
-     * @param  Closure $handler
+     * @param string  $name
+     * @param Closure $handler
+     *
      * @return Symfony\Component\HttpFoundation\File\UploadedFile
      */
     abstract protected function handleChunks($name, Closure $handler);
@@ -63,8 +64,9 @@ abstract class AjaxUpload
     /**
      * receive.
      *
-     * @param  string $name
-     * @param  Closure $handler
+     * @param string  $name
+     * @param Closure $handler
+     *
      * @return mixed
      */
     public function receive($name, Closure $handler)
@@ -85,8 +87,9 @@ abstract class AjaxUpload
     /**
      * handle single file.
      *
-     * @param  string $name    [description]
-     * @param  Closure $handler [description]
+     * @param string  $name    [description]
+     * @param Closure $handler [description]
+     *
      * @return Symfony\Component\HttpFoundation\File\UploadedFile
      */
     protected function handleSingle($name, Closure $handler)
@@ -115,6 +118,7 @@ abstract class AjaxUpload
      * chunk partial name.
      *
      * @param  string
+     *
      * @return string
      */
     protected function getPartialName($filename)
@@ -132,8 +136,9 @@ abstract class AjaxUpload
      *
      * @param string $output
      * @param string $input
-     * @param float $mode
-     * @param float $offset
+     * @param float  $mode
+     * @param float  $offset
+     *
      * @return void
      */
     protected function appendData($output, $input, $mode, $offset = null)
@@ -164,6 +169,7 @@ abstract class AjaxUpload
      * remove old data.
      *
      * @param string $path
+     *
      * @return void
      */
     public function removeOldData($path)
@@ -179,11 +185,12 @@ abstract class AjaxUpload
     /**
      * receive handler.
      *
-     * @param  Closure $handler
-     * @param  string $partialName
-     * @param  string $originalName
-     * @param  string $mimeType
-     * @param  int $fileSize
+     * @param Closure $handler
+     * @param string  $partialName
+     * @param string  $originalName
+     * @param string  $mimeType
+     * @param int     $fileSize
+     *
      * @return Symfony\Component\HttpFoundation\File\UploadedFile
      */
     protected function receiveHandler(Closure $handler, $partialName, $originalName, $mimeType, $fileSize = null)
@@ -199,6 +206,7 @@ abstract class AjaxUpload
      * is response.
      *
      * @param mixed $response
+     *
      * @return bool
      */
     protected function isResponse($response)
