@@ -117,7 +117,7 @@ abstract class AjaxUpload
     /**
      * chunk partial name.
      *
-     * @param  string $filename
+     * @param string $filename
      *
      * @return string
      */
