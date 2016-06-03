@@ -5,7 +5,7 @@ namespace Recca0120\Upload\Driver;
 use Closure;
 use Recca0120\Upload\UploadException;
 
-class FileAPI extends AjaxUpload
+class FileApi extends AjaxUpload
 {
     /**
      * require chunks.
