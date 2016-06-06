@@ -34,7 +34,7 @@ class Manager extends BaseManager
      */
     protected function createFileapiDriver()
     {
-        return $this->app->make(\Recca0120\Upload\Driver\FileAPI::class);
+        return $this->app->make(\Recca0120\Upload\Driver\FileApi::class);
     }
 
     /**
