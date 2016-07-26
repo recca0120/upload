@@ -8,8 +8,8 @@
 [![Daily Downloads](https://poser.pugx.org/recca0120/upload/d/daily)](https://packagist.org/packages/recca0120/upload)
 
 ## Features
-- Support [Plupload](http://www.plupload.com/)
-- Support [FileApi](http://mailru.github.io/FileAPI/)
+- Support [Plupload](http://www.plupload.com/) Chunks
+- Support [FileApi](http://mailru.github.io/FileAPI/) Chunks
 
 ## Installing
 
@@ -42,7 +42,7 @@ Include the service provider within `config/app.php`. The service povider is nee
 ## How to use
 
 Controller
-```
+```php
 
 use Recca0120\Upload\Manager;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
