@@ -8,8 +8,8 @@
 [![Daily Downloads](https://poser.pugx.org/recca0120/upload/d/daily)](https://packagist.org/packages/recca0120/upload)
 
 ## Features
-- Support [Plupload](http://www.plupload.com/)
-- Support [FileApi](http://mailru.github.io/FileAPI/)
+- Support [Plupload](http://www.plupload.com/) Chunks
+- Support [FileApi](http://mailru.github.io/FileAPI/) Chunks
 
 ## Installing
 
