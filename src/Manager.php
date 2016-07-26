@@ -2,25 +2,14 @@
 
 namespace Recca0120\Upload;
 
-use Illuminate\Container\Container;
 use Illuminate\Support\Manager as BaseManager;
 
 class Manager extends BaseManager
 {
     /**
-     * constructor.
-     *
-     * @param \Illuminate\Container\Container $app
-     */
-    public function __construct(Container $app)
-    {
-        $this->app = $app;
-    }
-
-    /**
      * default driver.
      *
-     * @return [type] [description]
+     * @return string
      */
     public function getDefaultDriver()
     {

@@ -7,22 +7,6 @@ use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 class ServiceProvider extends BaseServiceProvider
 {
     /**
-     * Indicates if loading of the provider is deferred.
-     *
-     * @var bool
-     */
-    protected $defer = true;
-
-    /**
-     * boot.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-    }
-
-    /**
      * Register the service provider.
      *
      * @return void
@@ -31,6 +15,10 @@ class ServiceProvider extends BaseServiceProvider
     {
         $this->app->singleton('ajaxupload', function ($app) {
             return new Manager($app);
+        });
+
+        $this->app->singleton(Manager::class, function ($app) {
+            return $this->app->make('ajaxupload');
         });
     }
 }

@@ -12,18 +12,21 @@ class Uploader
 {
     /**
      * $app.
+     *
      * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
 
     /**
      * $filesystem.
+     *
      * @var \Illuminate\Filesystem\Filesystem
      */
     protected $filesystem;
 
     /**
      * $api.
+     *
      * @var \Recca0120\Upload\Api
      */
     protected $api;
@@ -40,9 +43,9 @@ class Uploader
      *
      * @method __construct
      *
-     * @param  \Recca0120\Upload\Api                        $api
-     * @param  \Illuminate\Filesystem\Filesystem            $filesystem
-     * @param  \Illuminate\Contracts\Foundation\Application $app
+     * @param \Recca0120\Upload\Api                        $api
+     * @param \Illuminate\Filesystem\Filesystem            $filesystem
+     * @param \Illuminate\Contracts\Foundation\Application $app
      */
     public function __construct(Api $api, Filesystem $filesystem, ApplicationContract $app)
     {
@@ -56,8 +59,8 @@ class Uploader
      *
      * @method receive
      *
-     * @param  string  $name
-     * @param  \Closure $closure
+     * @param string   $name
+     * @param \Closure $closure
      *
      * @return \Symfony\Component\HttpFoundation\Response;
      */
@@ -117,9 +120,9 @@ class Uploader
      *
      * @method copy
      *
-     * @param  string $source
-     * @param  string $target
-     * @param  int|null $offset
+     * @param string   $source
+     * @param string   $target
+     * @param int|null $offset
      */
     protected function copy($source, $target, $offset)
     {
@@ -148,10 +151,12 @@ class Uploader
      *
      * @method removeOldData
      */
-    protected function removeOldData()
+    public function removeOldData($path = null, $maxFileAge = null)
     {
+        $path = is_null($path) === true ? $this->getChunkPath() : $path;
+        $maxFileAge = is_null($maxFileAge) === true ? $this->maxFileAge : $path;
         $time = time();
-        foreach ($this->filesystem->files($this->getChunkPath()) as $file) {
+        foreach ($this->filesystem->files($path) as $file) {
             if ($this->filesystem->lastModified($file) < ($time - $this->maxFileAge)) {
                 $this->filesystem->delete($file);
             }
