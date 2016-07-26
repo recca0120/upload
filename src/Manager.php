@@ -24,7 +24,7 @@ class Manager extends BaseManager
      */
     public function getDefaultDriver()
     {
-        return 'plupload';
+        return 'fileapi';
     }
 
     /**
@@ -34,7 +34,9 @@ class Manager extends BaseManager
      */
     protected function createFileapiDriver()
     {
-        return $this->app->make(\Recca0120\Upload\Driver\FileApi::class);
+        return $this->app->make(Uploader::class, [
+            $this->app->make(FileApi::class),
+        ]);
     }
 
     /**
@@ -44,6 +46,8 @@ class Manager extends BaseManager
      */
     protected function createPluploadDriver()
     {
-        return $this->app->make(\Recca0120\Upload\Driver\Plupload::class);
+        return $this->app->make(Uploader::class, [
+            $this->app->make(Plupload::class),
+        ]);
     }
 }
