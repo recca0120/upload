@@ -90,7 +90,7 @@ class Plupload extends Api
      *
      * @method replaceResponse
      *
-     * @param  \Symfony\Component\HttpFoundation\Response $response
+     * @param \Symfony\Component\HttpFoundation\Response $response
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
