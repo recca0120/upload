@@ -1,4 +1,4 @@
-## Ajax Upload for Laravel 5
+## Ajax Upload for Laravel 5 (Support jQuery File Upload, FileApi, Plupload)
 
 [![Latest Stable Version](https://poser.pugx.org/recca0120/upload/v/stable)](https://packagist.org/packages/recca0120/upload)
 [![Total Downloads](https://poser.pugx.org/recca0120/upload/downloads)](https://packagist.org/packages/recca0120/upload)
@@ -8,8 +8,9 @@
 [![Daily Downloads](https://poser.pugx.org/recca0120/upload/d/daily)](https://packagist.org/packages/recca0120/upload)
 
 ## Features
-- Support [Plupload](http://www.plupload.com/)
-- Support [FileApi](http://mailru.github.io/FileAPI/)
+- Support Chunks [jQuery File Upload](https://github.com/blueimp/jQuery-File-Upload) $driver = 'fileapi';
+- Support Chunks [FileApi](http://mailru.github.io/FileAPI/) $driver = 'fileapi';
+- Support Chunks [Plupload](http://www.plupload.com/) $driver = 'plupload';
 
 ## Installing
 
@@ -42,7 +43,7 @@ Include the service provider within `config/app.php`. The service povider is nee
 ## How to use
 
 Controller
-```
+```php
 
 use Recca0120\Upload\Manager;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
