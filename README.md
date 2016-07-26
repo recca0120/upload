@@ -42,7 +42,7 @@ Include the service provider within `config/app.php`. The service povider is nee
 ## How to use
 
 Controller
-```
+```php
 
 use Recca0120\Upload\Manager;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
