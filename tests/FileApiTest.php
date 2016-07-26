@@ -11,6 +11,35 @@ class FileApiTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
+    public function testRequestHasName()
+    {
+        /*
+        |------------------------------------------------------------
+        | Set
+        |------------------------------------------------------------
+        */
+
+        $request = m::mock(Request::class);
+
+        /*
+        |------------------------------------------------------------
+        | Expectation
+        |------------------------------------------------------------
+        */
+
+        $request
+            ->shouldReceive('get')->with('name')->once()->andReturn('foo.jpg');
+        /*
+        |------------------------------------------------------------
+        | Assertion
+        |------------------------------------------------------------
+        */
+        $api = new FileApi($request);
+        $api->setName('file');
+        $originalName = $api->getOriginalName();
+        $this->assertSame($originalName, 'foo.jpg');
+    }
+
     public function testApi()
     {
         /*
