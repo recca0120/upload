@@ -26,11 +26,7 @@ abstract class Api
      *
      * @method __construct
      *
-<<<<<<< HEAD
-     * @param  \Illuminate\Http\Request $request
-=======
      * @param \Illuminate\Http\Request $request
->>>>>>> develop
      */
     public function __construct(Request $request)
     {
@@ -103,11 +99,7 @@ abstract class Api
      *
      * @method replaceResponse
      *
-<<<<<<< HEAD
-     * @param  \Symfony\Component\HttpFoundation\Response $response
-=======
      * @param \Symfony\Component\HttpFoundation\Response $response
->>>>>>> develop
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */

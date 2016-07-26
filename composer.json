@@ -1,7 +1,7 @@
 {
     "name": "recca0120/upload",
-    "description": "Ajax Chunk Upload for Laravel 5",
-    "keywords": ["laravel", "chunk", "ajax", "upload", "jquery-fileapi", "plupload"],
+    "description": "Upload Large File For Laravel (Support Plupload And FileApi)",
+    "keywords": ["laravel", "chunk", "ajax", "upload", "jquery-fileapi", "plupload", "fileapi"],
     "license": "MIT",
     "authors": [
         {
