@@ -128,11 +128,11 @@ class Uploader
     {
         $mode = ($offset === 0) ? 'wb' : 'ab';
 
-        if (! ($targetStream = @fopen($target, $mode))) {
+        if (($targetStream = @fopen($target, $mode)) === false) {
             throw new UploadException('Failed to open output stream.', 102);
         }
 
-        if (! ($sourceStream = @fopen($source, 'rb'))) {
+        if (($sourceStream = @fopen($source, 'rb')) === false) {
             throw new UploadException('Failed to open input stream', 101);
         }
 
