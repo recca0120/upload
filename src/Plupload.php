@@ -86,15 +86,15 @@ class Plupload extends Api
     }
 
     /**
-     * replaceResponse.
+     * completedResponse.
      *
-     * @method replaceResponse
+     * @method completedResponse
      *
      * @param \Symfony\Component\HttpFoundation\Response $response
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function replaceResponse(Response $response)
+    public function completedResponse(Response $response)
     {
         $data = $response->getData();
         $response->setData([

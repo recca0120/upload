@@ -2,7 +2,7 @@
 
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Mockery as m;
-use Recca0120\Upload\FileApi;
+use Recca0120\Upload\FileAPI;
 use Recca0120\Upload\Manager;
 use Recca0120\Upload\Plupload;
 use Recca0120\Upload\Uploader;
@@ -14,7 +14,7 @@ class ManagerTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-    public function testFileApi()
+    public function testFileAPI()
     {
         /*
         |------------------------------------------------------------
@@ -32,7 +32,7 @@ class ManagerTest extends PHPUnit_Framework_TestCase
 
         $app
             ->shouldReceive('make')->with(Uploader::class, m::type('array'))
-            ->shouldReceive('make')->with(FileApi::class);
+            ->shouldReceive('make')->with(FileAPI::class);
 
         /*
         |------------------------------------------------------------
