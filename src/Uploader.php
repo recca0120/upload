@@ -77,7 +77,7 @@ class Uploader
         $this->copy($resourceName, $partialName, $startOffset);
 
         if ($this->api->isCompleted() === false) {
-            return new Response(null, 201);
+            return $this->api->chunkedResponse(new Response(null, 201));
         }
 
         $originalName = $this->api->getOriginalName();
@@ -91,7 +91,7 @@ class Uploader
             $this->filesystem->delete($tmpName);
         }
 
-        $response = $this->api->replaceResponse($response);
+        $response = $this->api->completedResponse($response);
 
         $this->removeOldData();
 

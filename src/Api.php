@@ -95,15 +95,29 @@ abstract class Api
     }
 
     /**
-     * replaceResponse.
+     * chunkedResponse.
      *
-     * @method replaceResponse
+     * @method chunkedResponse
      *
      * @param \Symfony\Component\HttpFoundation\Response $response
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function replaceResponse(Response $response)
+    public function chunkedResponse(Response $response)
+    {
+        return $response;
+    }
+
+    /**
+     * completedResponse.
+     *
+     * @method completedResponse
+     *
+     * @param \Symfony\Component\HttpFoundation\Response $response
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function completedResponse(Response $response)
     {
         return $response;
     }

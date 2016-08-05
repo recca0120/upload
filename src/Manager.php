@@ -19,12 +19,12 @@ class Manager extends BaseManager
     /**
      * create fileapi driver.
      *
-     * @return \Recca0120\Upload\Driver\FileApi
+     * @return \Recca0120\Upload\Driver\FileAPI
      */
     protected function createFileapiDriver()
     {
         return $this->app->make(Uploader::class, [
-            $this->app->make(FileApi::class),
+            $this->app->make(FileAPI::class),
         ]);
     }
 
