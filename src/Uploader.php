@@ -157,7 +157,7 @@ class Uploader
         $maxFileAge = is_null($maxFileAge) === true ? $this->maxFileAge : $path;
         $time = time();
         foreach ($this->filesystem->files($path) as $file) {
-            if ($this->filesystem->lastModified($file) < ($time - $this->maxFileAge)) {
+            if ($this->filesystem->exists($file) === true && $this->filesystem->lastModified($file) < ($time - $this->maxFileAge)) {
                 $this->filesystem->delete($file);
             }
         }
