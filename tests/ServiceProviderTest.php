@@ -11,7 +11,7 @@ class ServiceProviderTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-    public function testServiceProvider()
+    public function test_service_provider()
     {
         /*
         |------------------------------------------------------------

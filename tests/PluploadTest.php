@@ -12,7 +12,7 @@ class PluploadTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-    public function testApi()
+    public function test_api()
     {
         /*
         |------------------------------------------------------------

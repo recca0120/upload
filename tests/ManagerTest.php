@@ -14,7 +14,7 @@ class ManagerTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-    public function testFileAPI()
+    public function test_fileapi()
     {
         /*
         |------------------------------------------------------------
@@ -44,7 +44,7 @@ class ManagerTest extends PHPUnit_Framework_TestCase
         $manager->driver();
     }
 
-    public function testPlupload()
+    public function test_plupload()
     {
         /*
         |------------------------------------------------------------

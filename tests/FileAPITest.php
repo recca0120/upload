@@ -12,7 +12,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-    public function testRequestHasName()
+    public function test_request_has_name()
     {
         /*
         |------------------------------------------------------------
@@ -42,7 +42,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         $this->assertSame($originalName, 'foo.jpg');
     }
 
-    public function testApi()
+    public function test_api()
     {
         /*
         |------------------------------------------------------------
