@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Mockery as m;
 use Recca0120\Upload\Plupload;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Response;
 
 class PluploadTest extends PHPUnit_Framework_TestCase
 {
@@ -21,6 +22,7 @@ class PluploadTest extends PHPUnit_Framework_TestCase
         */
 
         $request = m::mock(Request::class);
+        $response = m::mock(Response::class);
         $file = m::mock(UploadedFile::class);
 
         /*
@@ -37,6 +39,13 @@ class PluploadTest extends PHPUnit_Framework_TestCase
             ->shouldReceive('get')->with('token')->andReturn(null)
             ->shouldReceive('file')->with('file')->twice()->andReturn($file)
             ->shouldReceive('header')->with('content-length')->once()->andReturn('1049073');
+
+        $response
+            ->shouldReceive('getData')->once()->andReturn([])
+            ->shouldReceive('setData')->once()->with([
+                'jsonrpc' => '2.0',
+                'result'  => [],
+            ]);
 
         $file
             ->shouldReceive('getMimeType')->once()->andReturn('image/jpg')
@@ -57,5 +66,8 @@ class PluploadTest extends PHPUnit_Framework_TestCase
         $this->assertSame($api->getResourceName(), 'php://input');
         $this->assertSame($api->isCompleted(), false);
         $this->assertSame($api->getPartialName(), md5($originalName).$api->getExtension($originalName));
+
+        $api->chunkedResponse($response);
+        $api->completedResponse($response);
     }
 }

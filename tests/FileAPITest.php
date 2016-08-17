@@ -88,5 +88,6 @@ class FileAPITest extends PHPUnit_Framework_TestCase
 
         $response = $api->chunkedResponse($response);
         $this->assertSame($response->headers->get('X-Last-Known-Byte'), $end);
+        $response = $api->completedResponse($response);
     }
 }
