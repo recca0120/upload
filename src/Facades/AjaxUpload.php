@@ -3,6 +3,7 @@
 namespace Recca0120\Upload\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use Recca0120\Upload\Manager;
 
 class AjaxUpload extends Facade
 {
@@ -13,6 +14,6 @@ class AjaxUpload extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'ajaxupload';
+        return Manager::class;
     }
 }

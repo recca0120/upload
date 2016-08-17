@@ -13,12 +13,8 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('ajaxupload', function ($app) {
-            return new Manager($app);
-        });
-
         $this->app->singleton(Manager::class, function ($app) {
-            return $this->app->make('ajaxupload');
+            return new Manager($app);
         });
     }
 }

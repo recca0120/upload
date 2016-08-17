@@ -27,9 +27,7 @@ class ServiceProviderTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $app
-            ->shouldReceive('singleton')->with('ajaxupload', m::type(Closure::class))->once()
-            ->shouldReceive('singleton')->with(Manager::class, m::type(Closure::class))->once();
+        $app->shouldReceive('singleton')->with(Manager::class, m::type(Closure::class))->once();
 
         /*
         |------------------------------------------------------------
