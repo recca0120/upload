@@ -3,6 +3,7 @@
 namespace Recca0120\Upload;
 
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 
 abstract class Api
@@ -120,6 +121,16 @@ abstract class Api
     public function completedResponse(Response $response)
     {
         return $response;
+    }
+
+    /**
+     * Returns the maximum size of an uploaded file as configured in php.ini.
+     *
+     * @return int The maximum size of an uploaded file in bytes
+     */
+    public function getMaxFilesize()
+    {
+        return UploadedFile::getMaxFilesize();
     }
 
     /**
