@@ -4,11 +4,10 @@ namespace Recca0120\Upload;
 
 use Closure;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
-use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 
-class Uploader
+class Adapter
 {
     /**
      * $app.
@@ -20,7 +19,7 @@ class Uploader
     /**
      * $filesystem.
      *
-     * @var \Illuminate\Filesystem\Filesystem
+     * @var \Recca0120\Upload\Filesystem
      */
     protected $filesystem;
 
@@ -44,7 +43,7 @@ class Uploader
      * @method __construct
      *
      * @param \Recca0120\Upload\Api                        $api
-     * @param \Illuminate\Filesystem\Filesystem            $filesystem
+     * @param \Recca0120\Upload\Filesystem                 $filesystem
      * @param \Illuminate\Contracts\Foundation\Application $app
      */
     public function __construct(Api $api, Filesystem $filesystem, ApplicationContract $app)
@@ -74,7 +73,7 @@ class Uploader
         $resourceName = $this->api->getResourceName();
         $startOffset = $this->api->getStartOffset();
         $partialName = $this->getChunkPath().$this->api->getPartialName().'.part';
-        $this->copy($resourceName, $partialName, $startOffset);
+        $this->filesystem->appendStream($resourceName, $partialName, $startOffset);
 
         if ($this->api->isCompleted() === false) {
             return $this->api->chunkedResponse(new Response(null, 201));
@@ -113,37 +112,6 @@ class Uploader
         }
 
         return $path;
-    }
-
-    /**
-     * copy.
-     *
-     * @method copy
-     *
-     * @param string   $source
-     * @param string   $target
-     * @param int|null $offset
-     */
-    protected function copy($source, $target, $offset)
-    {
-        $mode = ($offset === 0) ? 'wb' : 'ab';
-
-        if (($targetStream = @fopen($target, $mode)) === false) {
-            throw new UploadException('Failed to open output stream.', 102);
-        }
-
-        if (($sourceStream = @fopen($source, 'rb')) === false) {
-            throw new UploadException('Failed to open input stream', 101);
-        }
-
-        if (is_null($offset) === false) {
-            fseek($targetStream, $offset);
-        }
-        while ($buff = fread($sourceStream, 4096)) {
-            fwrite($targetStream, $buff);
-        }
-        @fclose($sourceStream);
-        @fclose($targetStream);
     }
 
     /**

@@ -1,14 +1,14 @@
 <?php
 
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
-use Illuminate\Filesystem\Filesystem;
 use Mockery as m;
+use Recca0120\Upload\Adapter;
 use Recca0120\Upload\Api;
-use Recca0120\Upload\Uploader;
+use Recca0120\Upload\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 
-class UploaderTest extends PHPUnit_Framework_TestCase
+class AdapterTest extends PHPUnit_Framework_TestCase
 {
     public function tearDown()
     {
@@ -28,7 +28,7 @@ class UploaderTest extends PHPUnit_Framework_TestCase
         $filesystem = m::mock(Filesystem::class);
         $app = m::mock(ApplicationContract::class);
         $file = m::mock(UploadedFile::class);
-        $uploader = new Uploader($api, $filesystem, $app);
+        $adapter = new Adapter($api, $filesystem, $app);
 
         /*
         |------------------------------------------------------------
@@ -47,7 +47,7 @@ class UploaderTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $uploader->receive($name, function ($r) use ($file) {
+        $adapter->receive($name, function ($r) use ($file) {
             $this->assertSame($file, $r);
         });
     }
@@ -62,16 +62,20 @@ class UploaderTest extends PHPUnit_Framework_TestCase
 
         $name = 'file';
         $api = m::mock(Api::class);
-        $filesystem = new Filesystem();
+        $filesystem = m::mock(Filesystem::class);
         $app = m::mock(ApplicationContract::class);
         $file = m::mock(UploadedFile::class);
-        $uploader = new Uploader($api, $filesystem, $app);
+        $adapter = new Adapter($api, $filesystem, $app);
 
         /*
         |------------------------------------------------------------
         | Expectation
         |------------------------------------------------------------
         */
+
+        $filesystem
+            ->shouldReceive('isDirectory')->once()->andReturn(true)
+            ->shouldReceive('appendStream')->once();
 
         $app->shouldReceive('storagePath')->andReturn(__DIR__);
 
@@ -94,56 +98,9 @@ class UploaderTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $uploader->receive($name, function ($r) use ($file) {
+        $adapter->receive($name, function ($r) use ($file) {
             $this->assertSame($file, $r);
         });
-    }
-
-    /**
-     * @expectedException \Recca0120\Upload\UploadException
-     */
-    public function test_cannot_read_file()
-    {
-        /*
-        |------------------------------------------------------------
-        | Set
-        |------------------------------------------------------------
-        */
-
-        $name = 'file';
-        $api = m::mock(Api::class);
-        $filesystem = new Filesystem();
-        $app = m::mock(ApplicationContract::class);
-        $file = m::mock(UploadedFile::class);
-        $response = m::mock(Response::class);
-        $uploader = new Uploader($api, $filesystem, $app);
-
-        /*
-        |------------------------------------------------------------
-        | Expectation
-        |------------------------------------------------------------
-        */
-
-        $app->shouldReceive('storagePath')->andReturn(__DIR__);
-
-        $api
-            ->shouldReceive('setName')->with($name)->once()->andReturn(false)
-            ->shouldReceive('hasChunks')->once()->andReturn(true)
-            ->shouldReceive('getResourceName')->once()->andReturn($name)
-            ->shouldReceive('getStartOffset')->once()->andReturn(10)
-            ->shouldReceive('getPartialName')->once()->andReturn('bbb');
-
-        /*
-        |------------------------------------------------------------
-        | Assertion
-        |------------------------------------------------------------
-        */
-
-        $uploader->receive($name, function ($r) use ($response) {
-            return $response;
-        });
-
-        @rmdir(__DIR__.'/uploadchunks');
     }
 
     public function test_receive_chunked_file_completed()
@@ -154,13 +111,14 @@ class UploaderTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $name = 'file';
+        $file = __FILE__;
+        $name = basename($file);
         $api = m::mock(Api::class);
-        $filesystem = new Filesystem();
+        $filesystem = m::mock(Filesystem::class);
         $app = m::mock(ApplicationContract::class);
         $file = m::mock(UploadedFile::class);
         $response = m::mock(Response::class);
-        $uploader = new Uploader($api, $filesystem, $app);
+        $adapter = new Adapter($api, $filesystem, $app);
 
         /*
         |------------------------------------------------------------
@@ -168,14 +126,30 @@ class UploaderTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
+        $filesystem
+            ->shouldReceive('isDirectory')->andReturn(false)
+            ->shouldReceive('makeDirectory')
+            ->shouldReceive('appendStream')->once()
+            ->shouldReceive('move')->once()
+            ->shouldReceive('isFile')->once()->andReturn(true)
+            ->shouldReceive('delete')->once()
+            ->shouldReceive('files')->once()->andReturn([
+                'foo',
+                'bar',
+            ])
+            ->shouldReceive('exists')->with('foo')->andReturn(true)
+            ->shouldReceive('lastModified')->with('foo')->andReturn(time() + 601)
+            ->shouldReceive('delete')
+            ->shouldReceive('exists')->with('bar')->andReturn(false);
+
         $app->shouldReceive('storagePath')->andReturn(__DIR__);
 
         $api
             ->shouldReceive('setName')->with($name)->once()->andReturn(false)
             ->shouldReceive('hasChunks')->once()->andReturn(true)
-            ->shouldReceive('getResourceName')->once()->andReturn(__FILE__)
+            ->shouldReceive('getResourceName')->once()->andReturn($name)
             ->shouldReceive('getStartOffset')->once()->andReturn(10)
-            ->shouldReceive('getPartialName')->once()->andReturn($name)
+            ->shouldReceive('getPartialName')->once()->andReturn('../'.$name)
             ->shouldReceive('isCompleted')->once()->andReturn(true)
             ->shouldReceive('getOriginalName')->once()->andReturn($name)
             ->shouldReceive('getMimeType')->once()->andReturn('')
@@ -187,11 +161,8 @@ class UploaderTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $uploader->receive($name, function ($r) use ($response) {
+        $adapter->receive($name, function ($r) use ($response) {
             return $response;
         });
-
-        $filesystem->deleteDirectory(__DIR__.'/uploadchunks', true);
-        @rmdir(__DIR__.'/uploadchunks');
     }
 }

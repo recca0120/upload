@@ -23,7 +23,7 @@ class Manager extends BaseManager
      */
     protected function createFileapiDriver()
     {
-        return $this->app->make(Uploader::class, [
+        return $this->app->make(Adapter::class, [
             $this->app->make(FileAPI::class),
         ]);
     }
@@ -35,7 +35,7 @@ class Manager extends BaseManager
      */
     protected function createPluploadDriver()
     {
-        return $this->app->make(Uploader::class, [
+        return $this->app->make(Adapter::class, [
             $this->app->make(Plupload::class),
         ]);
     }
