@@ -130,7 +130,9 @@ class AdapterTest extends PHPUnit_Framework_TestCase
             ->shouldReceive('isDirectory')->andReturn(false)
             ->shouldReceive('makeDirectory')
             ->shouldReceive('appendStream')->once()
-            ->shouldReceive('move')->once()
+            ->shouldReceive('move')->once()->andReturnUsing(function () {
+                var_dump(func_get_args());
+            })
             ->shouldReceive('isFile')->once()->andReturn(true)
             ->shouldReceive('delete')->once()
             ->shouldReceive('files')->once()->andReturn([
@@ -141,7 +143,7 @@ class AdapterTest extends PHPUnit_Framework_TestCase
             ->shouldReceive('lastModified')->with('foo')->andReturn(time() + 601)
             ->shouldReceive('delete')
             ->shouldReceive('exists')->with('bar')->andReturn(false)
-            ->shouldReceive('size')->once();
+            ->shouldReceive('size')->once()->andReturn(filesize(__FILE__));
 
         $app->shouldReceive('storagePath')->andReturn(__DIR__);
 
