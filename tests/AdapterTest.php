@@ -140,7 +140,8 @@ class AdapterTest extends PHPUnit_Framework_TestCase
             ->shouldReceive('exists')->with('foo')->andReturn(true)
             ->shouldReceive('lastModified')->with('foo')->andReturn(time() + 601)
             ->shouldReceive('delete')
-            ->shouldReceive('exists')->with('bar')->andReturn(false);
+            ->shouldReceive('exists')->with('bar')->andReturn(false)
+            ->shouldReceive('size')->once();
 
         $app->shouldReceive('storagePath')->andReturn(__DIR__);
 

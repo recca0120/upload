@@ -83,7 +83,7 @@ class Adapter
         $mimeType = $this->api->getMimeType();
         $tmpName = substr($partialName, 0, -5);
         $this->filesystem->move($partialName, $tmpName);
-        $file = new UploadedFile($tmpName, $originalName, $mimeType, filesize($tmpName), UPLOAD_ERR_OK, true);
+        $file = new UploadedFile($tmpName, $originalName, $mimeType, $this->filesystem->size($tmpName), UPLOAD_ERR_OK, true);
 
         $response = $closure($file);
         if ($this->filesystem->isFile($tmpName) === true) {
