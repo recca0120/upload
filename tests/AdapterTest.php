@@ -130,9 +130,7 @@ class AdapterTest extends PHPUnit_Framework_TestCase
             ->shouldReceive('isDirectory')->andReturn(false)
             ->shouldReceive('makeDirectory')
             ->shouldReceive('appendStream')->once()
-            ->shouldReceive('move')->once()->andReturnUsing(function () {
-                var_dump(func_get_args());
-            })
+            ->shouldReceive('move')->once()
             ->shouldReceive('isFile')->once()->andReturn(true)
             ->shouldReceive('delete')->once()
             ->shouldReceive('files')->once()->andReturn([
