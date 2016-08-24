@@ -72,7 +72,7 @@ class Adapter
 
         $resourceName = $this->api->getResourceName();
         $startOffset = $this->api->getStartOffset();
-        $partialName = $this->getChunkPath().$this->api->getPartialName().'.part';
+        $partialName = $this->api->getPartialName($this->getChunkPath());
         $this->filesystem->appendStream($resourceName, $partialName, $startOffset);
 
         if ($this->api->isCompleted() === false) {
@@ -89,7 +89,6 @@ class Adapter
         if ($this->filesystem->isFile($tmpName) === true) {
             $this->filesystem->delete($tmpName);
         }
-
         $response = $this->api->completedResponse($response);
 
         $this->removeOldData();

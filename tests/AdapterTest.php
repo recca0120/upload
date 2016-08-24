@@ -111,8 +111,8 @@ class AdapterTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $file = __FILE__;
-        $name = basename($file);
+        $filename = __FILE__;
+        $name = basename($filename);
         $api = m::mock(Api::class);
         $filesystem = m::mock(Filesystem::class);
         $app = m::mock(ApplicationContract::class);
@@ -150,7 +150,7 @@ class AdapterTest extends PHPUnit_Framework_TestCase
             ->shouldReceive('hasChunks')->once()->andReturn(true)
             ->shouldReceive('getResourceName')->once()->andReturn($name)
             ->shouldReceive('getStartOffset')->once()->andReturn(10)
-            ->shouldReceive('getPartialName')->once()->andReturn('../'.$name)
+            ->shouldReceive('getPartialName')->once()->andReturn($filename.'.part')
             ->shouldReceive('isCompleted')->once()->andReturn(true)
             ->shouldReceive('getOriginalName')->once()->andReturn($name)
             ->shouldReceive('getMimeType')->once()->andReturn('')

@@ -84,7 +84,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         $this->assertSame($api->getMimeType(), 'image/jpg');
         $this->assertSame($api->getResourceName(), 'php://input');
         $this->assertSame($api->isCompleted(), false);
-        $this->assertSame($api->getPartialName(), md5($originalName).$api->getExtension($originalName));
+        $this->assertSame($api->getPartialName(''), md5($originalName).$api->getExtension($originalName).'.part');
 
         $response = $api->chunkedResponse($response);
         $this->assertSame($response->headers->get('X-Last-Known-Byte'), $end);
