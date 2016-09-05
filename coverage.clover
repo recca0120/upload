@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1473132203">
+  <project timestamp="1473132203">
+    <package name="Recca0120\Upload">
+      <file name="C:\Users\recca\UniServerZ\www\driways\laravel\vendor\recca0120\upload\src/Adapter.php">
+        <class name="Adapter" namespace="Recca0120\Upload">
+          <metrics complexity="13" methods="4" coveredmethods="4" conditionals="0" coveredconditionals="0" statements="35" coveredstatements="35" elements="39" coveredelements="39"/>
+        </class>
+        <line num="49" type="method" name="__construct" visibility="public" complexity="1" crap="1" count="3"/>
+        <line num="51" type="stmt" count="3"/>
+        <line num="52" type="stmt" count="3"/>
+        <line num="53" type="stmt" count="3"/>
+        <line num="54" type="stmt" count="3"/>
+        <line num="66" type="method" name="receive" visibility="public" complexity="4" crap="4" count="3"/>
+        <line num="68" type="stmt" count="3"/>
+        <line num="69" type="stmt" count="3"/>
+        <line num="70" type="stmt" count="1"/>
+        <line num="73" type="stmt" count="2"/>
+        <line num="74" type="stmt" count="2"/>
+        <line num="75" type="stmt" count="2"/>
+        <line num="76" type="stmt" count="2"/>
+        <line num="78" type="stmt" count="2"/>
+        <line num="79" type="stmt" count="1"/>
+        <line num="82" type="stmt" count="1"/>
+        <line num="83" type="stmt" count="1"/>
+        <line num="84" type="stmt" count="1"/>
+        <line num="85" type="stmt" count="1"/>
+        <line num="86" type="stmt" count="1"/>
+        <line num="88" type="stmt" count="1"/>
+        <line num="89" type="stmt" count="1"/>
+        <line num="90" type="stmt" count="1"/>
+        <line num="92" type="stmt" count="1"/>
+        <line num="94" type="stmt" count="1"/>
+        <line num="96" type="stmt" count="1"/>
+        <line num="106" type="method" name="getChunkPath" visibility="protected" complexity="2" crap="2" count="2"/>
+        <line num="108" type="stmt" count="2"/>
+        <line num="109" type="stmt" count="2"/>
+        <line num="110" type="stmt" count="1"/>
+        <line num="113" type="stmt" count="2"/>
+        <line num="121" type="method" name="removeOldData" visibility="public" complexity="6" crap="6" count="1"/>
+        <line num="123" type="stmt" count="1"/>
+        <line num="124" type="stmt" count="1"/>
+        <line num="125" type="stmt" count="1"/>
+        <line num="126" type="stmt" count="1"/>
+        <line num="127" type="stmt" count="1"/>
+        <line num="128" type="stmt" count="1"/>
+        <line num="131" type="stmt" count="1"/>
+        <metrics loc="132" ncloc="81" classes="1" methods="4" coveredmethods="4" conditionals="0" coveredconditionals="0" statements="35" coveredstatements="35" elements="39" coveredelements="39"/>
+      </file>
+      <file name="C:\Users\recca\UniServerZ\www\driways\laravel\vendor\recca0120\upload\src/Api.php">
+        <class name="Api" namespace="Recca0120\Upload">
+          <metrics complexity="15" methods="8" coveredmethods="8" conditionals="0" coveredconditionals="0" statements="16" coveredstatements="16" elements="24" coveredelements="24"/>
+        </class>
+        <line num="32" type="method" name="__construct" visibility="public" complexity="1" crap="1" count="1"/>
+        <line num="34" type="stmt" count="1"/>
+        <line num="35" type="stmt" count="1"/>
+        <line num="44" type="method" name="setName" visibility="public" complexity="1" crap="1" count="3"/>
+        <line num="46" type="stmt" count="3"/>
+        <line num="48" type="stmt" count="3"/>
+        <line num="58" type="method" name="getFile" visibility="public" complexity="1" crap="1" count="1"/>
+        <line num="60" type="stmt" count="1"/>
+        <line num="70" type="method" name="getPartialName" visibility="public" complexity="1" crap="1" count="2"/>
+        <line num="72" type="stmt" count="2"/>
+        <line num="73" type="stmt" count="2"/>
+        <line num="74" type="stmt" count="2"/>
+        <line num="76" type="stmt" count="2"/>
+        <line num="88" type="method" name="getExtension" visibility="public" complexity="2" crap="2" count="2"/>
+        <line num="90" type="stmt" count="2"/>
+        <line num="91" type="stmt" count="2"/>
+        <line num="92" type="stmt" count="2"/>
+        <line num="95" type="stmt" count="2"/>
+        <line num="107" type="method" name="chunkedResponse" visibility="public" complexity="1" crap="1" count="1"/>
+        <line num="109" type="stmt" count="1"/>
+        <line num="121" type="method" name="completedResponse" visibility="public" complexity="1" crap="1" count="1"/>
+        <line num="123" type="stmt" count="1"/>
+        <line num="131" type="method" name="getMaxFilesize" visibility="public" complexity="1" crap="1" count="1"/>
+        <line num="133" type="stmt" count="1"/>
+        <metrics loc="189" ncloc="77" classes="1" methods="8" coveredmethods="8" conditionals="0" coveredconditionals="0" statements="16" coveredstatements="16" elements="24" coveredelements="24"/>
+      </file>
+      <file name="C:\Users\recca\UniServerZ\www\driways\laravel\vendor\recca0120\upload\src/FileAPI.php">
+        <class name="FileAPI" namespace="Recca0120\Upload">
+          <metrics complexity="11" methods="9" coveredmethods="9" conditionals="0" coveredconditionals="0" statements="24" coveredstatements="24" elements="33" coveredelements="33"/>
+        </class>
+        <line num="45" type="method" name="__construct" visibility="public" complexity="1" crap="1" count="2"/>
+        <line num="47" type="stmt" count="2"/>
+        <line num="48" type="stmt" count="2"/>
+        <line num="49" type="stmt" count="2"/>
+        <line num="56" type="method" name="parseContentRange" visibility="protected" complexity="2" crap="2" count="2"/>
+        <line num="58" type="stmt" count="2"/>
+        <line num="59" type="stmt" count="2"/>
+        <line num="60" type="stmt" count="1"/>
+        <line num="62" type="stmt" count="1"/>
+        <line num="63" type="stmt" count="1"/>
+        <line num="64" type="stmt" count="1"/>
+        <line num="65" type="stmt" count="1"/>
+        <line num="66" type="stmt" count="1"/>
+        <line num="67" type="stmt" count="1"/>
+        <line num="76" type="method" name="getOriginalName" visibility="public" complexity="2" crap="2" count="2"/>
+        <line num="78" type="stmt" count="2"/>
+        <line num="79" type="stmt" count="2"/>
+        <line num="80" type="stmt" count="1"/>
+        <line num="83" type="stmt" count="1"/>
+        <line num="85" type="stmt" count="1"/>
+        <line num="95" type="method" name="hasChunks" visibility="public" complexity="1" crap="1" count="1"/>
+        <line num="97" type="stmt" count="1"/>
+        <line num="107" type="method" name="getStartOffset" visibility="public" complexity="1" crap="1" count="1"/>
+        <line num="109" type="stmt" count="1"/>
+        <line num="119" type="method" name="isCompleted" visibility="public" complexity="1" crap="1" count="1"/>
+        <line num="121" type="stmt" count="1"/>
+        <line num="131" type="method" name="getMimeType" visibility="public" complexity="1" crap="1" count="1"/>
+        <line num="133" type="stmt" count="1"/>
+        <line num="143" type="method" name="getResourceName" visibility="public" complexity="1" crap="1" count="1"/>
+        <line num="145" type="stmt" count="1"/>
+        <line num="157" type="method" name="chunkedResponse" visibility="public" complexity="1" crap="1" count="1"/>
+        <line num="159" type="stmt" count="1"/>
+        <line num="161" type="stmt" count="1"/>
+        <metrics loc="163" ncloc="80" classes="1" methods="9" coveredmethods="9" conditionals="0" coveredconditionals="0" statements="24" coveredstatements="24" elements="33" coveredelements="33"/>
+      </file>
+      <file name="C:\Users\recca\UniServerZ\www\driways\laravel\vendor\recca0120\upload\src/Filesystem.php">
+        <class name="Filesystem" namespace="Recca0120\Upload">
+          <metrics complexity="8" methods="1" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="14" coveredstatements="0" elements="15" coveredelements="0"/>
+        </class>
+        <line num="18" type="method" name="appendStream" visibility="public" complexity="8" crap="72" count="0"/>
+        <line num="20" type="stmt" count="0"/>
+        <line num="22" type="stmt" count="0"/>
+        <line num="23" type="stmt" count="0"/>
+        <line num="24" type="stmt" count="0"/>
+        <line num="27" type="stmt" count="0"/>
+        <line num="28" type="stmt" count="0"/>
+        <line num="29" type="stmt" count="0"/>
+        <line num="32" type="stmt" count="0"/>
+        <line num="33" type="stmt" count="0"/>
+        <line num="36" type="stmt" count="0"/>
+        <line num="37" type="stmt" count="0"/>
+        <line num="40" type="stmt" count="0"/>
+        <line num="41" type="stmt" count="0"/>
+        <line num="42" type="stmt" count="0"/>
+        <metrics loc="43" ncloc="34" classes="1" methods="1" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="14" coveredstatements="0" elements="15" coveredelements="0"/>
+      </file>
+      <file name="C:\Users\recca\UniServerZ\www\driways\laravel\vendor\recca0120\upload\src/Manager.php">
+        <class name="Manager" namespace="Recca0120\Upload">
+          <metrics complexity="3" methods="3" coveredmethods="3" conditionals="0" coveredconditionals="0" statements="5" coveredstatements="5" elements="8" coveredelements="8"/>
+        </class>
+        <line num="14" type="method" name="getDefaultDriver" visibility="public" complexity="1" crap="1" count="1"/>
+        <line num="16" type="stmt" count="1"/>
+        <line num="24" type="method" name="createFileapiDriver" visibility="protected" complexity="1" crap="1" count="1"/>
+        <line num="26" type="stmt" count="1"/>
+        <line num="27" type="stmt" count="1"/>
+        <line num="36" type="method" name="createPluploadDriver" visibility="protected" complexity="1" crap="1" count="1"/>
+        <line num="38" type="stmt" count="1"/>
+        <line num="39" type="stmt" count="1"/>
+        <metrics loc="42" ncloc="27" classes="1" methods="3" coveredmethods="3" conditionals="0" coveredconditionals="0" statements="5" coveredstatements="5" elements="8" coveredelements="8"/>
+      </file>
+      <file name="C:\Users\recca\UniServerZ\www\driways\laravel\vendor\recca0120\upload\src/Plupload.php">
+        <class name="Plupload" namespace="Recca0120\Upload">
+          <metrics complexity="8" methods="7" coveredmethods="7" conditionals="0" coveredconditionals="0" statements="16" coveredstatements="16" elements="23" coveredelements="23"/>
+        </class>
+        <line num="16" type="method" name="getOriginalName" visibility="public" complexity="1" crap="1" count="1"/>
+        <line num="18" type="stmt" count="1"/>
+        <line num="28" type="method" name="hasChunks" visibility="public" complexity="1" crap="1" count="1"/>
+        <line num="30" type="stmt" count="1"/>
+        <line num="40" type="method" name="getStartOffset" visibility="public" complexity="2" crap="2" count="1"/>
+        <line num="42" type="stmt" count="1"/>
+        <line num="43" type="stmt" count="1"/>
+        <line num="44" type="stmt" count="1"/>
+        <line num="46" type="stmt" count="1"/>
+        <line num="56" type="method" name="isCompleted" visibility="public" complexity="1" crap="1" count="1"/>
+        <line num="58" type="stmt" count="1"/>
+        <line num="59" type="stmt" count="1"/>
+        <line num="61" type="stmt" count="1"/>
+        <line num="71" type="method" name="getMimeType" visibility="public" complexity="1" crap="1" count="1"/>
+        <line num="73" type="stmt" count="1"/>
+        <line num="83" type="method" name="getResourceName" visibility="public" complexity="1" crap="1" count="1"/>
+        <line num="85" type="stmt" count="1"/>
+        <line num="97" type="method" name="completedResponse" visibility="public" complexity="1" crap="1" count="1"/>
+        <line num="99" type="stmt" count="1"/>
+        <line num="100" type="stmt" count="1"/>
+        <line num="101" type="stmt" count="1"/>
+        <line num="102" type="stmt" count="1"/>
+        <line num="105" type="stmt" count="1"/>
+        <metrics loc="107" ncloc="56" classes="1" methods="7" coveredmethods="7" conditionals="0" coveredconditionals="0" statements="16" coveredstatements="16" elements="23" coveredelements="23"/>
+      </file>
+      <file name="C:\Users\recca\UniServerZ\www\driways\laravel\vendor\recca0120\upload\src/ServiceProvider.php">
+        <class name="ServiceProvider" namespace="Recca0120\Upload">
+          <metrics complexity="2" methods="1" coveredmethods="1" conditionals="0" coveredconditionals="0" statements="2" coveredstatements="2" elements="3" coveredelements="3"/>
+        </class>
+        <line num="16" type="method" name="anonymous function" complexity="1" crap="1" count="1"/>
+        <line num="17" type="stmt" count="1"/>
+        <line num="18" type="stmt" count="1"/>
+        <line num="19" type="stmt" count="1"/>
+        <metrics loc="20" ncloc="15" classes="1" methods="1" coveredmethods="1" conditionals="0" coveredconditionals="0" statements="3" coveredstatements="3" elements="4" coveredelements="4"/>
+      </file>
+      <file name="C:\Users\recca\UniServerZ\www\driways\laravel\vendor\recca0120\upload\src/UploadException.php">
+        <class name="UploadException" namespace="Recca0120\Upload">
+          <metrics complexity="0" methods="0" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="0" coveredstatements="0" elements="0" coveredelements="0"/>
+        </class>
+        <metrics loc="9" ncloc="9" classes="1" methods="0" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="0" coveredstatements="0" elements="0" coveredelements="0"/>
+      </file>
+    </package>
+    <package name="Recca0120\Upload\Facades">
+      <file name="C:\Users\recca\UniServerZ\www\driways\laravel\vendor\recca0120\upload\src/Facades/AjaxUpload.php">
+        <class name="AjaxUpload" namespace="Recca0120\Upload\Facades">
+          <metrics complexity="1" methods="1" coveredmethods="1" conditionals="0" coveredconditionals="0" statements="1" coveredstatements="1" elements="2" coveredelements="2"/>
+        </class>
+        <line num="15" type="method" name="getFacadeAccessor" visibility="protected" complexity="1" crap="1" count="1"/>
+        <line num="17" type="stmt" count="1"/>
+        <metrics loc="19" ncloc="14" classes="1" methods="1" coveredmethods="1" conditionals="0" coveredconditionals="0" statements="1" coveredstatements="1" elements="2" coveredelements="2"/>
+      </file>
+    </package>
+    <metrics files="9" loc="724" ncloc="393" classes="9" methods="34" coveredmethods="33" conditionals="0" coveredconditionals="0" statements="114" coveredstatements="100" elements="148" coveredelements="133"/>
+  </project>
+</coverage>

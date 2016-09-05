@@ -27,7 +27,9 @@ class ServiceProviderTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $app->shouldReceive('singleton')->with(Manager::class, m::type(Closure::class))->once();
+        $app->shouldReceive('singleton')->with(Manager::class, m::type(Closure::class))->once()->andReturnUsing(function ($className, $closure) use ($app) {
+            return $closure($app);
+        });
 
         /*
         |------------------------------------------------------------
