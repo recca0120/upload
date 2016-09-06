@@ -99,7 +99,7 @@ class Plupload extends Api
         $data = $response->getData();
         $response->setData([
             'jsonrpc' => '2.0',
-            'result'  => $data,
+            'result' => $data,
         ]);
 
         return $response;

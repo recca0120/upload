@@ -44,7 +44,7 @@ class PluploadTest extends PHPUnit_Framework_TestCase
             ->shouldReceive('getData')->once()->andReturn([])
             ->shouldReceive('setData')->once()->with([
                 'jsonrpc' => '2.0',
-                'result'  => [],
+                'result' => [],
             ]);
 
         $file
