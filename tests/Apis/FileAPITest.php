@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Mockery as m;
-use Recca0120\Upload\FileAPI;
+use Recca0120\Upload\Apis\FileAPI;
 use Symfony\Component\HttpFoundation\Response;
 
 class FileAPITest extends PHPUnit_Framework_TestCase

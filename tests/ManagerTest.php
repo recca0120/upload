@@ -2,10 +2,10 @@
 
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Mockery as m;
-use Recca0120\Upload\Adapter;
-use Recca0120\Upload\FileAPI;
+use Recca0120\Upload\ApiAdapter;
+use Recca0120\Upload\Apis\FileAPI;
 use Recca0120\Upload\Manager;
-use Recca0120\Upload\Plupload;
+use Recca0120\Upload\Apis\Plupload;
 
 class ManagerTest extends PHPUnit_Framework_TestCase
 {
@@ -31,7 +31,7 @@ class ManagerTest extends PHPUnit_Framework_TestCase
         */
 
         $app
-            ->shouldReceive('make')->with(Adapter::class, m::type('array'))
+            ->shouldReceive('make')->with(ApiAdapter::class, m::type('array'))
             ->shouldReceive('make')->with(FileAPI::class);
 
         /*
@@ -61,7 +61,7 @@ class ManagerTest extends PHPUnit_Framework_TestCase
         */
 
         $app
-            ->shouldReceive('make')->with(Adapter::class, m::type('array'))
+            ->shouldReceive('make')->with(ApiAdapter::class, m::type('array'))
             ->shouldReceive('make')->with(Plupload::class);
 
         /*

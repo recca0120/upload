@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Mockery as m;
-use Recca0120\Upload\Plupload;
+use Recca0120\Upload\Apis\Plupload;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 

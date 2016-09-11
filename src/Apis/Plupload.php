@@ -1,6 +1,6 @@
 <?php
 
-namespace Recca0120\Upload;
+namespace Recca0120\Upload\Apis;
 
 use Symfony\Component\HttpFoundation\Response;
 

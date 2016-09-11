@@ -2,13 +2,13 @@
 
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Mockery as m;
-use Recca0120\Upload\Adapter;
-use Recca0120\Upload\Api;
+use Recca0120\Upload\ApiAdapter;
+use Recca0120\Upload\Apis\Api;
 use Recca0120\Upload\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 
-class AdapterTest extends PHPUnit_Framework_TestCase
+class ApiAdapterTest extends PHPUnit_Framework_TestCase
 {
     public function tearDown()
     {
@@ -28,7 +28,7 @@ class AdapterTest extends PHPUnit_Framework_TestCase
         $filesystem = m::mock(Filesystem::class);
         $app = m::mock(ApplicationContract::class);
         $file = m::mock(UploadedFile::class);
-        $adapter = new Adapter($api, $filesystem, $app);
+        $adapter = new ApiAdapter($api, $filesystem, $app);
 
         /*
         |------------------------------------------------------------
@@ -65,7 +65,7 @@ class AdapterTest extends PHPUnit_Framework_TestCase
         $filesystem = m::mock(Filesystem::class);
         $app = m::mock(ApplicationContract::class);
         $file = m::mock(UploadedFile::class);
-        $adapter = new Adapter($api, $filesystem, $app);
+        $adapter = new ApiAdapter($api, $filesystem, $app);
 
         /*
         |------------------------------------------------------------
@@ -118,7 +118,7 @@ class AdapterTest extends PHPUnit_Framework_TestCase
         $app = m::mock(ApplicationContract::class);
         $file = m::mock(UploadedFile::class);
         $response = m::mock(Response::class);
-        $adapter = new Adapter($api, $filesystem, $app);
+        $adapter = new ApiAdapter($api, $filesystem, $app);
 
         /*
         |------------------------------------------------------------
