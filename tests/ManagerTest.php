@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Contracts\Foundation\Application as ApplicationContract;
+use Illuminate\Contracts\Foundation\Application;
 use Mockery as m;
 use Recca0120\Upload\ApiAdapter;
 use Recca0120\Upload\Apis\FileAPI;
@@ -22,7 +22,7 @@ class ManagerTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $app = m::mock(ApplicationContract::class);
+        $app = m::mock(Application::class);
 
         /*
         |------------------------------------------------------------
@@ -52,7 +52,7 @@ class ManagerTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $app = m::mock(ApplicationContract::class);
+        $app = m::mock(Application::class);
 
         /*
         |------------------------------------------------------------
