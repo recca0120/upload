@@ -3,7 +3,7 @@
 namespace Recca0120\Upload;
 
 use Closure;
-use Illuminate\Contracts\Foundation\Application as ApplicationContract;
+use Illuminate\Contracts\Foundation\Application;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 use Recca0120\Upload\Apis\Api;
@@ -43,11 +43,11 @@ class ApiAdapter
      *
      * @method __construct
      *
-     * @param \Recca0120\Upload\Apis\Api                        $api
+     * @param \Recca0120\Upload\Apis\Api                   $api
      * @param \Recca0120\Upload\Filesystem                 $filesystem
      * @param \Illuminate\Contracts\Foundation\Application $app
      */
-    public function __construct(Api $api, Filesystem $filesystem, ApplicationContract $app)
+    public function __construct(Api $api, Filesystem $filesystem, Application $app)
     {
         $this->api = $api;
         $this->filesystem = $filesystem;

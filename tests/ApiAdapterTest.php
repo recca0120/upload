@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Contracts\Foundation\Application as ApplicationContract;
+use Illuminate\Contracts\Foundation\Application;
 use Mockery as m;
 use Recca0120\Upload\ApiAdapter;
 use Recca0120\Upload\Apis\Api;
@@ -26,7 +26,7 @@ class ApiAdapterTest extends PHPUnit_Framework_TestCase
         $name = 'file';
         $api = m::mock(Api::class);
         $filesystem = m::mock(Filesystem::class);
-        $app = m::mock(ApplicationContract::class);
+        $app = m::mock(Application::class);
         $file = m::mock(UploadedFile::class);
         $adapter = new ApiAdapter($api, $filesystem, $app);
 
@@ -63,7 +63,7 @@ class ApiAdapterTest extends PHPUnit_Framework_TestCase
         $name = 'file';
         $api = m::mock(Api::class);
         $filesystem = m::mock(Filesystem::class);
-        $app = m::mock(ApplicationContract::class);
+        $app = m::mock(Application::class);
         $file = m::mock(UploadedFile::class);
         $adapter = new ApiAdapter($api, $filesystem, $app);
 
@@ -115,7 +115,7 @@ class ApiAdapterTest extends PHPUnit_Framework_TestCase
         $name = basename($filename);
         $api = m::mock(Api::class);
         $filesystem = m::mock(Filesystem::class);
-        $app = m::mock(ApplicationContract::class);
+        $app = m::mock(Application::class);
         $file = m::mock(UploadedFile::class);
         $response = m::mock(Response::class);
         $adapter = new ApiAdapter($api, $filesystem, $app);
