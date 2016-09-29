@@ -1,7 +1,6 @@
 <?php
 
 use Mockery as m;
-use Recca0120\Upload\Manager;
 use Recca0120\Upload\ServiceProvider;
 
 class ServiceProviderTest extends PHPUnit_Framework_TestCase
@@ -19,7 +18,7 @@ class ServiceProviderTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $app = m::mock(ApplictionContract::class);
+        $app = m::mock('Illuminate\Contracts\Foundation\Application');
 
         /*
         |------------------------------------------------------------
@@ -27,7 +26,7 @@ class ServiceProviderTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $app->shouldReceive('singleton')->with(Manager::class, m::type(Closure::class))->once()->andReturnUsing(function ($className, $closure) use ($app) {
+        $app->shouldReceive('singleton')->with('Recca0120\Upload\Manager', m::type('Closure'))->once()->andReturnUsing(function ($className, $closure) use ($app) {
             return $closure($app);
         });
 

@@ -1,12 +1,7 @@
 <?php
 
-use Illuminate\Contracts\Foundation\Application;
 use Mockery as m;
 use Recca0120\Upload\ApiAdapter;
-use Recca0120\Upload\Apis\Api;
-use Recca0120\Upload\Filesystem;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\Response;
 
 class ApiAdapterTest extends PHPUnit_Framework_TestCase
 {
@@ -24,10 +19,10 @@ class ApiAdapterTest extends PHPUnit_Framework_TestCase
         */
 
         $name = 'file';
-        $api = m::mock(Api::class);
-        $filesystem = m::mock(Filesystem::class);
-        $app = m::mock(Application::class);
-        $file = m::mock(UploadedFile::class);
+        $api = m::mock('Recca0120\Upload\Apis\Api');
+        $filesystem = m::mock('Recca0120\Upload\Filesystem');
+        $app = m::mock('Illuminate\Contracts\Foundation\Application');
+        $file = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile');
         $adapter = new ApiAdapter($api, $filesystem, $app);
 
         /*
@@ -61,10 +56,10 @@ class ApiAdapterTest extends PHPUnit_Framework_TestCase
         */
 
         $name = 'file';
-        $api = m::mock(Api::class);
-        $filesystem = m::mock(Filesystem::class);
-        $app = m::mock(Application::class);
-        $file = m::mock(UploadedFile::class);
+        $api = m::mock('Recca0120\Upload\Apis\Api');
+        $filesystem = m::mock('Recca0120\Upload\Filesystem');
+        $app = m::mock('Illuminate\Contracts\Foundation\Application');
+        $file = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile');
         $adapter = new ApiAdapter($api, $filesystem, $app);
 
         /*
@@ -90,7 +85,7 @@ class ApiAdapterTest extends PHPUnit_Framework_TestCase
             ->shouldReceive('getStartOffset')->once()->andReturn(10)
             ->shouldReceive('getPartialName')->once()->andReturn($name)
             ->shouldReceive('isCompleted')->once()->andReturn(false)
-            ->shouldReceive('chunkedResponse')->with(m::type(Response::class));
+            ->shouldReceive('chunkedResponse')->with(m::type('Symfony\Component\HttpFoundation\Response'));
 
         /*
         |------------------------------------------------------------
@@ -113,11 +108,11 @@ class ApiAdapterTest extends PHPUnit_Framework_TestCase
 
         $filename = __FILE__;
         $name = basename($filename);
-        $api = m::mock(Api::class);
-        $filesystem = m::mock(Filesystem::class);
-        $app = m::mock(Application::class);
-        $file = m::mock(UploadedFile::class);
-        $response = m::mock(Response::class);
+        $api = m::mock('Recca0120\Upload\Apis\Api');
+        $filesystem = m::mock('Recca0120\Upload\Filesystem');
+        $app = m::mock('Illuminate\Contracts\Foundation\Application');
+        $file = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile');
+        $response = m::mock('Symfony\Component\HttpFoundation\Response');
         $adapter = new ApiAdapter($api, $filesystem, $app);
 
         /*

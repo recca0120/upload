@@ -1,9 +1,6 @@
 <?php
 
-use Illuminate\Contracts\Foundation\Application;
 use Mockery as m;
-use Recca0120\Upload\ApiAdapter;
-use Recca0120\Upload\Apis\FileAPI;
 use Recca0120\Upload\Manager;
 use Recca0120\Upload\Apis\Plupload;
 
@@ -22,7 +19,7 @@ class ManagerTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $app = m::mock(Application::class);
+        $app = m::mock('Illuminate\Contracts\Foundation\Application');
 
         /*
         |------------------------------------------------------------
@@ -31,8 +28,8 @@ class ManagerTest extends PHPUnit_Framework_TestCase
         */
 
         $app
-            ->shouldReceive('make')->with(ApiAdapter::class, m::type('array'))
-            ->shouldReceive('make')->with(FileAPI::class);
+            ->shouldReceive('make')->with('Recca0120\Upload\ApiAdapter', m::type('array'))
+            ->shouldReceive('make')->with('Recca0120\Upload\Apis\FileAPI');
 
         /*
         |------------------------------------------------------------
@@ -52,7 +49,7 @@ class ManagerTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $app = m::mock(Application::class);
+        $app = m::mock('Illuminate\Contracts\Foundation\Application');
 
         /*
         |------------------------------------------------------------
@@ -61,8 +58,8 @@ class ManagerTest extends PHPUnit_Framework_TestCase
         */
 
         $app
-            ->shouldReceive('make')->with(ApiAdapter::class, m::type('array'))
-            ->shouldReceive('make')->with(Plupload::class);
+            ->shouldReceive('make')->with('Recca0120\Upload\ApiAdapter', m::type('array'))
+            ->shouldReceive('make')->with('Recca0120\Upload\Apis\Plupload');
 
         /*
         |------------------------------------------------------------

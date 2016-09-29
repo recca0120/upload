@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Mockery as m;
 use Recca0120\Upload\Apis\FileAPI;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +19,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $request = m::mock(Request::class);
+        $request = m::mock('Illuminate\Http\Request');
 
         /*
         |------------------------------------------------------------
@@ -50,7 +49,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $request = m::mock(Request::class);
+        $request = m::mock('Illuminate\Http\Request');
         $response = new Response(null, 201);
 
         /*

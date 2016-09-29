@@ -1,9 +1,7 @@
 <?php
 
-use Illuminate\Contracts\Foundation\Application;
 use Mockery as m;
 use Recca0120\Upload\Facades\AjaxUpload;
-use Recca0120\Upload\Manager;
 
 class CartFacadeTest extends PHPUnit_Framework_TestCase
 {
@@ -20,7 +18,7 @@ class CartFacadeTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $app = m::mock(Application::class.','.ArrayAccess::class);
+        $app = m::mock('Illuminate\Contracts\Foundation\Application, ArrayAccess');
         AjaxUpload::setFacadeApplication($app);
 
         /*
@@ -29,7 +27,7 @@ class CartFacadeTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $app->shouldReceive('offsetGet')->with(Manager::class)->once();
+        $app->shouldReceive('offsetGet')->with('Recca0120\Upload\Manager')->once();
 
         /*
         |------------------------------------------------------------
