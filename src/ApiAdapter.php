@@ -106,7 +106,7 @@ class ApiAdapter
      */
     protected function getChunkPath()
     {
-        $path = $this->app->storagePath().'/uploadchunks/';
+        $path = $this->app->storagePath().'/app/upload-chunks/';
         if ($this->filesystem->isDirectory($path) === false) {
             $this->filesystem->makeDirectory($path, 0755, true, true);
         }
