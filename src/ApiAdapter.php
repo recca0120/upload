@@ -108,7 +108,7 @@ class ApiAdapter
     {
         $path = $this->app->storagePath().'/app/upload-chunks/';
         if ($this->filesystem->isDirectory($path) === false) {
-            $this->filesystem->makeDirectory($path, 0755, true, true);
+            $this->filesystem->makeDirectory($path, 0777, true, true);
         }
 
         return $path;
