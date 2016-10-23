@@ -40,7 +40,7 @@ class ApiAdapter
      * @param \Recca0120\Upload\Filesystem                 $filesystem
      * @param \Illuminate\Contracts\Foundation\Application $config
      */
-    public function __construct(Api $api, Filesystem $filesystem, $config = null)
+    public function __construct(Api $api, Filesystem $filesystem, $config = [])
     {
         $this->api = $api;
         $this->filesystem = $filesystem;
