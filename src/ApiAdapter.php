@@ -129,7 +129,7 @@ class ApiAdapter
      */
     public function getStoragePath() {
         $filesystem = $this->getFilsystem();
-        $path = Arr::get($this->config, 'path');
+        $path = Arr::get($this->config, 'storage');
         if ($filesystem->isDirectory($path) === false) {
             $filesystem->makeDirectory($path, 0777, true, true);
         }

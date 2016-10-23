@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'path' => storage_path('app/chunk-uploads').'/',
+    'storage' => storage_path('app/chunk-uploads').'/',
 ];
