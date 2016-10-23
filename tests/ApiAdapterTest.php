@@ -21,9 +21,9 @@ class ApiAdapterTest extends PHPUnit_Framework_TestCase
         $name = 'file';
         $api = m::mock('Recca0120\Upload\Apis\Api');
         $filesystem = m::mock('Recca0120\Upload\Filesystem');
-        $app = m::mock('Illuminate\Contracts\Foundation\Application');
         $file = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile');
-        $adapter = new ApiAdapter($api, $filesystem, $app);
+        $config = [];
+        $adapter = new ApiAdapter($api, $filesystem, $config);
 
         /*
         |------------------------------------------------------------
@@ -58,9 +58,9 @@ class ApiAdapterTest extends PHPUnit_Framework_TestCase
         $name = 'file';
         $api = m::mock('Recca0120\Upload\Apis\Api');
         $filesystem = m::mock('Recca0120\Upload\Filesystem');
-        $app = m::mock('Illuminate\Contracts\Foundation\Application');
         $file = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile');
-        $adapter = new ApiAdapter($api, $filesystem, $app);
+        $config = [];
+        $adapter = new ApiAdapter($api, $filesystem, $config);
 
         /*
         |------------------------------------------------------------
@@ -71,8 +71,6 @@ class ApiAdapterTest extends PHPUnit_Framework_TestCase
         $filesystem
             ->shouldReceive('isDirectory')->once()->andReturn(true)
             ->shouldReceive('updateStream')->once();
-
-        $app->shouldReceive('storagePath')->andReturn(__DIR__);
 
         // $filesystem
         //     ->shouldReceive('isDirectory')->with(__DIR__.'/uploadchunks/')->andReturn(false)
@@ -112,10 +110,10 @@ class ApiAdapterTest extends PHPUnit_Framework_TestCase
         $name = basename($filename);
         $api = m::mock('Recca0120\Upload\Apis\Api');
         $filesystem = m::mock('Recca0120\Upload\Filesystem');
-        $app = m::mock('Illuminate\Contracts\Foundation\Application');
         $file = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile');
         $response = m::mock('Symfony\Component\HttpFoundation\Response');
-        $adapter = new ApiAdapter($api, $filesystem, $app);
+        $config = [];
+        $adapter = new ApiAdapter($api, $filesystem, $config);
 
         /*
         |------------------------------------------------------------
