@@ -159,7 +159,12 @@ class ApiAdapterTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $adapter->receive($name, function ($r) use ($response) {
+        $adapter->receive($name, function ($file) use ($response) {
+            if (class_exists('Illuminate\Http\UploadedFile') === true) {
+                $this->assertInstanceOf('Illuminate\Http\UploadedFile', $file);
+            } else {
+                $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\UploadedFile', $file);
+            }
             return $response;
         });
     }

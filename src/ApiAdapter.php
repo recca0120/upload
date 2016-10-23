@@ -4,10 +4,9 @@ namespace Recca0120\Upload;
 
 use Closure;
 use Illuminate\Contracts\Foundation\Application;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\Response;
-use Recca0120\Upload\Apis\Api;
 use Illuminate\Support\Arr;
+use Recca0120\Upload\Apis\Api;
+use Symfony\Component\HttpFoundation\Response;
 
 class ApiAdapter
 {
@@ -82,9 +81,9 @@ class ApiAdapter
         $mimeType = $this->api->getMimeType();
         $tmpName = substr($partialName, 0, -5);
         $filesystem->move($partialName, $tmpName);
-        $file = new UploadedFile($tmpName, $originalName, $mimeType, $filesystem->size($tmpName), UPLOAD_ERR_OK, true);
+        $uploadedFile = $this->createUploadedFile($tmpName, $originalName, $mimeType, $filesystem->size($tmpName));
 
-        $response = $closure($file);
+        $response = $closure($uploadedFile);
         if ($filesystem->isFile($tmpName) === true) {
             $filesystem->delete($tmpName);
         }
@@ -93,6 +92,14 @@ class ApiAdapter
         $this->removeOldData();
 
         return $response;
+    }
+
+    protected function createUploadedFile($path, $originalName, $mimeType = null, $size = null) {
+        $class = class_exists('Illuminate\Http\UploadedFile') ?
+            'Illuminate\Http\UploadedFile':
+            'Symfony\Component\HttpFoundation\File\UploadedFile';
+
+        return new $class($path, $originalName, $mimeType, $size, UPLOAD_ERR_OK, true);
     }
 
     /**
