@@ -65,10 +65,10 @@ class ApiAdapter
         }
 
         $filesystem = $this->getFilsystem();
-        $storagePath = $this->getDisk();
+        $path = $this->getPath();
         $resource = $this->api->getResource();
         $startOffset = $this->api->getStartOffset();
-        $partialName = $storagePath.$this->api->getPartialName();
+        $partialName = $path.$this->api->getPartialName();
         $filesystem->updateStream($partialName, $resource, [
             'startOffset' => $startOffset
         ]);
@@ -89,7 +89,7 @@ class ApiAdapter
         }
         $response = $this->api->completedResponse($response);
 
-        $this->removeOldData();
+        $this->removeOldData($path, $this->maxFileAge);
 
         return $response;
     }
@@ -107,11 +107,10 @@ class ApiAdapter
      *
      * @method removeOldData
      */
-    public function removeOldData($path = null, $maxFileAge = null)
+    public function removeOldData($path, $maxFileAge = 600)
     {
         $filesystem = $this->getFilsystem();
-        $path = is_null($path) === true ? $this->getDisk() : $path;
-        $maxFileAge = is_null($maxFileAge) === true ? $this->maxFileAge : $path;
+        $path = is_null($path) === true ? $this->getPath() : $path;
         $time = time();
         foreach ($filesystem->files($path) as $file) {
             if ($filesystem->exists($file) === true && $filesystem->lastModified($file) < ($time - $this->maxFileAge)) {
@@ -121,15 +120,15 @@ class ApiAdapter
     }
 
     /**
-     * getDisk.
+     * getPath.
      *
-     * @method getDisk
+     * @method getPath
      *
      * @return string
      */
-    public function getDisk() {
+    public function getPath() {
         $filesystem = $this->getFilsystem();
-        $diskPath = Arr::get($this->config, 'disk');
+        $diskPath = Arr::get($this->config, 'path');
         if ($filesystem->isDirectory($diskPath) === false) {
             $filesystem->makeDirectory($diskPath, 0777, true, true);
         }
