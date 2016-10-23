@@ -70,7 +70,7 @@ class ApiAdapter
         $resource = $this->api->getResource();
         $startOffset = $this->api->getStartOffset();
         $partialName = $storagePath.$this->api->getPartialName();
-        $filesystem->updateStream($resource, $partialName, [
+        $filesystem->updateStream($partialName, $resource, [
             'startOffset' => $startOffset
         ]);
 

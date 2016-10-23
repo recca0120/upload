@@ -67,7 +67,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $filesystem->updateStream(fopen('php://input', 'w+'), null, 0);
+        $filesystem->updateStream(null, fopen('php://input', 'w+'), 0);
     }
 
     public function test_write()
@@ -96,7 +96,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $filesystem->updateStream($source, $target, 0);
+        $filesystem->updateStream($target, $source, 0);
         // $this->assertSame('writing to tempfile', file_get_contents($target));
         unlink($source);
         unlink($target);
@@ -128,7 +128,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $filesystem->updateStream($source, $target, 3);
+        $filesystem->updateStream($target, $source, 3);
         // $this->assertSame('writing to tempfile', file_get_contents($target));
         unlink($source);
         unlink($target);

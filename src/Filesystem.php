@@ -13,31 +13,31 @@ class Filesystem extends IlluminateFilesystem
      *
      * @method appendStream
      *
-     * @param string|resource $source
-     * @param string|resource $target
+     * @param string|resource $resource
+     * @param string|resource $path
      * @param int             $offset
      */
-    public function updateStream($source, $target, $config = [])
+    public function updateStream($path, $resource, $config = [])
     {
         $offset = Arr::get($config, 'offset', 0);
         $mode = ($offset === 0) ? 'wb' : 'ab';
 
-        $sourceStream = (is_resource($source) === true) ? $source : @fopen($source, $mode);
-        if (is_resource($sourceStream) === false) {
+        $resourceStream = (is_resource($resource) === true) ? $resource : @fopen($resource, $mode);
+        if (is_resource($resourceStream) === false) {
             throw new InvalidUploadException('Failed to open input stream.', 101);
         }
 
-        $targetStream = (is_resource($target) === true) ? $target : @fopen($target, $mode);
-        if (is_resource($targetStream) === false) {
+        $pathStream = (is_resource($path) === true) ? $path : @fopen($path, $mode);
+        if (is_resource($pathStream) === false) {
             throw new InvalidUploadException('Failed to open output stream.', 102);
         }
 
-        fseek($targetStream, $offset);
-        while ($buffer = fread($sourceStream, 4096)) {
-            fwrite($targetStream, $buffer);
+        fseek($pathStream, $offset);
+        while ($buffer = fread($resourceStream, 4096)) {
+            fwrite($pathStream, $buffer);
         }
 
-        @fclose($sourceStream);
-        @fclose($targetStream);
+        @fclose($resourceStream);
+        @fclose($pathStream);
     }
 }
