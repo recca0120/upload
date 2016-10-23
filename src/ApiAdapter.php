@@ -3,7 +3,6 @@
 namespace Recca0120\Upload;
 
 use Closure;
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Arr;
 use Recca0120\Upload\Apis\Api;
 use Symfony\Component\HttpFoundation\Response;
@@ -70,7 +69,7 @@ class ApiAdapter
         $startOffset = $this->api->getStartOffset();
         $partialName = $path.$this->api->getPartialName();
         $filesystem->updateStream($partialName, $resource, [
-            'startOffset' => $startOffset
+            'startOffset' => $startOffset,
         ]);
 
         if ($this->api->isCompleted() === false) {
@@ -94,9 +93,10 @@ class ApiAdapter
         return $response;
     }
 
-    protected function createUploadedFile($path, $originalName, $mimeType = null, $size = null) {
+    protected function createUploadedFile($path, $originalName, $mimeType = null, $size = null)
+    {
         $class = class_exists('Illuminate\Http\UploadedFile') ?
-            'Illuminate\Http\UploadedFile':
+            'Illuminate\Http\UploadedFile' :
             'Symfony\Component\HttpFoundation\File\UploadedFile';
 
         return new $class($path, $originalName, $mimeType, $size, UPLOAD_ERR_OK, true);
@@ -126,7 +126,8 @@ class ApiAdapter
      *
      * @return string
      */
-    public function getPath() {
+    public function getPath()
+    {
         $filesystem = $this->getFilsystem();
         $diskPath = Arr::get($this->config, 'path');
         if ($filesystem->isDirectory($diskPath) === false) {
@@ -136,7 +137,8 @@ class ApiAdapter
         return $diskPath;
     }
 
-    public function getFilsystem() {
+    public function getFilsystem()
+    {
         return $this->filesystem;
     }
 }

@@ -79,7 +79,7 @@ class ApiAdapterTest extends PHPUnit_Framework_TestCase
         $api
             ->shouldReceive('setName')->with($name)->once()->andReturn(false)
             ->shouldReceive('hasChunks')->once()->andReturn(true)
-            ->shouldReceive('getResource')->once()->andReturnUsing(function() {
+            ->shouldReceive('getResource')->once()->andReturnUsing(function () {
                 return fopen(__FILE__, 'rb');
             })
             ->shouldReceive('getStartOffset')->once()->andReturn(10)
@@ -141,7 +141,7 @@ class ApiAdapterTest extends PHPUnit_Framework_TestCase
         $api
             ->shouldReceive('setName')->with($name)->once()->andReturn(false)
             ->shouldReceive('hasChunks')->once()->andReturn(true)
-            ->shouldReceive('getResource')->once()->andReturnUsing(function() {
+            ->shouldReceive('getResource')->once()->andReturnUsing(function () {
                 return fopen(__FILE__, 'rb');
             })
             ->shouldReceive('getStartOffset')->once()->andReturn(10)
@@ -163,6 +163,7 @@ class ApiAdapterTest extends PHPUnit_Framework_TestCase
             } else {
                 $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\UploadedFile', $file);
             }
+
             return $response;
         });
     }

@@ -29,7 +29,7 @@ class Manager extends BaseManager
 
         return $this->app->make(ApiAdapter::class, [
             $this->app->make(FileAPI::class),
-            'config' => $config
+            'config' => $config,
         ]);
     }
 
@@ -44,7 +44,7 @@ class Manager extends BaseManager
 
         return $this->app->make(ApiAdapter::class, [
             $this->app->make(Plupload::class),
-            'config' => $config
+            'config' => $config,
         ]);
     }
 }
