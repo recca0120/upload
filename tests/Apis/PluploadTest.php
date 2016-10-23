@@ -34,7 +34,7 @@ class PluploadTest extends PHPUnit_Framework_TestCase
             ->shouldReceive('get')->with('chunk', 1)->twice()->andReturn('6')
             ->shouldReceive('get')->with('chunks')->once()->andReturn('8')
             ->shouldReceive('get')->with('token')->andReturn(null)
-            ->shouldReceive('file')->with('file')->twice()->andReturn($file)
+            ->shouldReceive('file')->with('file')->times(3)->andReturn($file)
             ->shouldReceive('header')->with('content-length')->once()->andReturn('1049073');
 
         $response
@@ -46,7 +46,7 @@ class PluploadTest extends PHPUnit_Framework_TestCase
 
         $file
             ->shouldReceive('getMimeType')->once()->andReturn('image/jpg')
-            ->shouldReceive('getPathname')->once()->andReturn('php://input');
+            ->shouldReceive('getPathname')->twice()->andReturn('php://input');
 
         /*
         |------------------------------------------------------------
@@ -61,6 +61,7 @@ class PluploadTest extends PHPUnit_Framework_TestCase
         $this->assertSame($api->getStartOffset(), 6294438);
         $this->assertSame($api->getMimeType(), 'image/jpg');
         $this->assertSame($api->getResourceName(), 'php://input');
+        $this->assertTrue(is_resource($api->getResource()));
         $this->assertSame($api->isCompleted(), false);
         $this->assertSame($api->getPartialName(''), md5($originalName).$api->getExtension($originalName).'.part');
 

@@ -186,4 +186,15 @@ abstract class Api
      * @return string
      */
     abstract public function getResourceName();
+
+    /**
+     * getResource.
+     *
+     * @method getResource
+     *
+     * @return resource
+     */
+    public function getResource() {
+        return fopen($this->getResourceName(), 'rb');
+    }
 }

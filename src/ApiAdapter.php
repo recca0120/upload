@@ -4,10 +4,10 @@ namespace Recca0120\Upload;
 
 use Closure;
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Support\Arr;
-use Recca0120\Upload\Apis\Api;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
+use Recca0120\Upload\Apis\Api;
+use Illuminate\Support\Arr;
 
 class ApiAdapter
 {
@@ -67,10 +67,10 @@ class ApiAdapter
 
         $filesystem = $this->getFilsystem();
         $storagePath = $this->getStoragePath();
-        $resourceName = $this->api->getResourceName();
+        $resource = $this->api->getResource();
         $startOffset = $this->api->getStartOffset();
         $partialName = $storagePath.$this->api->getPartialName();
-        $filesystem->updateStream($resourceName, $partialName, [
+        $filesystem->updateStream($resource, $partialName, [
             'startOffset' => $startOffset
         ]);
 

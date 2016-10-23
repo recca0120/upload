@@ -81,7 +81,9 @@ class ApiAdapterTest extends PHPUnit_Framework_TestCase
         $api
             ->shouldReceive('setName')->with($name)->once()->andReturn(false)
             ->shouldReceive('hasChunks')->once()->andReturn(true)
-            ->shouldReceive('getResourceName')->once()->andReturn(__FILE__)
+            ->shouldReceive('getResource')->once()->andReturnUsing(function() {
+                return fopen(__FILE__, 'rb');
+            })
             ->shouldReceive('getStartOffset')->once()->andReturn(10)
             ->shouldReceive('getPartialName')->once()->andReturn($name)
             ->shouldReceive('isCompleted')->once()->andReturn(false)
@@ -141,7 +143,9 @@ class ApiAdapterTest extends PHPUnit_Framework_TestCase
         $api
             ->shouldReceive('setName')->with($name)->once()->andReturn(false)
             ->shouldReceive('hasChunks')->once()->andReturn(true)
-            ->shouldReceive('getResourceName')->once()->andReturn($name)
+            ->shouldReceive('getResource')->once()->andReturnUsing(function() {
+                return fopen(__FILE__, 'rb');
+            })
             ->shouldReceive('getStartOffset')->once()->andReturn(10)
             ->shouldReceive('getPartialName')->once()->andReturn($filename.'.part')
             ->shouldReceive('isCompleted')->once()->andReturn(true)
