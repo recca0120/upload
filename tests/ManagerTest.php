@@ -1,8 +1,8 @@
 <?php
 
 use Mockery as m;
-use Recca0120\Upload\Manager;
 use Recca0120\Upload\Apis\Plupload;
+use Recca0120\Upload\Manager;
 
 class ManagerTest extends PHPUnit_Framework_TestCase
 {
@@ -19,7 +19,8 @@ class ManagerTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $app = m::mock('Illuminate\Contracts\Foundation\Application');
+        $app = m::mock('Illuminate\Contracts\Foundation\Application, ArrayAccess');
+        $config = m::mock('Illuminate\Contracts\Config\Repository, ArrayAccess');
 
         /*
         |------------------------------------------------------------
@@ -28,8 +29,11 @@ class ManagerTest extends PHPUnit_Framework_TestCase
         */
 
         $app
-            ->shouldReceive('make')->with('Recca0120\Upload\ApiAdapter', m::type('array'))
-            ->shouldReceive('make')->with('Recca0120\Upload\Apis\FileAPI');
+            ->shouldReceive('make')->with('Recca0120\Upload\ApiAdapter', m::type('array'))->once()
+            ->shouldReceive('make')->with('Recca0120\Upload\Apis\FileAPI')->once()
+            ->shouldReceive('offsetGet')->with('config')->once()->andReturn($config);
+
+        $config->shouldReceive('offsetGet')->with('upload')->once()->andReturn([]);
 
         /*
         |------------------------------------------------------------
@@ -49,7 +53,8 @@ class ManagerTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $app = m::mock('Illuminate\Contracts\Foundation\Application');
+        $app = m::mock('Illuminate\Contracts\Foundation\Application, ArrayAccess');
+        $config = m::mock('Illuminate\Contracts\Config\Repository, ArrayAccess');
 
         /*
         |------------------------------------------------------------
@@ -58,8 +63,11 @@ class ManagerTest extends PHPUnit_Framework_TestCase
         */
 
         $app
-            ->shouldReceive('make')->with('Recca0120\Upload\ApiAdapter', m::type('array'))
-            ->shouldReceive('make')->with('Recca0120\Upload\Apis\Plupload');
+            ->shouldReceive('make')->with('Recca0120\Upload\ApiAdapter', m::type('array'))->once()
+            ->shouldReceive('make')->with('Recca0120\Upload\Apis\Plupload')->once()
+            ->shouldReceive('offsetGet')->with('config')->once()->andReturn($config);
+
+        $config->shouldReceive('offsetGet')->with('upload')->once()->andReturn([]);
 
         /*
         |------------------------------------------------------------

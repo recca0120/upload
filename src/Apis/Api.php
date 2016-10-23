@@ -67,13 +67,13 @@ abstract class Api
      *
      * @return string
      */
-    public function getPartialName($chunkPath)
+    public function getPartialName()
     {
         $originalName = $this->getOriginalName();
         $extension = $this->getExtension($originalName);
         $token = $this->request->get('token');
 
-        return $chunkPath.md5($originalName.$token).$extension.'.part';
+        return md5($originalName.$token).$extension.'.part';
     }
 
     /**

@@ -2,9 +2,9 @@
 
 namespace Recca0120\Upload;
 
+use Illuminate\Support\Manager as BaseManager;
 use Recca0120\Upload\Apis\FileAPI;
 use Recca0120\Upload\Apis\Plupload;
-use Illuminate\Support\Manager as BaseManager;
 
 class Manager extends BaseManager
 {
@@ -25,8 +25,11 @@ class Manager extends BaseManager
      */
     protected function createFileapiDriver()
     {
+        $config = $this->app['config']['upload'];
+
         return $this->app->make(ApiAdapter::class, [
             $this->app->make(FileAPI::class),
+            'config' => $config
         ]);
     }
 
@@ -37,8 +40,11 @@ class Manager extends BaseManager
      */
     protected function createPluploadDriver()
     {
+        $config = $this->app['config']['upload'];
+
         return $this->app->make(ApiAdapter::class, [
             $this->app->make(Plupload::class),
+            'config' => $config
         ]);
     }
 }

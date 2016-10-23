@@ -3,6 +3,7 @@
 namespace Recca0120\Upload;
 
 use Illuminate\Filesystem\Filesystem as IlluminateFilesystem;
+use Illuminate\Support\Arr;
 use Recca0120\Upload\Exceptions\InvalidUploadException;
 
 class Filesystem extends IlluminateFilesystem
@@ -16,8 +17,9 @@ class Filesystem extends IlluminateFilesystem
      * @param string|resource $target
      * @param int             $offset
      */
-    public function appendStream($source, $target, $offset = 0)
+    public function updateStream($source, $target, $config = [])
     {
+        $offset = Arr::get($config, 'offset', 0);
         $mode = ($offset === 0) ? 'wb' : 'ab';
 
         $sourceStream = (is_resource($source) === true) ? $source : @fopen($source, $mode);

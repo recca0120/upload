@@ -70,7 +70,7 @@ class ApiAdapterTest extends PHPUnit_Framework_TestCase
 
         $filesystem
             ->shouldReceive('isDirectory')->once()->andReturn(true)
-            ->shouldReceive('appendStream')->once();
+            ->shouldReceive('updateStream')->once();
 
         $app->shouldReceive('storagePath')->andReturn(__DIR__);
 
@@ -124,7 +124,7 @@ class ApiAdapterTest extends PHPUnit_Framework_TestCase
         $filesystem
             ->shouldReceive('isDirectory')->andReturn(false)
             ->shouldReceive('makeDirectory')
-            ->shouldReceive('appendStream')->once()
+            ->shouldReceive('updateStream')->once()
             ->shouldReceive('move')->once()
             ->shouldReceive('isFile')->once()->andReturn(true)
             ->shouldReceive('delete')->once()
@@ -138,8 +138,6 @@ class ApiAdapterTest extends PHPUnit_Framework_TestCase
             ->shouldReceive('exists')->with('bar')->andReturn(false)
             ->shouldReceive('size')->once()->andReturn(filesize(__FILE__));
 
-        $app->shouldReceive('storagePath')->andReturn(__DIR__);
-
         $api
             ->shouldReceive('setName')->with($name)->once()->andReturn(false)
             ->shouldReceive('hasChunks')->once()->andReturn(true)
@@ -147,7 +145,7 @@ class ApiAdapterTest extends PHPUnit_Framework_TestCase
             ->shouldReceive('getStartOffset')->once()->andReturn(10)
             ->shouldReceive('getPartialName')->once()->andReturn($filename.'.part')
             ->shouldReceive('isCompleted')->once()->andReturn(true)
-            ->shouldReceive('getOriginalName')->once()->andReturn($name)
+            ->shouldReceive('getOriginalName')->once()->andReturn(basename($name))
             ->shouldReceive('getMimeType')->once()->andReturn('')
             ->shouldReceive('completedResponse')->with($response);
 

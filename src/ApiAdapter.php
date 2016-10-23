@@ -4,19 +4,13 @@ namespace Recca0120\Upload;
 
 use Closure;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Support\Arr;
+use Recca0120\Upload\Apis\Api;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
-use Recca0120\Upload\Apis\Api;
 
 class ApiAdapter
 {
-    /**
-     * $app.
-     *
-     * @var \Illuminate\Contracts\Foundation\Application
-     */
-    protected $app;
-
     /**
      * $filesystem.
      *
@@ -45,13 +39,13 @@ class ApiAdapter
      *
      * @param \Recca0120\Upload\Apis\Api                   $api
      * @param \Recca0120\Upload\Filesystem                 $filesystem
-     * @param \Illuminate\Contracts\Foundation\Application $app
+     * @param \Illuminate\Contracts\Foundation\Application $config
      */
-    public function __construct(Api $api, Filesystem $filesystem, Application $app)
+    public function __construct(Api $api, Filesystem $filesystem, $config = null)
     {
         $this->api = $api;
         $this->filesystem = $filesystem;
-        $this->app = $app;
+        $this->config = $config;
     }
 
     /**
@@ -71,10 +65,14 @@ class ApiAdapter
             return $closure($this->api->getFile());
         }
 
+        $filesystem = $this->getFilsystem();
+        $storagePath = $this->getStoragePath();
         $resourceName = $this->api->getResourceName();
         $startOffset = $this->api->getStartOffset();
-        $partialName = $this->api->getPartialName($this->getChunkPath());
-        $this->filesystem->appendStream($resourceName, $partialName, $startOffset);
+        $partialName = $storagePath.$this->api->getPartialName();
+        $filesystem->updateStream($resourceName, $partialName, [
+            'startOffset' => $startOffset
+        ]);
 
         if ($this->api->isCompleted() === false) {
             return $this->api->chunkedResponse(new Response(null, 201));
@@ -83,12 +81,12 @@ class ApiAdapter
         $originalName = $this->api->getOriginalName();
         $mimeType = $this->api->getMimeType();
         $tmpName = substr($partialName, 0, -5);
-        $this->filesystem->move($partialName, $tmpName);
-        $file = new UploadedFile($tmpName, $originalName, $mimeType, $this->filesystem->size($tmpName), UPLOAD_ERR_OK, true);
+        $filesystem->move($partialName, $tmpName);
+        $file = new UploadedFile($tmpName, $originalName, $mimeType, $filesystem->size($tmpName), UPLOAD_ERR_OK, true);
 
         $response = $closure($file);
-        if ($this->filesystem->isFile($tmpName) === true) {
-            $this->filesystem->delete($tmpName);
+        if ($filesystem->isFile($tmpName) === true) {
+            $filesystem->delete($tmpName);
         }
         $response = $this->api->completedResponse($response);
 
@@ -98,36 +96,41 @@ class ApiAdapter
     }
 
     /**
-     * getChunkPath.
-     *
-     * @method getChunkPath
-     *
-     * @return string
-     */
-    protected function getChunkPath()
-    {
-        $path = $this->app->storagePath().'/app/upload-chunks/';
-        if ($this->filesystem->isDirectory($path) === false) {
-            $this->filesystem->makeDirectory($path, 0777, true, true);
-        }
-
-        return $path;
-    }
-
-    /**
      * removeOldData.
      *
      * @method removeOldData
      */
     public function removeOldData($path = null, $maxFileAge = null)
     {
-        $path = is_null($path) === true ? $this->getChunkPath() : $path;
+        $filesystem = $this->getFilsystem();
+        $path = is_null($path) === true ? $this->getStoragePath() : $path;
         $maxFileAge = is_null($maxFileAge) === true ? $this->maxFileAge : $path;
         $time = time();
-        foreach ($this->filesystem->files($path) as $file) {
-            if ($this->filesystem->exists($file) === true && $this->filesystem->lastModified($file) < ($time - $this->maxFileAge)) {
-                $this->filesystem->delete($file);
+        foreach ($filesystem->files($path) as $file) {
+            if ($filesystem->exists($file) === true && $filesystem->lastModified($file) < ($time - $this->maxFileAge)) {
+                $filesystem->delete($file);
             }
         }
+    }
+
+    /**
+     * getStoragePath.
+     *
+     * @method getStoragePath
+     *
+     * @return string
+     */
+    public function getStoragePath() {
+        $filesystem = $this->getFilsystem();
+        $path = Arr::get($this->config, 'path');
+        if ($filesystem->isDirectory($path) === false) {
+            $filesystem->makeDirectory($path, 0777, true, true);
+        }
+
+        return $path;
+    }
+
+    public function getFilsystem() {
+        return $this->filesystem;
     }
 }
