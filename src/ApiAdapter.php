@@ -3,7 +3,6 @@
 namespace Recca0120\Upload;
 
 use Closure;
-use Illuminate\Support\Arr;
 use Recca0120\Upload\Apis\Api;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -129,7 +128,7 @@ class ApiAdapter
     public function getPath()
     {
         $filesystem = $this->getFilsystem();
-        $diskPath = Arr::get($this->config, 'path');
+        $diskPath = array_get($this->config, 'path');
         if ($filesystem->isDirectory($diskPath) === false) {
             $filesystem->makeDirectory($diskPath, 0777, true, true);
         }
