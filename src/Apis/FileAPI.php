@@ -8,62 +8,35 @@ use Symfony\Component\HttpFoundation\Response;
 class FileAPI extends Api
 {
     /**
-     * $hasChunks.
+     * boot.
      *
-     * @var bool
+     * @method boot
      */
-    public $hasChunks = false;
-
-    /**
-     * $start.
-     *
-     * @var int
-     */
-    public $start;
-
-    /**
-     * $end.
-     *
-     * @var int
-     */
-    public $end;
-
-    /**
-     * $total.
-     *
-     * @var int
-     */
-    public $total;
-
-    /**
-     * __construct.
-     *
-     * @method __construct
-     *
-     * @param \Illuminate\Http\Request $request
-     */
-    public function __construct(Request $request)
+    protected function boot()
     {
-        $this->request = $request;
-        $this->parseContentRange();
-    }
+        $start = 0;
+        $end = 0;
+        $total = 0;
+        $hasChunks = false;
 
-    /**
-     * parseContentRange.
-     *
-     * @method parseContentRange
-     */
-    protected function parseContentRange()
-    {
         $contentRange = $this->request->header('content-range');
-        if (empty($contentRange)) {
-            return;
+        if (empty($contentRange) === false) {
+            list($start, $end, $total) = sscanf($contentRange, 'bytes %d-%d/%d');
+            $hasChunks = true;
         }
-        list($start, $end, $total) = sscanf($contentRange, 'bytes %d-%d/%d');
-        $this->start = (int) $start;
-        $this->end = (int) $end;
-        $this->total = (int) $total;
-        $this->hasChunks = true;
+
+        $originalName = $this->request->get('name');
+        if (is_null($originalName) === true) {
+            list($originalName) = sscanf($this->request->header('content-disposition'), 'attachment; filename=%s');
+        }
+
+        $this->attributes = [
+            'originalName' => $originalName,
+            'start' => (int) $start,
+            'end' => (int) $end,
+            'total' => (int) $total,
+            'hasChunks' => $hasChunks,
+        ];
     }
 
     /**
@@ -75,14 +48,7 @@ class FileAPI extends Api
      */
     public function getOriginalName()
     {
-        $name = $this->request->get('name');
-        if (is_null($name) === false) {
-            return $name;
-        }
-
-        list($name) = sscanf($this->request->header('content-disposition'), 'attachment; filename=%s');
-
-        return $name;
+        return $this->attributes['originalName'];
     }
 
     /**
@@ -94,7 +60,7 @@ class FileAPI extends Api
      */
     public function hasChunks()
     {
-        return $this->hasChunks;
+        return $this->attributes['hasChunks'];
     }
 
     /**
@@ -106,7 +72,7 @@ class FileAPI extends Api
      */
     public function getStartOffset()
     {
-        return $this->start;
+        return $this->attributes['start'];
     }
 
     /**
@@ -118,7 +84,7 @@ class FileAPI extends Api
      */
     public function isCompleted()
     {
-        return $this->end >= $this->total - 1;
+        return $this->attributes['end'] >= $this->attributes['total'] - 1;
     }
 
     /**
@@ -156,7 +122,7 @@ class FileAPI extends Api
      */
     public function chunkedResponse(Response $response)
     {
-        $response->headers->set('X-Last-Known-Byte', $this->end);
+        $response->headers->set('X-Last-Known-Byte', $this->attributes['end']);
 
         return $response;
     }

@@ -63,9 +63,9 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         $total = 7845180;
 
         $request
-            ->shouldReceive('get')->with('name')->twice()->andReturn(null)
+            ->shouldReceive('get')->with('name')->once()->andReturn(null)
             ->shouldReceive('get')->with('token')->andReturn(null)
-            ->shouldReceive('header')->with('content-disposition')->twice()->andReturn('attachment; filename=foo.jpg')
+            ->shouldReceive('header')->with('content-disposition')->once()->andReturn('attachment; filename=foo.jpg')
             ->shouldReceive('header')->with('content-type')->once()->andReturn('image/jpg')
             ->shouldReceive('header')->with('content-range')->once()->andReturn('bytes '.$start.'-'.$end.'/'.$total);
 
@@ -84,7 +84,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         $this->assertSame($api->getResourceName(), 'php://input');
         $this->assertTrue(is_resource($api->getResource()));
         $this->assertSame($api->isCompleted(), false);
-        $this->assertSame($api->getPartialName(''), md5($originalName).$api->getExtension($originalName).'.part');
+        $this->assertSame($api->getPartialName(), md5($originalName).$api->getExtension($originalName).'.part');
 
         $response = $api->chunkedResponse($response);
         $this->assertSame($response->headers->get('X-Last-Known-Byte'), $end);

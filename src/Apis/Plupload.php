@@ -2,10 +2,28 @@
 
 namespace Recca0120\Upload\Apis;
 
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class Plupload extends Api
 {
+    /**
+     * boot.
+     *
+     * @method boot
+     */
+    protected function boot()
+    {
+        $chunks = $this->request->get('chunks');
+        $this->attributes = [
+            'originalName' => $this->request->get('name'),
+            'hasChunks' => is_null($chunks) === false,
+            'chunks' => is_null($chunks) === true ? 1 : (int) $chunks,
+            'chunk' => (int) $this->request->get('chunk', 1),
+            'content-length' => (int) $this->request->header('content-length'),
+        ];
+    }
+
     /**
      * getOriginalName.
      *
@@ -15,7 +33,7 @@ class Plupload extends Api
      */
     public function getOriginalName()
     {
-        return $this->request->get('name');
+        return $this->attributes['originalName'];
     }
 
     /**
@@ -27,7 +45,31 @@ class Plupload extends Api
      */
     public function hasChunks()
     {
-        return is_null($this->request->get('chunks')) === false;
+        return $this->attributes['hasChunks'];
+    }
+
+    /**
+     * getChunk.
+     *
+     * @method getChunk
+     *
+     * @return int
+     */
+    public function getChunk()
+    {
+        return $this->attributes['chunk'];
+    }
+
+    /**
+     * getChunks.
+     *
+     * @method getChunks
+     *
+     * @return int
+     */
+    public function getChunks()
+    {
+        return $this->attributes['chunks'];
     }
 
     /**
@@ -39,9 +81,9 @@ class Plupload extends Api
      */
     public function getStartOffset()
     {
-        $chunk = (int) $this->request->get('chunk', 1);
-        $chunks = (int) $this->request->get('chunks', 1);
-        $length = (int) $this->request->header('content-length');
+        $chunk = $this->attributes['chunk'];
+        $chunks = $this->attributes['chunks'];
+        $length = $this->attributes['content-length'];
 
         return ($chunk >= $chunks - 1) ? null : $chunk * $length;
     }
@@ -55,8 +97,8 @@ class Plupload extends Api
      */
     public function isCompleted()
     {
-        $chunk = (int) $this->request->get('chunk', 1);
-        $chunks = (int) $this->request->get('chunks', 1);
+        $chunk = $this->attributes['chunk'];
+        $chunks = $this->attributes['chunks'];
 
         return $chunk >= $chunks - 1;
     }

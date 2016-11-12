@@ -29,9 +29,8 @@ class PluploadTest extends PHPUnit_Framework_TestCase
         */
 
         $request
-            ->shouldReceive('get')->with('name')->twice()->andReturn('foo.jpg')
-            ->shouldReceive('get')->with('chunks', 1)->twice()->andReturn('8')
-            ->shouldReceive('get')->with('chunk', 1)->twice()->andReturn('6')
+            ->shouldReceive('get')->with('name')->once()->andReturn('foo.jpg')
+            ->shouldReceive('get')->with('chunk', 1)->once()->andReturn('6')
             ->shouldReceive('get')->with('chunks')->once()->andReturn('8')
             ->shouldReceive('get')->with('token')->andReturn(null)
             ->shouldReceive('file')->with('file')->times(3)->andReturn($file)
@@ -53,17 +52,20 @@ class PluploadTest extends PHPUnit_Framework_TestCase
         | Assertion
         |------------------------------------------------------------
         */
+
         $api = new Plupload($request);
         $api->setName('file');
         $originalName = $api->getOriginalName();
         $this->assertSame($originalName, 'foo.jpg');
         $this->assertSame($api->hasChunks(), true);
+        $this->assertSame(6, $api->getChunk());
+        $this->assertSame(8, $api->getChunks());
         $this->assertSame($api->getStartOffset(), 6294438);
         $this->assertSame($api->getMimeType(), 'image/jpg');
         $this->assertSame($api->getResourceName(), 'php://input');
         $this->assertTrue(is_resource($api->getResource()));
         $this->assertSame($api->isCompleted(), false);
-        $this->assertSame($api->getPartialName(''), md5($originalName).$api->getExtension($originalName).'.part');
+        $this->assertSame($api->getPartialName(), md5($originalName).$api->getExtension($originalName).'.part');
 
         $api->chunkedResponse($response);
         $api->completedResponse($response);

@@ -23,6 +23,13 @@ abstract class Api
     protected $name;
 
     /**
+     * $attributes.
+     *
+     * @var array
+     */
+    protected $attributes = [];
+
+    /**
      * __construct.
      *
      * @method __construct
@@ -32,6 +39,16 @@ abstract class Api
     public function __construct(Request $request)
     {
         $this->request = $request;
+        $this->boot();
+    }
+
+    /**
+     * boot.
+     *
+     * @method boot
+     */
+    protected function boot()
+    {
     }
 
     /**

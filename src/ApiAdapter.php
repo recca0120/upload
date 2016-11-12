@@ -136,6 +136,13 @@ class ApiAdapter
         return $diskPath;
     }
 
+    /**
+     * getFilsystem.
+     *
+     * @method getFilsystem
+     *
+     * @return \Recca0120\Upload\Filesystem
+     */
     public function getFilsystem()
     {
         return $this->filesystem;
