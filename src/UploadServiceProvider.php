@@ -13,12 +13,9 @@ class UploadServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/upload.php', 'upload');
 
-        $aliasName = 'Recca0120\Upload\Manager';
-        class_alias(UploadManager::class, $aliasName);
-
         $this->app->singleton(UploadManager::class, function ($app) {
             return new UploadManager($app);
         });
-        $this->app->singleton($aliasName, UploadManager::class);
+        $this->app->singleton(Manager::class, UploadManager::class);
     }
 }
