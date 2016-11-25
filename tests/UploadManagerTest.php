@@ -2,9 +2,9 @@
 
 use Mockery as m;
 use Recca0120\Upload\Apis\Plupload;
-use Recca0120\Upload\Manager;
+use Recca0120\Upload\UploadManager;
 
-class ManagerTest extends PHPUnit_Framework_TestCase
+class UploadManagerTest extends PHPUnit_Framework_TestCase
 {
     public function tearDown()
     {
@@ -41,7 +41,7 @@ class ManagerTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $manager = new Manager($app);
+        $manager = new UploadManager($app);
         $manager->driver();
     }
 
@@ -75,7 +75,7 @@ class ManagerTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $manager = new Manager($app);
+        $manager = new UploadManager($app);
         $manager->driver('plupload');
     }
 }

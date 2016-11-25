@@ -20,6 +20,7 @@ class ServiceProviderTest extends PHPUnit_Framework_TestCase
 
         $app = m::mock('Illuminate\Contracts\Foundation\Application, ArrayAccess');
         $config = m::mock('Illuminate\Contracts\Config\Repository, ArrayAccess');
+        $aliasName = 'Recca0120\Upload\Manager';
 
         /*
         |------------------------------------------------------------
@@ -29,9 +30,10 @@ class ServiceProviderTest extends PHPUnit_Framework_TestCase
 
         $app
             ->shouldReceive('offsetGet')->with('config')->andReturn($config)
-            ->shouldReceive('singleton')->with('Recca0120\Upload\Manager', m::type('Closure'))->once()->andReturnUsing(function ($className, $closure) use ($app) {
+            ->shouldReceive('singleton')->with('Recca0120\Upload\UploadManager', m::type('Closure'))->once()->andReturnUsing(function ($className, $closure) use ($app) {
                 return $closure($app);
-            });
+            })
+            ->shouldReceive('singleton')->with($aliasName, 'Recca0120\Upload\UploadManager');
 
         $config
             ->shouldReceive('get')->andReturn([])
@@ -45,6 +47,8 @@ class ServiceProviderTest extends PHPUnit_Framework_TestCase
 
         $serviceProvider = new ServiceProvider($app);
         $serviceProvider->register();
+
+        $this->assertTrue(class_exists($aliasName));
     }
 }
 

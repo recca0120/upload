@@ -2,11 +2,11 @@
 
 namespace Recca0120\Upload;
 
-use Illuminate\Support\Manager as BaseManager;
+use Illuminate\Support\Manager;
 use Recca0120\Upload\Apis\FileAPI;
 use Recca0120\Upload\Apis\Plupload;
 
-class Manager extends BaseManager
+class UploadManager extends Manager
 {
     /**
      * default driver.

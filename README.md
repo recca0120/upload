@@ -37,7 +37,7 @@ Include the service provider within `config/app.php`. The service povider is nee
 ```php
 'providers' => [
     ...
-    Recca0120\Upload\ServiceProvider::class,
+    Recca0120\Upload\UploadServiceProvider::class,
     ...
 ];
 ```
@@ -47,12 +47,12 @@ Include the service provider within `config/app.php`. The service povider is nee
 Controller
 ```php
 
-use Recca0120\Upload\Manager;
+use Recca0120\Upload\UploadManager;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class UploadController extends Controller
 {
-    public function upload(Manager $manager)
+    public function upload(UploadManager $manager)
     {
         $driver = 'plupload'; // or 'fileapi'
         $name = 'file'; // $_FILES index;

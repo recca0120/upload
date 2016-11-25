@@ -27,7 +27,7 @@ class CartFacadeTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $app->shouldReceive('offsetGet')->with('Recca0120\Upload\Manager')->once();
+        $app->shouldReceive('offsetGet')->with('Recca0120\Upload\UploadManager')->once();
 
         /*
         |------------------------------------------------------------
