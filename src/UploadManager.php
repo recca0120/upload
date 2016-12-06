@@ -3,8 +3,8 @@
 namespace Recca0120\Upload;
 
 use Illuminate\Support\Manager;
-use Recca0120\Upload\Apis\FileAPI;
-use Recca0120\Upload\Apis\Plupload;
+use Recca0120\Upload\Uploader\FileAPI;
+use Recca0120\Upload\Uploader\Plupload;
 
 class UploadManager extends Manager
 {
@@ -27,7 +27,7 @@ class UploadManager extends Manager
     {
         $config = $this->app['config']['upload'];
 
-        return $this->app->make(ApiAdapter::class, [
+        return $this->app->make(Receiver::class, [
             $this->app->make(FileAPI::class),
             'config' => $config,
         ]);
@@ -42,7 +42,7 @@ class UploadManager extends Manager
     {
         $config = $this->app['config']['upload'];
 
-        return $this->app->make(ApiAdapter::class, [
+        return $this->app->make(Receiver::class, [
             $this->app->make(Plupload::class),
             'config' => $config,
         ]);

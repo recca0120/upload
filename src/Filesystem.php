@@ -3,41 +3,44 @@
 namespace Recca0120\Upload;
 
 use Illuminate\Filesystem\Filesystem as IlluminateFilesystem;
-use Illuminate\Support\Arr;
-use Recca0120\Upload\Exceptions\InvalidUploadException;
+use Exception;
 
 class Filesystem extends IlluminateFilesystem
 {
-    /**
-     * appendStream.
-     *
-     * @method appendStream
-     *
-     * @param string|resource $resource
-     * @param string|resource $path
-     * @param int             $offset
-     */
-    public function updateStream($path, $resource, $config = [])
+    public function appendStream($output, $input, $offset = 0)
     {
-        $offset = Arr::get($config, 'offset', 0);
         $mode = ($offset === 0) ? 'wb' : 'ab';
+        $output = $this->convertToResource($output, $mode, 'output');
+        $input = $this->convertToResource($input, 'rb', 'input');
 
-        $resourceStream = (is_resource($resource) === true) ? $resource : @fopen($resource, $mode);
-        if (is_resource($resourceStream) === false) {
-            throw new InvalidUploadException('Failed to open input stream.', 101);
+        fseek($output, $offset);
+        while ($buffer = fread($input, 4096)) {
+            fwrite($output, $buffer);
         }
 
-        $pathStream = (is_resource($path) === true) ? $path : @fopen($path, $mode);
-        if (is_resource($pathStream) === false) {
-            throw new InvalidUploadException('Failed to open output stream.', 102);
+        @fclose($output);
+        @fclose($input);
+    }
+
+    protected function convertToResource($resource, $mode = 'wb', $type = 'input')
+    {
+        $resource = is_resource($resource) === true ? $resource : @fopen($resource, $mode);
+
+        if (is_resource($resource) === false) {
+            $code = $type === 'input' ? 101 : 102;
+
+            throw new Exception('Failed to open '.$type.' stream.', $code);
         }
 
-        fseek($pathStream, $offset);
-        while ($buffer = fread($resourceStream, 4096)) {
-            fwrite($pathStream, $buffer);
-        }
+        return $resource;
+    }
 
-        @fclose($resourceStream);
-        @fclose($pathStream);
+    public function createUploadedFile($path, $originalName, $mimeType = null, $size = null)
+    {
+        $class = class_exists('Illuminate\Http\UploadedFile') === true ?
+            'Illuminate\Http\UploadedFile' :
+            'Symfony\Component\HttpFoundation\File\UploadedFile';
+
+        return new $class($path, $originalName, $mimeType, $size, UPLOAD_ERR_OK, true);
     }
 }

@@ -2,6 +2,8 @@
 
 use Mockery as m;
 use Recca0120\Upload\Filesystem;
+use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\content\LargeFileContent;
 
 class FilesystemTest extends PHPUnit_Framework_TestCase
 {
@@ -10,127 +12,153 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-    /**
-     * @expectedException \Recca0120\Upload\Exceptions\InvalidUploadException
-     * @expectedExceptionMessage Failed to open input stream.
-     * @expectedExceptionCode 101
-     */
-    public function test_source_isnot_resource()
+    public function test_append_stream()
     {
         /*
         |------------------------------------------------------------
-        | Set
+        | Arrange
         |------------------------------------------------------------
         */
 
-        $filesystem = new Filesystem();
+        $root = vfsStream::setup();
+        $input = vfsStream::newFile('input.txt')
+            ->withContent(LargeFileContent::withKilobytes(10))
+            ->at($root);
+        $output = vfsStream::newFile('output.txt')
+            ->at($root);
+        $offset = 0;
+        $appendContent = '';
+        $length = 4096;
+        /*
+        |------------------------------------------------------------
+        | Act
+        |------------------------------------------------------------
+        */
+
+        $filesystem = new Filesystem;
 
         /*
         |------------------------------------------------------------
-        | Expectation
+        | Assert
         |------------------------------------------------------------
         */
 
-        /*
-        |------------------------------------------------------------
-        | Assertion
-        |------------------------------------------------------------
-        */
-
-        $filesystem->updateStream(null, null, 0);
+        for ($i = 0;$i < 5;$i++) {
+            $filesystem->appendStream($output->url(), $input->url(), $offset);
+            $offset += $input->size();
+            $appendContent .= $input->getContent();
+            $this->assertSame($offset, $output->size());
+            $this->assertSame($appendContent, $output->getContent());
+        }
     }
 
     /**
-     * @expectedException \Recca0120\Upload\Exceptions\InvalidUploadException
+     * @expectedException Exception
      * @expectedExceptionMessage Failed to open output stream.
      * @expectedExceptionCode 102
      */
-    public function test_target_isnot_resource()
+    public function test_output_is_not_resource()
     {
         /*
         |------------------------------------------------------------
-        | Set
+        | Arrange
         |------------------------------------------------------------
         */
 
-        $filesystem = new Filesystem();
+        $root = vfsStream::setup();
+        $input = vfsStream::newFile('input.txt')
+            ->at($root);
+        $output = null;
+        $offset = 0;
 
         /*
         |------------------------------------------------------------
-        | Expectation
+        | Act
         |------------------------------------------------------------
         */
+
+        $filesystem = new Filesystem;
 
         /*
         |------------------------------------------------------------
-        | Assertion
+        | Assert
         |------------------------------------------------------------
         */
 
-        $filesystem->updateStream(null, fopen('php://input', 'w+'), 0);
+        $filesystem->appendStream($output, $input->url(), $offset);
     }
 
-    public function test_write()
+    /**
+     * @expectedException Exception
+     * @expectedExceptionMessage Failed to open input stream.
+     * @expectedExceptionCode 101
+     */
+    public function test_input_is_not_resource()
     {
         /*
         |------------------------------------------------------------
-        | Set
+        | Arrange
         |------------------------------------------------------------
         */
 
-        $filesystem = new Filesystem();
-        $source = tempnam(sys_get_temp_dir(), 'upload');
-        $target = tempnam(sys_get_temp_dir(), 'upload');
+        $root = vfsStream::setup();
+        $input = null;
+        $output = vfsStream::newFile('output.txt')
+            ->at($root);
+        $offset = 0;
 
         /*
         |------------------------------------------------------------
-        | Expectation
+        | Act
         |------------------------------------------------------------
         */
 
-        file_put_contents($source, 'writing to tempfile');
+        $filesystem = new Filesystem;
 
         /*
         |------------------------------------------------------------
-        | Assertion
+        | Assert
         |------------------------------------------------------------
         */
 
-        $filesystem->updateStream($target, $source, 0);
-        // $this->assertSame('writing to tempfile', file_get_contents($target));
-        unlink($source);
-        unlink($target);
+        $filesystem->appendStream($output->url(), $input, $offset);
     }
 
-    public function test_write_offset()
+    public function test_create_uploaded_file()
     {
         /*
         |------------------------------------------------------------
-        | Set
+        | Arrange
         |------------------------------------------------------------
         */
 
-        $filesystem = new Filesystem();
-        $source = tempnam(sys_get_temp_dir(), 'upload');
-        $target = tempnam(sys_get_temp_dir(), 'upload');
+        $root = vfsStream::setup();
+        $file = vfsStream::newFile('file.txt')
+            ->at($root);
 
         /*
         |------------------------------------------------------------
-        | Expectation
+        | Act
         |------------------------------------------------------------
         */
 
-        file_put_contents($source, 'writing to tempfile');
+        $path = $file->url();
+        $filesystem = new Filesystem;
+        $mimeType = $filesystem->mimeType($path);
+        $size = $filesystem->size($path);
+        $name = $filesystem->basename($path);
+        $uploadedFile = $filesystem->createUploadedFile($path, $name, $mimeType, $size);
 
         /*
         |------------------------------------------------------------
-        | Assertion
+        | Assert
         |------------------------------------------------------------
         */
 
-        $filesystem->updateStream($target, $source, 3);
-        // $this->assertSame('writing to tempfile', file_get_contents($target));
-        unlink($source);
-        unlink($target);
+        $instance = class_exists('Illuminate\Http\UploadedFile') === true ?
+            'Illuminate\Http\UploadedFile' :
+            'Symfony\Component\HttpFoundation\File\UploadedFile';
+
+        $this->assertInstanceOf($instance, $uploadedFile);
     }
 }
