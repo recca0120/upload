@@ -118,6 +118,7 @@ class PluploadTest extends PHPUnit_Framework_TestCase
         $extension = pathinfo($originalName, PATHINFO_EXTENSION);
         $mimeType = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $file);
         $tmpfile = $path.'/'.md5($originalName.$token).'.'.$extension;
+        $tmpfileExtension = Plupload::TMPFILE_EXTENSION;
 
         $chunks = 8;
         $chunk = 7;
@@ -147,7 +148,7 @@ class PluploadTest extends PHPUnit_Framework_TestCase
 
         $filesystem
             ->shouldReceive('extension')->with($originalName)->andReturn($extension)
-            ->shouldReceive('move')->with($tmpfile.'.part', $tmpfile)
+            ->shouldReceive('move')->with($tmpfile.$tmpfileExtension, $tmpfile)
             ->shouldReceive('size')->with($tmpfile)->andReturn($size);
 
         $uploader = new Plupload($request, $filesystem, $path);
@@ -167,7 +168,7 @@ class PluploadTest extends PHPUnit_Framework_TestCase
         $request->shouldHaveReceived('get')->with('name')->once();
         $request->shouldHaveReceived('get')->with('token')->once();
         $filesystem->shouldHaveReceived('extension')->with($originalName)->once();
-        $filesystem->shouldHaveReceived('appendStream')->with($tmpfile.'.part', $input, $start)->once();
+        $filesystem->shouldHaveReceived('appendStream')->with($tmpfile.$tmpfileExtension, $input, $start)->once();
         $filesystem->shouldHaveReceived('createUploadedFile')->with($tmpfile, $originalName, $mimeType, $size)->once();
     }
 

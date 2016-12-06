@@ -11,6 +11,13 @@ use Recca0120\Upload\Exceptions\ChunkedResponseException;
 abstract class Base implements Uploader
 {
     /**
+     * TMPFILE_EXTENSION.
+     *
+     * @var string
+     */
+    const TMPFILE_EXTENSION = '.part';
+
+    /**
      * $request.
      *
      * @var \Illuminate\Http\Request
@@ -89,13 +96,14 @@ abstract class Base implements Uploader
     protected function receiveChunkedFile($originalName, $input, $start, $mimeType, $isCompleted = false, $headers = [])
     {
         $tmpfile = $this->tmpfile($originalName);
-        $this->filesystem->appendStream($tmpfile.'.part', $input, $start);
+        $extension = static::TMPFILE_EXTENSION;
+        $this->filesystem->appendStream($tmpfile.$extension, $input, $start);
 
         if ($isCompleted === false) {
             throw new ChunkedResponseException($headers);
         }
 
-        $this->filesystem->move($tmpfile.'.part', $tmpfile);
+        $this->filesystem->move($tmpfile.$extension, $tmpfile);
         $size = $this->filesystem->size($tmpfile);
 
         return $this->filesystem->createUploadedFile($tmpfile, $originalName, $mimeType, $size);

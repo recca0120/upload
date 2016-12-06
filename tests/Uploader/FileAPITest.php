@@ -67,6 +67,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         $extension = pathinfo($originalName, PATHINFO_EXTENSION);
         $mimeType = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $file);
         $tmpfile = $path.'/'.md5($originalName.$token).'.'.$extension;
+        $tmpfileExtension = FileAPI::TMPFILE_EXTENSION;
 
         $start = 5242880;
         $end = 5767167;
@@ -113,7 +114,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         $request->shouldHaveReceived('header')->with('content-type')->once();
         $filesystem->shouldHaveReceived('extension')->with($originalName)->once();
         $request->shouldHaveReceived('get')->with('token')->once();
-        $filesystem->shouldHaveReceived('appendStream')->with($tmpfile.'.part', $input, $start)->once();
+        $filesystem->shouldHaveReceived('appendStream')->with($tmpfile.$tmpfileExtension, $input, $start)->once();
     }
 
     public function test_upload_chunk_file()
@@ -136,6 +137,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         $extension = pathinfo($originalName, PATHINFO_EXTENSION);
         $mimeType = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $file);
         $tmpfile = $path.'/'.md5($originalName.$token).'.'.$extension;
+        $tmpfileExtension = FileAPI::TMPFILE_EXTENSION;
 
         $start = 5242880;
         $end = 7845180;
@@ -160,7 +162,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         $filesystem
             ->shouldReceive('extension')->with($originalName)->andReturn($extension)
             ->shouldReceive('mimeType')->with($originalName)->andReturn($mimeType)
-            ->shouldReceive('move')->with($tmpfile.'.part', $tmpfile)
+            ->shouldReceive('move')->with($tmpfile.$tmpfileExtension, $tmpfile)
             ->shouldReceive('size')->with($tmpfile)->andReturn($total);
 
         $uploader = new FileAPI($request, $filesystem, $path);
@@ -179,8 +181,8 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         $filesystem->shouldHaveReceived('extension')->with($originalName)->once();
         $filesystem->shouldHaveReceived('mimeType')->with($originalName)->once();
         $request->shouldHaveReceived('get')->with('token')->once();
-        $filesystem->shouldHaveReceived('appendStream')->with($tmpfile.'.part', $input, $start)->once();
-        $filesystem->shouldHaveReceived('move')->with($tmpfile.'.part', $tmpfile)->once();
+        $filesystem->shouldHaveReceived('appendStream')->with($tmpfile.$tmpfileExtension, $input, $start)->once();
+        $filesystem->shouldHaveReceived('move')->with($tmpfile.$tmpfileExtension, $tmpfile)->once();
         $filesystem->shouldHaveReceived('size')->once();
         $filesystem->shouldHaveReceived('createUploadedFile')->with($tmpfile, $originalName, $mimeType, $size)->once();
     }
