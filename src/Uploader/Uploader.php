@@ -3,9 +3,9 @@
 namespace Recca0120\Upload\Uploader;
 
 use Illuminate\Http\Request;
-use Recca0120\Upload\Exception\ChunkedResponseException;
 use Recca0120\Upload\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
+use Recca0120\Upload\Exception\ChunkedResponseException;
 
 abstract class Uploader
 {

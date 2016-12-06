@@ -1,8 +1,8 @@
 <?php
 
 use Mockery as m;
-use Recca0120\Upload\Filesystem;
 use org\bovigo\vfs\vfsStream;
+use Recca0120\Upload\Filesystem;
 use org\bovigo\vfs\content\LargeFileContent;
 
 class FilesystemTest extends PHPUnit_Framework_TestCase
@@ -43,7 +43,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        for ($i = 0;$i < 5;$i++) {
+        for ($i = 0; $i < 5; $i++) {
             $filesystem->appendStream($output->url(), $input->url(), $offset);
             $offset += $input->size();
             $appendContent .= $input->getContent();

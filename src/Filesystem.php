@@ -2,8 +2,8 @@
 
 namespace Recca0120\Upload;
 
-use Illuminate\Filesystem\Filesystem as IlluminateFilesystem;
 use Exception;
+use Illuminate\Filesystem\Filesystem as IlluminateFilesystem;
 
 class Filesystem extends IlluminateFilesystem
 {
