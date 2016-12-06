@@ -41,7 +41,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $this->assertSame($uploadedFile, $uploader->get($name));
+        $this->assertSame($uploadedFile, $uploader->receive($name));
 
         $request->shouldHaveReceived('header')->with('content-range')->once();
         $request->shouldHaveReceived('file')->with($name)->once();
@@ -100,7 +100,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         */
 
         try {
-            $uploader->get($name);
+            $uploader->receive($name);
         } catch (ChunkedResponseException $e) {
             $response = $e->getResponse();
             $this->assertSame(201, $response->getStatusCode());
@@ -171,7 +171,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $uploader->get($name);
+        $uploader->receive($name);
 
         $request->shouldHaveReceived('header')->with('content-range')->once();
         $request->shouldHaveReceived('get')->with('name')->once();

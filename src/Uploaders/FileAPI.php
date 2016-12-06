@@ -6,6 +6,11 @@ use Illuminate\Http\Request;
 
 class FileAPI extends Base
 {
+    /**
+     * getOriginalName.
+     *
+     * @return string
+     */
     protected function getOriginalName()
     {
         $originalName = $this->request->get('name');
@@ -16,6 +21,13 @@ class FileAPI extends Base
         return $originalName;
     }
 
+    /**
+     * getMimeType.
+     *
+     * @param  string $originalName
+     *
+     * @return string
+     */
     protected function getMimeType($originalName)
     {
         $mimeType = $this->request->header('content-type');

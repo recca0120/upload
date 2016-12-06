@@ -9,12 +9,34 @@ use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
 class Receiver
 {
+    /**
+     * $uploader.
+     *
+     * @var \Recca0120\Upload\Contracts\Uploader
+     */
     protected $uploader;
 
+    /**
+     * $filesystem.
+     *
+     * @var \Recca0120\Upload\Filesystem
+     */
     protected $filesystem;
 
+    /**
+     * $config
+     *
+     * @var array
+     */
     protected $config;
 
+    /**
+     * __construct
+     *
+     * @param \Recca0120\Upload\Contracts\Uploader   $uploader
+     * @param \Recca0120\Upload\Filesystem $filesystem
+     * @param array     $config
+     */
     public function __construct(Uploader $uploader, Filesystem $filesystem, $config = [])
     {
         $this->uploader = $uploader;
@@ -22,6 +44,14 @@ class Receiver
         $this->config = $config;
     }
 
+    /**
+     * receive.
+     *
+     * @param  string $name
+     * @param  Closure $closure
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function receive($name, Closure $closure)
     {
         $path = Arr::get($this->config, 'path');
@@ -47,6 +77,11 @@ class Receiver
         return $this->uploader->completedResponse($response);
     }
 
+    /**
+     * cleanDirectory
+     *
+     * @param  string $path
+     */
     protected function cleanDirectory($path)
     {
         $time = time();

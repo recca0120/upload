@@ -41,7 +41,7 @@ class PluploadTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $this->assertSame($uploadedFile, $uploader->get($name));
+        $this->assertSame($uploadedFile, $uploader->receive($name));
 
         $request->shouldHaveReceived('get')->with('chunks')->once();
         $request->shouldHaveReceived('file')->with($name)->once();
@@ -86,7 +86,7 @@ class PluploadTest extends PHPUnit_Framework_TestCase
         */
 
         try {
-            $uploader->get($name);
+            $uploader->receive($name);
         } catch (ChunkedResponseException $e) {
             $response = $e->getResponse();
             $this->assertSame(201, $response->getStatusCode());
@@ -158,7 +158,7 @@ class PluploadTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $uploader->get($name);
+        $uploader->receive($name);
 
         $request->shouldHaveReceived('get')->with('chunks')->once();
         $request->shouldHaveReceived('file')->with($name)->once();
@@ -169,5 +169,42 @@ class PluploadTest extends PHPUnit_Framework_TestCase
         $filesystem->shouldHaveReceived('extension')->with($originalName)->once();
         $filesystem->shouldHaveReceived('appendStream')->with($tmpfile.'.part', $input, $start)->once();
         $filesystem->shouldHaveReceived('createUploadedFile')->with($tmpfile, $originalName, $mimeType, $size)->once();
+    }
+
+    public function test_completed_response()
+    {
+        /*
+        |------------------------------------------------------------
+        | Arrange
+        |------------------------------------------------------------
+        */
+
+        $request = m::spy('Illuminate\Http\Request');
+        $filesystem = m::spy('Recca0120\Upload\Filesystem');
+        $response = m::spy('Symfony\Component\HttpFoundation\Response');
+        $data = ['foo' => 'bar'];
+
+        /*
+        |------------------------------------------------------------
+        | Act
+        |------------------------------------------------------------
+        */
+
+        $response
+            ->shouldReceive('getData')->andReturn($data);
+
+        $uploader = new Plupload($request, $filesystem);
+
+        /*
+        |------------------------------------------------------------
+        | Assert
+        |------------------------------------------------------------
+        */
+
+        $this->assertSame($response, $uploader->completedResponse($response));
+        $response->shouldHaveReceived('setData')->with([
+            'jsonrpc' => '2.0',
+            'result' => $data,
+        ]);
     }
 }
