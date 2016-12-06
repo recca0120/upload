@@ -53,7 +53,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException Recca0120\Upload\Exceptions\ResourceOpenException
      * @expectedExceptionMessage Failed to open output stream.
      * @expectedExceptionCode 102
      */
@@ -89,7 +89,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException Recca0120\Upload\Exceptions\ResourceOpenException
      * @expectedExceptionMessage Failed to open input stream.
      * @expectedExceptionCode 101
      */

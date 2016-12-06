@@ -2,7 +2,7 @@
 
 namespace Recca0120\Upload;
 
-use Exception;
+use Recca0120\Upload\Exceptions\ResourceOpenException;
 use Illuminate\Filesystem\Filesystem as IlluminateFilesystem;
 
 class Filesystem extends IlluminateFilesystem
@@ -56,7 +56,7 @@ class Filesystem extends IlluminateFilesystem
         if (is_resource($resource) === false) {
             $code = $type === 'input' ? 101 : 102;
 
-            throw new Exception('Failed to open '.$type.' stream.', $code);
+            throw new ResourceOpenException('Failed to open '.$type.' stream.', $code);
         }
 
         return $resource;
