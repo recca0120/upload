@@ -61,6 +61,7 @@ class FileAPI extends Base
 
         $isCompleted = ($end >= $total - 1);
         $input = 'php://input';
+
         return $this->receiveChunkedFile($originalName, $input, $start, $mimeType, $isCompleted, [
             'X-Last-Known-Byte' => $end,
         ]);

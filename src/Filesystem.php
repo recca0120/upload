@@ -23,7 +23,7 @@ class Filesystem extends IlluminateFilesystem
      *
      * @param string|resource $output
      * @param string|resource $input
-     * @param integer $offset
+     * @param int $offset
      */
     public function appendStream($output, $input, $offset = 0)
     {

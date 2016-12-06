@@ -4,28 +4,28 @@ namespace Recca0120\Upload\Uploaders;
 
 use Illuminate\Http\Request;
 use Recca0120\Upload\Filesystem;
-use Symfony\Component\HttpFoundation\Response;
 use Recca0120\Upload\Contracts\Uploader;
+use Symfony\Component\HttpFoundation\Response;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
 abstract class Base implements Uploader
 {
     /**
-     * $request
+     * $request.
      *
      * @var \Illuminate\Http\Request
      */
     protected $request;
 
     /**
-     * $filesystem
+     * $filesystem.
      *
      * @var \Recca0120\Upload\Filesystem
      */
     protected $filesystem;
 
     /**
-     * $path
+     * $path.
      *
      * @var string
      */
@@ -46,7 +46,7 @@ abstract class Base implements Uploader
     }
 
     /**
-     * setPath
+     * setPath.
      *
      * @param string $path
      *
@@ -81,7 +81,7 @@ abstract class Base implements Uploader
      * @param  string|resource  $input
      * @param  int  $start
      * @param  string  $mimeType
-     * @param  boolean $isCompleted
+     * @param  bool $isCompleted
      * @param  array  $headers
      *
      * @return string

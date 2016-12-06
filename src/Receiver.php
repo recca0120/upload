@@ -24,14 +24,14 @@ class Receiver
     protected $filesystem;
 
     /**
-     * $config
+     * $config.
      *
      * @var array
      */
     protected $config;
 
     /**
-     * __construct
+     * __construct.
      *
      * @param \Recca0120\Upload\Contracts\Uploader   $uploader
      * @param \Recca0120\Upload\Filesystem $filesystem
@@ -78,7 +78,7 @@ class Receiver
     }
 
     /**
-     * cleanDirectory
+     * cleanDirectory.
      *
      * @param  string $path
      */

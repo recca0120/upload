@@ -7,8 +7,8 @@ use Recca0120\Upload\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
-interface Uploader {
-
+interface Uploader
+{
     /**
      * __construct.
      *
@@ -19,7 +19,7 @@ interface Uploader {
     public function __construct(Request $request, Filesystem $filesystem, $path = null);
 
     /**
-     * setPath
+     * setPath.
      *
      * @param string $path
      *
