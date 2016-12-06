@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 class Plupload extends Base
 {
     /**
-     * get.
+     * receive.
      *
      * @param string $name
      *
@@ -16,7 +16,7 @@ class Plupload extends Base
      *
      * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      */
-    public function get($name)
+    public function receive($name)
     {
         $uploadedFile = $this->request->file($name);
         $chunks = $this->request->get('chunks');
@@ -33,10 +33,8 @@ class Plupload extends Base
 
         $isCompleted = ($chunk >= $chunks - 1);
         $input = $uploadedFile->getPathname();
-        $tmpfile = $this->receive($originalName, $input, $start, $isCompleted);
-        $size = $this->filesystem->size($tmpfile);
 
-        return $this->filesystem->createUploadedFile($tmpfile, $originalName, $mimeType, $size);
+        return $this->receiveChunkedFile($originalName, $input, $start, $mimeType, $isCompleted);
     }
 
     /**

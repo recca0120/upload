@@ -10,12 +10,34 @@ use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
 abstract class Base implements Uploader
 {
+    /**
+     * $request
+     *
+     * @var \Illuminate\Http\Request
+     */
     protected $request;
 
+    /**
+     * $filesystem
+     *
+     * @var \Recca0120\Upload\Filesystem
+     */
     protected $filesystem;
 
+    /**
+     * $path
+     *
+     * @var string
+     */
     protected $path;
 
+    /**
+     * __construct.
+     *
+     * @param \Illuminate\Http\Request    $request
+     * @param \Recca0120\Upload\Filesystem $filesystem
+     * @param string    $path
+     */
     public function __construct(Request $request, Filesystem $filesystem, $path = null)
     {
         $this->request = $request;
@@ -23,6 +45,13 @@ abstract class Base implements Uploader
         $this->setPath($path);
     }
 
+    /**
+     * setPath
+     *
+     * @param string $path
+     *
+     * @return static
+     */
     public function setPath($path = null)
     {
         $this->path = is_null($path) === true ? sys_get_temp_dir() : $path;
@@ -30,6 +59,13 @@ abstract class Base implements Uploader
         return $this;
     }
 
+    /**
+     * tmpfile.
+     *
+     * @param  string $originalName
+     *
+     * @return string
+     */
     protected function tmpfile($originalName)
     {
         $extension = $this->filesystem->extension($originalName);
@@ -38,9 +74,21 @@ abstract class Base implements Uploader
         return $this->path.'/'.md5($originalName.$token).'.'.$extension;
     }
 
-    protected function receive($output, $input, $start, $isCompleted = false, $headers = [])
+    /**
+     * receiveChunkedFile.
+     *
+     * @param  string|resource  $originalName
+     * @param  string|resource  $input
+     * @param  int  $start
+     * @param  string  $mimeType
+     * @param  boolean $isCompleted
+     * @param  array  $headers
+     *
+     * @return string
+     */
+    protected function receiveChunkedFile($originalName, $input, $start, $mimeType, $isCompleted = false, $headers = [])
     {
-        $tmpfile = $this->tmpfile($output);
+        $tmpfile = $this->tmpfile($originalName);
         $this->filesystem->appendStream($tmpfile.'.part', $input, $start);
 
         if ($isCompleted === false) {
@@ -48,8 +96,9 @@ abstract class Base implements Uploader
         }
 
         $this->filesystem->move($tmpfile.'.part', $tmpfile);
+        $size = $this->filesystem->size($tmpfile);
 
-        return $tmpfile;
+        return $this->filesystem->createUploadedFile($tmpfile, $originalName, $mimeType, $size);
     }
 
     /**

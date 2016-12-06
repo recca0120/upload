@@ -35,7 +35,7 @@ class FileAPI extends Base
      *
      * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      */
-    public function get($name)
+    public function receive($name)
     {
         $contentRange = $this->request->header('content-range');
         if (empty($contentRange) === true) {
@@ -49,11 +49,8 @@ class FileAPI extends Base
 
         $isCompleted = ($end >= $total - 1);
         $input = 'php://input';
-        $tmpfile = $this->receive($originalName, $input, $start, $isCompleted, [
+        return $this->receiveChunkedFile($originalName, $input, $start, $mimeType, $isCompleted, [
             'X-Last-Known-Byte' => $end,
         ]);
-        $size = $this->filesystem->size($tmpfile);
-
-        return $this->filesystem->createUploadedFile($tmpfile, $originalName, $mimeType, $size);
     }
 }

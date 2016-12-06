@@ -184,4 +184,33 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         $filesystem->shouldHaveReceived('size')->once();
         $filesystem->shouldHaveReceived('createUploadedFile')->with($tmpfile, $originalName, $mimeType, $size)->once();
     }
+
+    public function test_completed_response()
+    {
+        /*
+        |------------------------------------------------------------
+        | Arrange
+        |------------------------------------------------------------
+        */
+
+        $request = m::spy('Illuminate\Http\Request');
+        $filesystem = m::spy('Recca0120\Upload\Filesystem');
+        $response = m::spy('Symfony\Component\HttpFoundation\Response');
+
+        /*
+        |------------------------------------------------------------
+        | Act
+        |------------------------------------------------------------
+        */
+
+        $uploader = new FileAPI($request, $filesystem);
+
+        /*
+        |------------------------------------------------------------
+        | Assert
+        |------------------------------------------------------------
+        */
+
+        $this->assertSame($response, $uploader->completedResponse($response));
+    }
 }

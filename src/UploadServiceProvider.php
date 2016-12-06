@@ -13,6 +13,7 @@ class UploadServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/upload.php', 'upload');
 
+        $this->app->singleton(Filesystem::class, Filesystem::class);
         $this->app->singleton(UploadManager::class, function ($app) {
             return new UploadManager($app);
         });

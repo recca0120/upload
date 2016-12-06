@@ -7,6 +7,13 @@ use Illuminate\Filesystem\Filesystem as IlluminateFilesystem;
 
 class Filesystem extends IlluminateFilesystem
 {
+    /**
+     * appendStream.
+     *
+     * @param string|resource $output
+     * @param string|resource $input
+     * @param integer $offset
+     */
     public function appendStream($output, $input, $offset = 0)
     {
         $mode = ($offset === 0) ? 'wb' : 'ab';
@@ -22,6 +29,15 @@ class Filesystem extends IlluminateFilesystem
         @fclose($input);
     }
 
+    /**
+     * convertToResource.
+     *
+     * @param string|resource $resource [description]
+     * @param string $mode     string
+     * @param string $type     string
+     *
+     * @return resource
+     */
     protected function convertToResource($resource, $mode = 'wb', $type = 'input')
     {
         $resource = is_resource($resource) === true ? $resource : @fopen($resource, $mode);
@@ -35,6 +51,16 @@ class Filesystem extends IlluminateFilesystem
         return $resource;
     }
 
+    /**
+     * createUploadedFile.
+     *
+     * @param string $path
+     * @param string $originalName
+     * @param string $mimeType
+     * @param int $size
+     *
+     * @return \Illuminate\Http\UploadedFile
+     */
     public function createUploadedFile($path, $originalName, $mimeType = null, $size = null)
     {
         $class = class_exists('Illuminate\Http\UploadedFile') === true ?

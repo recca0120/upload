@@ -32,7 +32,7 @@ class Receiver
         try {
             $uploadedFile = $this->uploader
                 ->setPath($path)
-                ->get($name);
+                ->receive($name);
         } catch (ChunkedResponseException $e) {
             return $e->getResponse();
         }
@@ -42,12 +42,12 @@ class Receiver
         if ($this->filesystem->isFile($file) === true) {
             $this->filesystem->delete($file);
         }
-        $this->clean($path);
+        $this->cleanDirectory($path);
 
         return $this->uploader->completedResponse($response);
     }
 
-    protected function clean($path)
+    protected function cleanDirectory($path)
     {
         $time = time();
         $maxFileAge = 3600;
