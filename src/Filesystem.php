@@ -8,6 +8,17 @@ use Illuminate\Filesystem\Filesystem as IlluminateFilesystem;
 class Filesystem extends IlluminateFilesystem
 {
     /**
+     * Extract the trailing name component from a file path.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function basename($path)
+    {
+        return pathinfo($path, PATHINFO_BASENAME);
+    }
+
+    /**
      * appendStream.
      *
      * @param string|resource $output
