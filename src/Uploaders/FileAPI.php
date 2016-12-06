@@ -1,10 +1,10 @@
 <?php
 
-namespace Recca0120\Upload\Uploader;
+namespace Recca0120\Upload\Uploaders;
 
 use Illuminate\Http\Request;
 
-class FileAPI extends Uploader
+class FileAPI extends Base
 {
     protected function getOriginalName()
     {

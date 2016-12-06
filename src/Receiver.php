@@ -4,8 +4,8 @@ namespace Recca0120\Upload;
 
 use Closure;
 use Illuminate\Support\Arr;
-use Recca0120\Upload\Uploader\Uploader;
-use Recca0120\Upload\Exception\ChunkedResponseException;
+use Recca0120\Upload\Contracts\Uploader;
+use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
 class Receiver
 {

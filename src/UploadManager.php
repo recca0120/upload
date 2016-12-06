@@ -3,8 +3,8 @@
 namespace Recca0120\Upload;
 
 use Illuminate\Support\Manager;
-use Recca0120\Upload\Uploader\FileAPI;
-use Recca0120\Upload\Uploader\Plupload;
+use Recca0120\Upload\Uploaders\FileAPI;
+use Recca0120\Upload\Uploaders\Plupload;
 
 class UploadManager extends Manager
 {

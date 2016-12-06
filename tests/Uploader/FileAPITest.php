@@ -1,8 +1,8 @@
 <?php
 
 use Mockery as m;
-use Recca0120\Upload\Uploader\FileAPI;
-use Recca0120\Upload\Exception\ChunkedResponseException;
+use Recca0120\Upload\Uploaders\FileAPI;
+use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
 class FileAPITest extends PHPUnit_Framework_TestCase
 {

@@ -1,13 +1,14 @@
 <?php
 
-namespace Recca0120\Upload\Uploader;
+namespace Recca0120\Upload\Uploaders;
 
 use Illuminate\Http\Request;
 use Recca0120\Upload\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
-use Recca0120\Upload\Exception\ChunkedResponseException;
+use Recca0120\Upload\Contracts\Uploader;
+use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
-abstract class Uploader
+abstract class Base implements Uploader
 {
     protected $request;
 
@@ -64,6 +65,4 @@ abstract class Uploader
     {
         return $response;
     }
-
-    abstract public function get($name);
 }

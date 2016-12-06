@@ -1,14 +1,14 @@
 <?php
 
-namespace Recca0120\Upload\Uploader;
+namespace Recca0120\Upload\Uploaders;
 
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class Plupload extends Uploader
+class Plupload extends Base
 {
     /**
-     * receive.
+     * get.
      *
      * @param string $name
      *

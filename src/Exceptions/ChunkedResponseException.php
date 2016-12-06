@@ -1,6 +1,6 @@
 <?php
 
-namespace Recca0120\Upload\Exception;
+namespace Recca0120\Upload\Exceptions;
 
 use Exception;
 use Symfony\Component\HttpFoundation\Response;

@@ -1,8 +1,8 @@
 <?php
 
 use Mockery as m;
-use Recca0120\Upload\Uploader\Plupload;
-use Recca0120\Upload\Exception\ChunkedResponseException;
+use Recca0120\Upload\Uploaders\Plupload;
+use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
 class PluploadTest extends PHPUnit_Framework_TestCase
 {
