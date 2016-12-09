@@ -232,7 +232,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         ];
         $request = m::spy('Illuminate\Http\Request');
         $filesystem = m::spy('Recca0120\Upload\Filesystem');
-        $response = m::spy('Symfony\Component\HttpFoundation\Response');
+        $response = m::spy('Illuminate\Http\JsonResponse');
 
         /*
         |------------------------------------------------------------
@@ -249,5 +249,48 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         */
 
         $this->assertSame($response, $uploader->completedResponse($response));
+    }
+
+    public function test_delete_uploaded_file()
+    {
+        /*
+        |------------------------------------------------------------
+        | Arrange
+        |------------------------------------------------------------
+        */
+
+        $config = [
+            'path' => __DIR__,
+        ];
+        $request = m::spy('Illuminate\Http\Request');
+        $filesystem = m::spy('Recca0120\Upload\Filesystem');
+        $uploadedFile = m::spy('Symfony\Component\HttpFoundation\File\UploadedFile');
+        $file = 'test';
+
+        /*
+        |------------------------------------------------------------
+        | Act
+        |------------------------------------------------------------
+        */
+
+        $uploadedFile
+            ->shouldReceive('getPathname')->andReturn($file);
+
+        $filesystem
+            ->shouldReceive('isFile')->with($file)->andReturn(true)
+            ->shouldReceive('delete')->with($file)->andReturn(true);
+
+        $uploader = new FileAPI($config, $request, $filesystem);
+
+        /*
+        |------------------------------------------------------------
+        | Assert
+        |------------------------------------------------------------
+        */
+
+        $this->assertSame($uploader, $uploader->deleteUploadedFile($uploadedFile));
+        $uploadedFile->shouldHaveReceived('getPathname')->once();
+        $filesystem->shouldHaveReceived('isFile')->with($file)->once();
+        $filesystem->shouldHaveReceived('delete')->with($file)->once();
     }
 }

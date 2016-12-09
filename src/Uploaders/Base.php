@@ -5,7 +5,7 @@ namespace Recca0120\Upload\Uploaders;
 use Illuminate\Http\Request;
 use Recca0120\Upload\Filesystem;
 use Recca0120\Upload\Contracts\Uploader;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
@@ -188,11 +188,11 @@ abstract class Base implements Uploader
      *
      * @method completedResponse
      *
-     * @param \Symfony\Component\HttpFoundation\Response $response
+     * @param Illuminate\Http\JsonResponse $response
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Illuminate\Http\JsonResponse
      */
-    public function completedResponse(Response $response)
+    public function completedResponse(JsonResponse $response)
     {
         return $response;
     }

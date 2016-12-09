@@ -4,7 +4,7 @@ namespace Recca0120\Upload\Contracts;
 
 use Illuminate\Http\Request;
 use Recca0120\Upload\Filesystem;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
@@ -31,6 +31,22 @@ interface Uploader
     public function receive($name);
 
     /**
+     * makeDirectory.
+     *
+     * @param string $path
+     *
+     * @return static
+     */
+    public function makeDirectory($path);
+
+    /**
+     * cleanDirectory.
+     *
+     * @param string $path
+     */
+    public function cleanDirectory($path);
+
+    /**
      * deleteUploadedFile.
      *
      * @param \Symfony\Component\HttpFoundation\File\UploadedFile
@@ -42,9 +58,9 @@ interface Uploader
      *
      * @method completedResponse
      *
-     * @param \Symfony\Component\HttpFoundation\Response $response
+     * @param \Illuminate\Http\JsonResponse $response
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function completedResponse(Response $response);
+    public function completedResponse(JsonResponse $response);
 }

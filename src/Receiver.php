@@ -6,7 +6,7 @@ use Closure;
 use Recca0120\Upload\Contracts\Uploader;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Illuminate\Http\JsonResponse;
 
 class Receiver
 {
@@ -49,29 +49,51 @@ class Receiver
         }
     }
 
+    /**
+     * save.
+     *
+     * @param  string $name
+     * @param  Closure $closure
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function save($name, $destination, $basePath = null, $baseUrl = null) {
-        return $this->receive($name, function(UploadedFile $uploadedFile) use ($destination, $basePath, $baseUrl) {
+        $path = $basePath.'/'.$destination;
+        $this->uploader->makeDirectory($path);
+
+        return $this->receive($name, function(UploadedFile $uploadedFile) use ($destination, $path, $baseUrl) {
             $clientOriginalName = $uploadedFile->getClientOriginalName();
-            $extension = strtolower($uploadedFile->getClientOriginalExtension());
+            $clientOriginalExtension = strtolower($uploadedFile->getClientOriginalExtension());
             $basename = pathinfo($uploadedFile->getBasename(), PATHINFO_FILENAME);
+            $filename = $basename.'.'.$clientOriginalExtension;
+            $tempname = $destination.'/'.$filename;
             $mimeType = $uploadedFile->getMimeType();
             $size = $uploadedFile->getSize();
-            $filename = $basename.'.'.$extension;
-            $uploadedFile->move($basePath.'/'.$destination, $filename);
-            $tempname = $destination.'/'.$filename;
 
-            $response = [
+            $uploadedFile->move($path, $filename);
+
+            return $this->makeJsonResponse([
                 'name' => $clientOriginalName,
                 'tmp_name' => $tempname,
                 'type' => $mimeType,
                 'size' => $size,
-            ];
-
-            if (is_null($baseUrl) === false) {
-                $response['url'] = rtrim($baseUrl, '/').'/'.$tempname;
-            }
-
-            return new JsonResponse($response);
+            ], $baseUrl);
         });
+    }
+
+    /**
+     * makeJsonResponse.
+     *
+     * @param array $data
+     * @param string $baseUrl
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function makeJsonResponse($data, $baseUrl = null) {
+        if (is_null($baseUrl) === false) {
+            $data['url'] = rtrim($baseUrl, '/').'/'.$data['tmp_name'];
+        }
+
+        return new JsonResponse($data);
     }
 }

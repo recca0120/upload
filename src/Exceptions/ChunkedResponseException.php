@@ -2,10 +2,10 @@
 
 namespace Recca0120\Upload\Exceptions;
 
-use Exception;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
 
-class ChunkedResponseException extends Exception
+class ChunkedResponseException extends RuntimeException
 {
     /**
      * $headers.

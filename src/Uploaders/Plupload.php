@@ -3,7 +3,7 @@
 namespace Recca0120\Upload\Uploaders;
 
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\JsonResponse;
 
 class Plupload extends Base
 {
@@ -42,11 +42,11 @@ class Plupload extends Base
      *
      * @method completedResponse
      *
-     * @param \Symfony\Component\HttpFoundation\Response $response
+     * @param Illuminate\Http\JsonResponse $response
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Illuminate\Http\JsonResponse
      */
-    public function completedResponse(Response $response)
+    public function completedResponse(JsonResponse $response)
     {
         $data = $response->getData();
         $response->setData([
