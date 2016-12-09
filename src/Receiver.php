@@ -3,10 +3,10 @@
 namespace Recca0120\Upload;
 
 use Closure;
+use Illuminate\Http\JsonResponse;
 use Recca0120\Upload\Contracts\Uploader;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
-use Illuminate\Http\JsonResponse;
 
 class Receiver
 {
@@ -57,11 +57,12 @@ class Receiver
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function save($name, $destination, $basePath = null, $baseUrl = null) {
+    public function save($name, $destination, $basePath = null, $baseUrl = null)
+    {
         $path = $basePath.'/'.$destination;
         $this->uploader->makeDirectory($path);
 
-        return $this->receive($name, function(UploadedFile $uploadedFile) use ($destination, $path, $baseUrl) {
+        return $this->receive($name, function (UploadedFile $uploadedFile) use ($destination, $path, $baseUrl) {
             $clientOriginalName = $uploadedFile->getClientOriginalName();
             $clientOriginalExtension = strtolower($uploadedFile->getClientOriginalExtension());
             $basename = pathinfo($uploadedFile->getBasename(), PATHINFO_FILENAME);
@@ -89,7 +90,8 @@ class Receiver
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function makeJsonResponse($data, $baseUrl = null) {
+    protected function makeJsonResponse($data, $baseUrl = null)
+    {
         if (is_null($baseUrl) === false) {
             $data['url'] = rtrim($baseUrl, '/').'/'.$data['tmp_name'];
         }

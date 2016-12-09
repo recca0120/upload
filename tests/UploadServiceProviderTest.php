@@ -46,7 +46,7 @@ class UploadServiceProviderTest extends PHPUnit_Framework_TestCase
         */
 
         $app->shouldHaveReceived('singleton')->with('Recca0120\Upload\Filesystem', 'Recca0120\Upload\Filesystem')->once();
-        $app->shouldHaveReceived('singleton')->with('Recca0120\Upload\UploadManager', m::on(function($closure) use ($app) {
+        $app->shouldHaveReceived('singleton')->with('Recca0120\Upload\UploadManager', m::on(function ($closure) use ($app) {
             return is_a($closure($app), 'Recca0120\Upload\UploadManager');
         }))->once();
         $app->shouldHaveReceived('offsetGet')->with('request')->twice();
@@ -55,6 +55,6 @@ class UploadServiceProviderTest extends PHPUnit_Framework_TestCase
     }
 }
 
-function storage_path() {
-
+function storage_path()
+{
 }

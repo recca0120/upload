@@ -20,8 +20,8 @@ class UploadManagerTest extends PHPUnit_Framework_TestCase
 
         $app = [
             'config' => [
-                'upload' => []
-            ]
+                'upload' => [],
+            ],
         ];
 
         /*
@@ -51,8 +51,8 @@ class UploadManagerTest extends PHPUnit_Framework_TestCase
 
         $app = [
             'config' => [
-                'upload' => []
-            ]
+                'upload' => [],
+            ],
         ];
 
         /*
