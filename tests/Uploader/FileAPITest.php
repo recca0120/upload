@@ -19,7 +19,6 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $path = __DIR__;
         $config = [
             'path' => __DIR__,
         ];
@@ -38,7 +37,10 @@ class FileAPITest extends PHPUnit_Framework_TestCase
             ->shouldReceive('file')->with($name)->andReturn($uploadedFile);
 
         $filesystem
-            ->shouldReceive('isDirectory')->with($path)->andReturn(false);
+            ->shouldReceive('isDirectory')->with($config['path'])->andReturn(false)
+            ->shouldReceive('files')->with($config['path'])->andReturn(['file'])
+            ->shouldReceive('isFile')->with('file')->andReturn(true)
+            ->shouldReceive('lastModified')->with('file')->andReturn(-1);
 
         $uploader = new FileAPI($config, $request, $filesystem);
 
@@ -50,10 +52,14 @@ class FileAPITest extends PHPUnit_Framework_TestCase
 
         $this->assertSame($uploadedFile, $uploader->receive($name));
 
-        $filesystem->shouldHaveReceived('isDirectory')->with($path)->once();
-        $filesystem->shouldHaveReceived('makeDirectory')->with($path, 0777, true, true)->once();
+        $filesystem->shouldHaveReceived('isDirectory')->with($config['path'])->once();
+        $filesystem->shouldHaveReceived('makeDirectory')->with($config['path'], 0777, true, true)->once();
         $request->shouldHaveReceived('header')->with('content-range')->once();
         $request->shouldHaveReceived('file')->with($name)->once();
+        $filesystem->shouldHaveReceived('files')->with($config['path'])->once();
+        $filesystem->shouldHaveReceived('isFile')->with('file')->once();
+        $filesystem->shouldHaveReceived('lastModified')->with('file')->once();
+        $filesystem->shouldHaveReceived('delete')->with('file')->once();
     }
 
     public function test_upload_chunk_file_throw_chunk_response()
@@ -64,7 +70,6 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $path = __DIR__;
         $config = [
             'path' => __DIR__,
         ];
@@ -72,14 +77,13 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         $filesystem = m::spy('Recca0120\Upload\Filesystem');
         $uploadedFile = m::spy('Symfony\Component\HttpFoundation\File\UploadedFile');
         $name = 'foo';
-        $path = __DIR__;
 
         $token = uniqid();
         $file = __FILE__;
         $originalName = basename($file);
         $extension = pathinfo($originalName, PATHINFO_EXTENSION);
         $mimeType = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $file);
-        $tmpfile = $path.'/'.md5($originalName.$token).'.'.$extension;
+        $tmpfile = $config['path'].'/'.md5($originalName.$token).'.'.$extension;
         $tmpfileExtension = FileAPI::TMPFILE_EXTENSION;
 
         $start = 5242880;
@@ -103,7 +107,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
             ->shouldReceive('get')->with('token')->andReturn($token);
 
         $filesystem
-            ->shouldReceive('isDirectory')->with($path)->andReturn(false)
+            ->shouldReceive('isDirectory')->with($config['path'])->andReturn(false)
             ->shouldReceive('extension')->andReturn($extension);
 
         $uploader = new FileAPI($config, $request, $filesystem);
@@ -122,8 +126,8 @@ class FileAPITest extends PHPUnit_Framework_TestCase
             $this->assertSame($end, $response->headers->get('X-Last-Known-Byte'));
         }
 
-        $filesystem->shouldHaveReceived('isDirectory')->with($path)->once();
-        $filesystem->shouldHaveReceived('makeDirectory')->with($path, 0777, true, true)->once();
+        $filesystem->shouldHaveReceived('isDirectory')->with($config['path'])->once();
+        $filesystem->shouldHaveReceived('makeDirectory')->with($config['path'], 0777, true, true)->once();
         $request->shouldHaveReceived('header')->with('content-range')->once();
         $request->shouldHaveReceived('get')->with('name')->once();
         $request->shouldHaveReceived('header')->with('content-disposition')->once();
@@ -141,7 +145,6 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $path = __DIR__;
         $config = [
             'path' => __DIR__,
         ];
@@ -155,7 +158,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         $originalName = basename($file);
         $extension = pathinfo($originalName, PATHINFO_EXTENSION);
         $mimeType = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $file);
-        $tmpfile = $path.'/'.md5($originalName.$token).'.'.$extension;
+        $tmpfile = $config['path'].'/'.md5($originalName.$token).'.'.$extension;
         $tmpfileExtension = FileAPI::TMPFILE_EXTENSION;
 
         $start = 5242880;
@@ -179,11 +182,14 @@ class FileAPITest extends PHPUnit_Framework_TestCase
             ->shouldReceive('get')->with('token')->andReturn($token);
 
         $filesystem
-            ->shouldReceive('isDirectory')->with($path)->andReturn(false)
+            ->shouldReceive('isDirectory')->with($config['path'])->andReturn(false)
             ->shouldReceive('extension')->with($originalName)->andReturn($extension)
             ->shouldReceive('mimeType')->with($originalName)->andReturn($mimeType)
             ->shouldReceive('move')->with($tmpfile.$tmpfileExtension, $tmpfile)
-            ->shouldReceive('size')->with($tmpfile)->andReturn($total);
+            ->shouldReceive('size')->with($tmpfile)->andReturn($total)
+            ->shouldReceive('files')->with($config['path'])->andReturn(['file'])
+            ->shouldReceive('isFile')->with('file')->andReturn(true)
+            ->shouldReceive('lastModified')->with('file')->andReturn(-1);
 
         $uploader = new FileAPI($config, $request, $filesystem);
 
@@ -195,8 +201,8 @@ class FileAPITest extends PHPUnit_Framework_TestCase
 
         $uploader->receive($name);
 
-        $filesystem->shouldHaveReceived('isDirectory')->with($path)->once();
-        $filesystem->shouldHaveReceived('makeDirectory')->with($path, 0777, true, true)->once();
+        $filesystem->shouldHaveReceived('isDirectory')->with($config['path'])->once();
+        $filesystem->shouldHaveReceived('makeDirectory')->with($config['path'], 0777, true, true)->once();
         $request->shouldHaveReceived('header')->with('content-range')->once();
         $request->shouldHaveReceived('get')->with('name')->once();
         $request->shouldHaveReceived('header')->with('content-disposition')->once();
@@ -207,6 +213,10 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         $filesystem->shouldHaveReceived('move')->with($tmpfile.$tmpfileExtension, $tmpfile)->once();
         $filesystem->shouldHaveReceived('size')->once();
         $filesystem->shouldHaveReceived('createUploadedFile')->with($tmpfile, $originalName, $mimeType, $size)->once();
+        $filesystem->shouldHaveReceived('files')->with($config['path'])->once();
+        $filesystem->shouldHaveReceived('isFile')->with('file')->once();
+        $filesystem->shouldHaveReceived('lastModified')->with('file')->once();
+        $filesystem->shouldHaveReceived('delete')->with('file')->once();
     }
 
     public function test_completed_response()
@@ -217,7 +227,6 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $path = __DIR__;
         $config = [
             'path' => __DIR__,
         ];

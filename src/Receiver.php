@@ -6,6 +6,7 @@ use Closure;
 use Recca0120\Upload\Contracts\Uploader;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class Receiver
 {
@@ -20,7 +21,6 @@ class Receiver
      * __construct.
      *
      * @param \Recca0120\Upload\Contracts\Uploader   $uploader
-     * @param \Illuminate\Http\Request $request
      */
     public function __construct(Uploader $uploader)
     {
@@ -40,25 +40,38 @@ class Receiver
         try {
             $uploadedFile = $this->uploader->receive($name);
             $response = $closure($uploadedFile);
-            $this->deleteUploadedFile($uploadedFile);
 
-            return $this->uploader->completedResponse($response);
+            return $this->uploader
+                ->deleteUploadedFile($uploadedFile)
+                ->completedResponse($response);
         } catch (ChunkedResponseException $e) {
             return $e->getResponse();
         }
     }
 
-    /**
-     * deleteUploadedFile.
-     *
-     * @param  UploadedFile $uploadedFile
-     */
-    protected function deleteUploadedFile(UploadedFile $uploadedFile)
-    {
-        $filesystem = $this->uploader->getFilesystem();
-        $file = $uploadedFile->getPathname();
-        if ($filesystem->isFile($file) === true) {
-            $filesystem->delete($file);
-        }
+    public function save($name, $destination, $basePath = null, $baseUrl = null) {
+        return $this->receive($name, function(UploadedFile $uploadedFile) use ($destination, $basePath, $baseUrl) {
+            $clientOriginalName = $uploadedFile->getClientOriginalName();
+            $extension = strtolower($uploadedFile->getClientOriginalExtension());
+            $basename = pathinfo($uploadedFile->getBasename(), PATHINFO_FILENAME);
+            $mimeType = $uploadedFile->getMimeType();
+            $size = $uploadedFile->getSize();
+            $filename = $basename.'.'.$extension;
+            $uploadedFile->move($basePath.'/'.$destination, $filename);
+            $tempname = $destination.'/'.$filename;
+
+            $response = [
+                'name' => $clientOriginalName,
+                'tmp_name' => $tempname,
+                'type' => $mimeType,
+                'size' => $size,
+            ];
+
+            if (is_null($baseUrl) === false) {
+                $response['url'] = rtrim($baseUrl, '/').'/'.$tempname;
+            }
+
+            return new JsonResponse($response);
+        });
     }
 }

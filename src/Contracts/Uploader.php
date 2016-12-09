@@ -5,6 +5,7 @@ namespace Recca0120\Upload\Contracts;
 use Illuminate\Http\Request;
 use Recca0120\Upload\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
 interface Uploader
@@ -28,6 +29,13 @@ interface Uploader
      * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      */
     public function receive($name);
+
+    /**
+     * deleteUploadedFile.
+     *
+     * @param \Symfony\Component\HttpFoundation\File\UploadedFile
+     */
+    public function deleteUploadedFile(UploadedFile $uploadedFile);
 
     /**
      * completedResponse.

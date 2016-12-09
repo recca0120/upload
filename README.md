@@ -66,9 +66,9 @@ class UploadController extends Controller
                 $size = $file->getSize();
 
                 return response()->json([
-                    'name'     => $clientOriginalName,
-                    'type'     => $mimeType,
-                    'size'     => $size,
+                    'name' => $clientOriginalName,
+                    'type' => $mimeType,
+                    'size' => $size,
                 ]);
             });
     }

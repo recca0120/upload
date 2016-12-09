@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Recca0120\Upload\Filesystem;
 use Recca0120\Upload\Contracts\Uploader;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
 abstract class Base implements Uploader
@@ -116,9 +117,11 @@ abstract class Base implements Uploader
      */
     public function receive($name)
     {
-        $this->makeDirectory();
-        $uploadedFile = $this->doReceive($name);
-        $this->cleanDirectory();
+        $uploadedFile = $this
+            ->makeDirectory($this->path)
+            ->doReceive($name);
+
+        $this->cleanDirectory($this->path);
 
         return $uploadedFile;
     }
@@ -136,32 +139,48 @@ abstract class Base implements Uploader
 
     /**
      * makeDirectory.
+     *
+     * @return static
      */
-    protected function makeDirectory()
+    public function makeDirectory($path)
     {
-        if ($this->filesystem->isDirectory($this->path) === false) {
-            $this->filesystem->makeDirectory($this->path, 0777, true, true);
+        if ($this->filesystem->isDirectory($path) === false) {
+            $this->filesystem->makeDirectory($path, 0777, true, true);
         }
+
+        return $this;
     }
 
     /**
      * cleanDirectory.
      */
-    protected function cleanDirectory()
+    public function cleanDirectory($path)
     {
         $time = time();
         $maxFileAge = 3600;
-        $files = $this->filesystem->files($this->path);
+        $files = $this->filesystem->files($path);
         foreach ((array) $files as $file) {
-            if ($this->filesystem->exists($file) === true && $this->filesystem->lastModified($file) < ($time - $maxFileAge)) {
+            if ($this->filesystem->isFile($file) === true && $this->filesystem->lastModified($file) < ($time - $maxFileAge)) {
                 $this->filesystem->delete($file);
             }
         }
     }
 
-    public function getFilesystem()
+    /**
+     * deleteUploadedFile.
+     *
+     * @param \Symfony\Component\HttpFoundation\File\UploadedFile
+     *
+     * @return static
+     */
+    public function deleteUploadedFile(UploadedFile $uploadedFile)
     {
-        return $this->filesystem;
+        $file = $uploadedFile->getPathname();
+        if ($this->filesystem->isFile($file) === true) {
+            $this->filesystem->delete($file);
+        }
+
+        return $this;
     }
 
     /**
