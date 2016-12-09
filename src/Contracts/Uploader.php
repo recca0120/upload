@@ -12,20 +12,11 @@ interface Uploader
     /**
      * __construct.
      *
+     * @param array    $config
      * @param \Illuminate\Http\Request    $request
      * @param \Recca0120\Upload\Filesystem $filesystem
-     * @param string    $path
      */
-    public function __construct(Request $request, Filesystem $filesystem, $path = null);
-
-    /**
-     * setPath.
-     *
-     * @param string $path
-     *
-     * @return static
-     */
-    public function setPath($path = null);
+    public function __construct($config = [], Request $request = null, Filesystem $filesystem = null);
 
     /**
      * receive.

@@ -32,6 +32,13 @@ abstract class Base implements Uploader
     protected $filesystem;
 
     /**
+     * $config.
+     *
+     * @var array
+     */
+    protected $config;
+
+    /**
      * $path.
      *
      * @var string
@@ -41,29 +48,18 @@ abstract class Base implements Uploader
     /**
      * __construct.
      *
+     * @param array    $path
      * @param \Illuminate\Http\Request    $request
      * @param \Recca0120\Upload\Filesystem $filesystem
-     * @param string    $path
      */
-    public function __construct(Request $request, Filesystem $filesystem, $path = null)
+    public function __construct($config = [], Request $request = null, Filesystem $filesystem = null)
     {
-        $this->request = $request;
-        $this->filesystem = $filesystem;
-        $this->setPath($path);
-    }
+        $this->request = is_null($request) === true ? Request::capture() : $request;
+        $this->filesystem = is_null($filesystem) === true ? new Filesystem : $filesystem;
+        $this->config = $config;
 
-    /**
-     * setPath.
-     *
-     * @param string $path
-     *
-     * @return static
-     */
-    public function setPath($path = null)
-    {
-        $this->path = is_null($path) === true ? sys_get_temp_dir() : $path;
-
-        return $this;
+        $path = isset($config['path']) === false ? sys_get_temp_dir().'/temp/' : $config['path'];
+        $this->path = $path;
     }
 
     /**
@@ -107,6 +103,65 @@ abstract class Base implements Uploader
         $size = $this->filesystem->size($tmpfile);
 
         return $this->filesystem->createUploadedFile($tmpfile, $originalName, $mimeType, $size);
+    }
+
+    /**
+     * receive.
+     *
+     * @param string $name
+     *
+     * @throws ChunkedResponseException
+     *
+     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
+     */
+    public function receive($name)
+    {
+        $this->makeDirectory();
+        $uploadedFile = $this->doReceive($name);
+        $this->cleanDirectory();
+
+        return $uploadedFile;
+    }
+
+    /**
+     * doReceive.
+     *
+     * @param string $name
+     *
+     * @throws ChunkedResponseException
+     *
+     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
+     */
+    abstract protected function doReceive($name);
+
+    /**
+     * makeDirectory.
+     */
+    protected function makeDirectory()
+    {
+        if ($this->filesystem->isDirectory($this->path) === false) {
+            $this->filesystem->makeDirectory($this->path, 0777, true, true);
+        }
+    }
+
+    /**
+     * cleanDirectory.
+     */
+    protected function cleanDirectory()
+    {
+        $time = time();
+        $maxFileAge = 3600;
+        $files = $this->filesystem->files($this->path);
+        foreach ((array) $files as $file) {
+            if ($this->filesystem->exists($file) === true && $this->filesystem->lastModified($file) < ($time - $maxFileAge)) {
+                $this->filesystem->delete($file);
+            }
+        }
+    }
+
+    public function getFilesystem()
+    {
+        return $this->filesystem;
     }
 
     /**

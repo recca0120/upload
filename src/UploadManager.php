@@ -2,12 +2,27 @@
 
 namespace Recca0120\Upload;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Manager;
 use Recca0120\Upload\Uploaders\FileAPI;
 use Recca0120\Upload\Uploaders\Plupload;
 
 class UploadManager extends Manager
 {
+    /**
+     * __construct.
+     *
+     * @param $app
+     * @param $request
+     * @param $filesystem
+     */
+    public function __construct($app, Request $request = null, Filesystem $filesystem = null)
+    {
+        parent::__construct($app);
+        $this->request = is_null($request) === true ? Request::capture() : $request;
+        $this->filesystem = is_null($filesystem) === true ? new Filesystem : $filesystem;
+    }
+
     /**
      * default driver.
      *
@@ -27,10 +42,7 @@ class UploadManager extends Manager
     {
         $config = $this->app['config']['upload'];
 
-        return $this->app->make(Receiver::class, [
-            $this->app->make(FileAPI::class),
-            'config' => $config,
-        ]);
+        return new Receiver(new FileAPI($config, $this->request, $this->filesystem));
     }
 
     /**
@@ -42,9 +54,6 @@ class UploadManager extends Manager
     {
         $config = $this->app['config']['upload'];
 
-        return $this->app->make(Receiver::class, [
-            $this->app->make(Plupload::class),
-            'config' => $config,
-        ]);
+        return new Receiver(new Plupload($config, $this->request, $this->filesystem));
     }
 }

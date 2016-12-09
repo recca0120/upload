@@ -19,6 +19,10 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
+        $path = __DIR__;
+        $config = [
+            'path' => __DIR__,
+        ];
         $request = m::spy('Illuminate\Http\Request');
         $filesystem = m::spy('Recca0120\Upload\Filesystem');
         $uploadedFile = m::spy('Symfony\Component\HttpFoundation\File\UploadedFile');
@@ -33,7 +37,10 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         $request
             ->shouldReceive('file')->with($name)->andReturn($uploadedFile);
 
-        $uploader = new FileAPI($request, $filesystem);
+        $filesystem
+            ->shouldReceive('isDirectory')->with($path)->andReturn(false);
+
+        $uploader = new FileAPI($config, $request, $filesystem);
 
         /*
         |------------------------------------------------------------
@@ -43,6 +50,8 @@ class FileAPITest extends PHPUnit_Framework_TestCase
 
         $this->assertSame($uploadedFile, $uploader->receive($name));
 
+        $filesystem->shouldHaveReceived('isDirectory')->with($path)->once();
+        $filesystem->shouldHaveReceived('makeDirectory')->with($path, 0777, true, true)->once();
         $request->shouldHaveReceived('header')->with('content-range')->once();
         $request->shouldHaveReceived('file')->with($name)->once();
     }
@@ -55,6 +64,10 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
+        $path = __DIR__;
+        $config = [
+            'path' => __DIR__,
+        ];
         $request = m::spy('Illuminate\Http\Request');
         $filesystem = m::spy('Recca0120\Upload\Filesystem');
         $uploadedFile = m::spy('Symfony\Component\HttpFoundation\File\UploadedFile');
@@ -90,9 +103,10 @@ class FileAPITest extends PHPUnit_Framework_TestCase
             ->shouldReceive('get')->with('token')->andReturn($token);
 
         $filesystem
+            ->shouldReceive('isDirectory')->with($path)->andReturn(false)
             ->shouldReceive('extension')->andReturn($extension);
 
-        $uploader = new FileAPI($request, $filesystem, $path);
+        $uploader = new FileAPI($config, $request, $filesystem);
 
         /*
         |------------------------------------------------------------
@@ -108,6 +122,8 @@ class FileAPITest extends PHPUnit_Framework_TestCase
             $this->assertSame($end, $response->headers->get('X-Last-Known-Byte'));
         }
 
+        $filesystem->shouldHaveReceived('isDirectory')->with($path)->once();
+        $filesystem->shouldHaveReceived('makeDirectory')->with($path, 0777, true, true)->once();
         $request->shouldHaveReceived('header')->with('content-range')->once();
         $request->shouldHaveReceived('get')->with('name')->once();
         $request->shouldHaveReceived('header')->with('content-disposition')->once();
@@ -125,11 +141,14 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
+        $path = __DIR__;
+        $config = [
+            'path' => __DIR__,
+        ];
         $request = m::spy('Illuminate\Http\Request');
         $filesystem = m::spy('Recca0120\Upload\Filesystem');
         $uploadedFile = m::spy('Symfony\Component\HttpFoundation\File\UploadedFile');
         $name = 'foo';
-        $path = __DIR__;
 
         $token = uniqid();
         $file = __FILE__;
@@ -160,12 +179,13 @@ class FileAPITest extends PHPUnit_Framework_TestCase
             ->shouldReceive('get')->with('token')->andReturn($token);
 
         $filesystem
+            ->shouldReceive('isDirectory')->with($path)->andReturn(false)
             ->shouldReceive('extension')->with($originalName)->andReturn($extension)
             ->shouldReceive('mimeType')->with($originalName)->andReturn($mimeType)
             ->shouldReceive('move')->with($tmpfile.$tmpfileExtension, $tmpfile)
             ->shouldReceive('size')->with($tmpfile)->andReturn($total);
 
-        $uploader = new FileAPI($request, $filesystem, $path);
+        $uploader = new FileAPI($config, $request, $filesystem);
 
         /*
         |------------------------------------------------------------
@@ -175,6 +195,8 @@ class FileAPITest extends PHPUnit_Framework_TestCase
 
         $uploader->receive($name);
 
+        $filesystem->shouldHaveReceived('isDirectory')->with($path)->once();
+        $filesystem->shouldHaveReceived('makeDirectory')->with($path, 0777, true, true)->once();
         $request->shouldHaveReceived('header')->with('content-range')->once();
         $request->shouldHaveReceived('get')->with('name')->once();
         $request->shouldHaveReceived('header')->with('content-disposition')->once();
@@ -195,6 +217,10 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
+        $path = __DIR__;
+        $config = [
+            'path' => __DIR__,
+        ];
         $request = m::spy('Illuminate\Http\Request');
         $filesystem = m::spy('Recca0120\Upload\Filesystem');
         $response = m::spy('Symfony\Component\HttpFoundation\Response');
@@ -205,7 +231,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $uploader = new FileAPI($request, $filesystem);
+        $uploader = new FileAPI($config, $request, $filesystem);
 
         /*
         |------------------------------------------------------------

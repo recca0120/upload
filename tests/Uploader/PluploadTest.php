@@ -19,6 +19,10 @@ class PluploadTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
+        $path = __DIR__;
+        $config = [
+            'path' => __DIR__,
+        ];
         $request = m::spy('Illuminate\Http\Request');
         $filesystem = m::spy('Recca0120\Upload\Filesystem');
         $uploadedFile = m::spy('Symfony\Component\HttpFoundation\File\UploadedFile');
@@ -33,7 +37,10 @@ class PluploadTest extends PHPUnit_Framework_TestCase
         $request
             ->shouldReceive('file')->with($name)->andReturn($uploadedFile);
 
-        $uploader = new Plupload($request, $filesystem);
+        $filesystem
+            ->shouldReceive('isDirectory')->with($path)->andReturn(false);
+
+        $uploader = new Plupload($config, $request, $filesystem);
 
         /*
         |------------------------------------------------------------
@@ -43,6 +50,8 @@ class PluploadTest extends PHPUnit_Framework_TestCase
 
         $this->assertSame($uploadedFile, $uploader->receive($name));
 
+        $filesystem->shouldHaveReceived('isDirectory')->with($path)->once();
+        $filesystem->shouldHaveReceived('makeDirectory')->with($path, 0777, true, true)->once();
         $request->shouldHaveReceived('get')->with('chunks')->once();
         $request->shouldHaveReceived('file')->with($name)->once();
     }
@@ -55,6 +64,10 @@ class PluploadTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
+        $path = __DIR__;
+        $config = [
+            'path' => __DIR__,
+        ];
         $request = m::spy('Illuminate\Http\Request');
         $filesystem = m::spy('Recca0120\Upload\Filesystem');
         $uploadedFile = m::spy('Symfony\Component\HttpFoundation\File\UploadedFile');
@@ -77,7 +90,10 @@ class PluploadTest extends PHPUnit_Framework_TestCase
             ->shouldReceive('header')->with('content-length')->andReturn($contentLength)
             ->shouldReceive('file')->with($name)->andReturn($uploadedFile);
 
-        $uploader = new Plupload($request, $filesystem, $path);
+        $filesystem
+            ->shouldReceive('isDirectory')->with($path)->andReturn(false);
+
+        $uploader = new Plupload($config, $request, $filesystem);
 
         /*
         |------------------------------------------------------------
@@ -92,6 +108,8 @@ class PluploadTest extends PHPUnit_Framework_TestCase
             $this->assertSame(201, $response->getStatusCode());
         }
 
+        $filesystem->shouldHaveReceived('isDirectory')->with($path)->once();
+        $filesystem->shouldHaveReceived('makeDirectory')->with($path, 0777, true, true)->once();
         $request->shouldHaveReceived('get')->with('chunks')->once();
         $request->shouldHaveReceived('file')->with($name)->once();
         $request->shouldHaveReceived('get')->with('chunk')->once();
@@ -106,11 +124,14 @@ class PluploadTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
+        $path = __DIR__;
+        $config = [
+            'path' => __DIR__,
+        ];
         $request = m::spy('Illuminate\Http\Request');
         $filesystem = m::spy('Recca0120\Upload\Filesystem');
         $uploadedFile = m::spy('Symfony\Component\HttpFoundation\File\UploadedFile');
         $name = 'foo';
-        $path = __DIR__;
 
         $token = uniqid();
         $file = __FILE__;
@@ -147,11 +168,12 @@ class PluploadTest extends PHPUnit_Framework_TestCase
             ->shouldReceive('getPathname')->andReturn($input);
 
         $filesystem
+            ->shouldReceive('isDirectory')->with($path)->andReturn(false)
             ->shouldReceive('extension')->with($originalName)->andReturn($extension)
             ->shouldReceive('move')->with($tmpfile.$tmpfileExtension, $tmpfile)
             ->shouldReceive('size')->with($tmpfile)->andReturn($size);
 
-        $uploader = new Plupload($request, $filesystem, $path);
+        $uploader = new Plupload($config, $request, $filesystem);
 
         /*
         |------------------------------------------------------------
@@ -161,6 +183,8 @@ class PluploadTest extends PHPUnit_Framework_TestCase
 
         $uploader->receive($name);
 
+        $filesystem->shouldHaveReceived('isDirectory')->with($path)->once();
+        $filesystem->shouldHaveReceived('makeDirectory')->with($path, 0777, true, true)->once();
         $request->shouldHaveReceived('get')->with('chunks')->once();
         $request->shouldHaveReceived('file')->with($name)->once();
         $request->shouldHaveReceived('get')->with('chunk')->once();
@@ -180,6 +204,10 @@ class PluploadTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
+        $path = __DIR__;
+        $config = [
+            'path' => __DIR__,
+        ];
         $request = m::spy('Illuminate\Http\Request');
         $filesystem = m::spy('Recca0120\Upload\Filesystem');
         $response = m::spy('Symfony\Component\HttpFoundation\Response');
@@ -194,7 +222,7 @@ class PluploadTest extends PHPUnit_Framework_TestCase
         $response
             ->shouldReceive('getData')->andReturn($data);
 
-        $uploader = new Plupload($request, $filesystem);
+        $uploader = new Plupload($config, $request, $filesystem);
 
         /*
         |------------------------------------------------------------
@@ -203,6 +231,7 @@ class PluploadTest extends PHPUnit_Framework_TestCase
         */
 
         $this->assertSame($response, $uploader->completedResponse($response));
+
         $response->shouldHaveReceived('setData')->with([
             'jsonrpc' => '2.0',
             'result' => $data,

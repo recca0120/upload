@@ -47,7 +47,7 @@ class FileAPI extends Base
      *
      * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      */
-    public function receive($name)
+    protected function doReceive($name)
     {
         $contentRange = $this->request->header('content-range');
         if (empty($contentRange) === true) {

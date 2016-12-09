@@ -3,8 +3,8 @@
 namespace Recca0120\Upload;
 
 use Closure;
-use Illuminate\Support\Arr;
 use Recca0120\Upload\Contracts\Uploader;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
 class Receiver
@@ -17,31 +17,14 @@ class Receiver
     protected $uploader;
 
     /**
-     * $filesystem.
-     *
-     * @var \Recca0120\Upload\Filesystem
-     */
-    protected $filesystem;
-
-    /**
-     * $config.
-     *
-     * @var array
-     */
-    protected $config;
-
-    /**
      * __construct.
      *
      * @param \Recca0120\Upload\Contracts\Uploader   $uploader
-     * @param \Recca0120\Upload\Filesystem $filesystem
-     * @param array     $config
+     * @param \Illuminate\Http\Request $request
      */
-    public function __construct(Uploader $uploader, Filesystem $filesystem, $config = [])
+    public function __construct(Uploader $uploader)
     {
         $this->uploader = $uploader;
-        $this->filesystem = $filesystem;
-        $this->config = $config;
     }
 
     /**
@@ -54,42 +37,28 @@ class Receiver
      */
     public function receive($name, Closure $closure)
     {
-        $path = Arr::get($this->config, 'path');
-        if ($this->filesystem->isDirectory($path) === false) {
-            $this->filesystem->makeDirectory($path, 0777, true, true);
-        }
-
         try {
-            $uploadedFile = $this->uploader
-                ->setPath($path)
-                ->receive($name);
+            $uploadedFile = $this->uploader->receive($name);
+            $response = $closure($uploadedFile);
+            $this->deleteUploadedFile($uploadedFile);
+
+            return $this->uploader->completedResponse($response);
         } catch (ChunkedResponseException $e) {
             return $e->getResponse();
         }
-
-        $response = $closure($uploadedFile);
-        $file = $uploadedFile->getPathname();
-        if ($this->filesystem->isFile($file) === true) {
-            $this->filesystem->delete($file);
-        }
-        $this->cleanDirectory($path);
-
-        return $this->uploader->completedResponse($response);
     }
 
     /**
-     * cleanDirectory.
+     * deleteUploadedFile.
      *
-     * @param  string $path
+     * @param  UploadedFile $uploadedFile
      */
-    protected function cleanDirectory($path)
+    protected function deleteUploadedFile(UploadedFile $uploadedFile)
     {
-        $time = time();
-        $maxFileAge = 3600;
-        foreach ($this->filesystem->files($path) as $file) {
-            if ($this->filesystem->exists($file) === true && $this->filesystem->lastModified($file) < ($time - $maxFileAge)) {
-                $this->filesystem->delete($file);
-            }
+        $filesystem = $this->uploader->getFilesystem();
+        $file = $uploadedFile->getPathname();
+        if ($filesystem->isFile($file) === true) {
+            $filesystem->delete($file);
         }
     }
 }

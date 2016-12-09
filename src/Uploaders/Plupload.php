@@ -16,7 +16,7 @@ class Plupload extends Base
      *
      * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      */
-    public function receive($name)
+    protected function doReceive($name)
     {
         $uploadedFile = $this->request->file($name);
         $chunks = $this->request->get('chunks');
