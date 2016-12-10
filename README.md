@@ -32,7 +32,7 @@ Instead, you may of course manually update your require block and run `composer 
 }
 ```
 
-## standalone
+## Standalone
 
 ```php
 
@@ -66,6 +66,12 @@ Include the service provider within `config/app.php`. The service povider is nee
     Recca0120\Upload\UploadServiceProvider::class,
     ...
 ];
+```
+
+publish
+
+```php
+artisan vendor:publish --provider="Recca0120\Upload\UploadServiceProvider"
 ```
 
 ## How to use

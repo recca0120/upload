@@ -53,6 +53,38 @@ class UploadServiceProviderTest extends PHPUnit_Framework_TestCase
         $app->shouldHaveReceived('make')->with('Recca0120\Upload\Filesystem')->twice();
         $app->shouldHaveReceived('singleton')->with('Recca0120\Upload\Manager', 'Recca0120\Upload\UploadManager')->once();
     }
+
+    public function test_boot_running_in_console()
+    {
+        /*
+        |------------------------------------------------------------
+        | Arrange
+        |------------------------------------------------------------
+        */
+
+        $app = m::spy('Illuminate\Contracts\Foundation\Application, ArrayAccess');
+
+        /*
+        |------------------------------------------------------------
+        | Act
+        |------------------------------------------------------------
+        */
+
+        $app
+            ->shouldReceive('runningInConsole')->andReturn(true);
+
+        $serviceProvider = new UploadServiceProvider($app);
+        $serviceProvider->boot();
+
+        /*
+        |------------------------------------------------------------
+        | Assert
+        |------------------------------------------------------------
+        */
+
+        $app->shouldHaveReceived('runningInConsole')->once();
+        $app->shouldHaveReceived('configPath')->once();
+    }
 }
 
 function storage_path()
