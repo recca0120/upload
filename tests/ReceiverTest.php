@@ -43,7 +43,7 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $receiver->receive($name, function($uploaded) use ($response, $uploadedFile) {
+        $receiver->receive($name, function ($uploaded) use ($response, $uploadedFile) {
             $this->assertSame($uploaded, $uploadedFile);
 
             return $response;
@@ -85,7 +85,8 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $response = $receiver->receive($name, function() {});
+        $response = $receiver->receive($name, function () {
+        });
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
         $uploader->shouldHaveReceived('makeDirectory')->with(sys_get_temp_dir().'/storage/temp')->once();
         $uploader->shouldHaveReceived('receive')->with($name)->once();
@@ -155,7 +156,7 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         $uploadedFile->shouldReceive('getSize')->andReturn($size);
         $uploadedFile->shouldReceive('move')->with($basePath.'/'.$destination, $basename.'.'.$clientOriginalExtension);
         $uploader->shouldHaveReceived('deleteUploadedFile')->with($uploadedFile)->once();
-        $uploader->shouldHaveReceived('completedResponse')->with(m::on(function($response) use ($clientOriginalName, $mimeType, $size) {
+        $uploader->shouldHaveReceived('completedResponse')->with(m::on(function ($response) use ($clientOriginalName, $mimeType, $size) {
             $data = $response->getData();
             $this->assertSame($data->name, $clientOriginalName);
             $this->assertSame($data->type, $mimeType);

@@ -4,8 +4,8 @@ namespace Recca0120\Upload\Uploaders;
 
 use Illuminate\Http\Request;
 use Recca0120\Upload\Filesystem;
-use Recca0120\Upload\Contracts\Uploader;
 use Illuminate\Http\JsonResponse;
+use Recca0120\Upload\Contracts\Uploader;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 

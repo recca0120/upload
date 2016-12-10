@@ -3,11 +3,11 @@
 namespace Recca0120\Upload;
 
 use Closure;
+use Illuminate\Support\Arr;
+use Illuminate\Http\JsonResponse;
 use Recca0120\Upload\Contracts\Uploader;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Arr;
 
 class Receiver
 {
@@ -40,7 +40,8 @@ class Receiver
      *
      * @param string $basePath
      */
-    public function setBasePath($basePath) {
+    public function setBasePath($basePath)
+    {
         $this->basePath = $basePath;
 
         return $this;
@@ -51,7 +52,8 @@ class Receiver
      *
      * @return string
      */
-    public function getBasePath() {
+    public function getBasePath()
+    {
         return is_null($this->basePath) === true ? sys_get_temp_dir() : $this->basePath;
     }
 
@@ -60,7 +62,8 @@ class Receiver
      *
      * @param string $baseUrl
      */
-    public function setBaseUrl($baseUrl) {
+    public function setBaseUrl($baseUrl)
+    {
         $this->baseUrl = $baseUrl;
 
         return $this;
@@ -103,7 +106,8 @@ class Receiver
      *
      * @return Closure
      */
-    public function save($name, $destination) {
+    public function save($name, $destination)
+    {
         return $this->receive($name, null, $destination);
     }
 
@@ -112,8 +116,9 @@ class Receiver
      *
      * @return \Closure
      */
-    protected function callback() {
-        return function(UploadedFile $uploadedFile, $destination, $path, $baseUrl) {
+    protected function callback()
+    {
+        return function (UploadedFile $uploadedFile, $destination, $path, $baseUrl) {
             $clientOriginalName = $uploadedFile->getClientOriginalName();
             $clientOriginalExtension = strtolower($uploadedFile->getClientOriginalExtension());
             $basename = pathinfo($uploadedFile->getBasename(), PATHINFO_FILENAME);
@@ -141,7 +146,8 @@ class Receiver
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function makeJsonResponse($data, $baseUrl = null) {
+    protected function makeJsonResponse($data, $baseUrl = null)
+    {
         if (is_null($baseUrl) === false) {
             $data['url'] = rtrim($baseUrl, '/').'/'.$data['tmp_name'];
         }
