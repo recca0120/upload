@@ -18,21 +18,31 @@ class Receiver
      */
     protected $uploader;
 
+    /**
+     * $basePath.
+     *
+     * @var string
+     */
     public $basePath = null;
 
+    /**
+     * $baseUrl.
+     *
+     * @var string
+     */
     public $baseUrl = null;
 
     /**
      * __construct.
      *
      * @param \Recca0120\Upload\Contracts\Uploader  $uploader
-     * @param array                                 $config
      */
-    public function __construct(Uploader $uploader, $config = [])
+    public function __construct(Uploader $uploader)
     {
-        $this->uploader = $uploader;
+        $config = $uploader->getConfig();
         $this->setBasePath(Arr::get($config, 'base_path'));
         $this->setBaseUrl(Arr::get($config, 'base_url'));
+        $this->uploader = $uploader;
     }
 
     /**
@@ -54,7 +64,9 @@ class Receiver
      */
     public function getBasePath()
     {
-        return is_null($this->basePath) === true ? sys_get_temp_dir() : $this->basePath;
+        $basePath = is_null($this->basePath) === true ? sys_get_temp_dir() : $this->basePath;
+
+        return rtrim($basePath, '/').'/';
     }
 
     /**
@@ -74,21 +86,21 @@ class Receiver
      *
      * @param  string $name
      * @param  Closure $closure
-     * @param  string $destination
+     * @param  string $destinationPath
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function receive($name = 'file', Closure $callback = null, $destination = 'storage/temp')
+    public function receive($inputName = 'file', Closure $callback = null, $destinationPath = 'storage/temp')
     {
         $callback = is_null($callback) === true ? $this->callback() : $callback;
-        $path = $this->getBasePath().'/'.$destination;
+        $absolutePath = $this->getBasePath().$destinationPath;
 
         try {
             $uploadedFile = $this->uploader
-                ->makeDirectory($path)
-                ->receive($name);
+                ->makeDirectory($absolutePath)
+                ->receive($inputName);
 
-            $response = $callback($uploadedFile, $destination, $path, $this->baseUrl);
+            $response = $callback($uploadedFile, $destinationPath, $absolutePath, $this->baseUrl);
 
             return $this->uploader
                 ->deleteUploadedFile($uploadedFile)
@@ -101,14 +113,14 @@ class Receiver
     /**
      * save.
      *
-     * @param  string $name
-     * @param  string $destination
+     * @param  string $inputName
+     * @param  string $destinationPath
      *
      * @return Closure
      */
-    public function save($name, $destination)
+    public function save($inputName, $destinationPath = 'storage/temp')
     {
-        return $this->receive($name, null, $destination);
+        return $this->receive($inputName, null, $destinationPath);
     }
 
     /**
@@ -118,16 +130,16 @@ class Receiver
      */
     protected function callback()
     {
-        return function (UploadedFile $uploadedFile, $destination, $path, $baseUrl) {
+        return function (UploadedFile $uploadedFile, $destinationPath, $absolutePath, $baseUrl) {
             $clientOriginalName = $uploadedFile->getClientOriginalName();
             $clientOriginalExtension = strtolower($uploadedFile->getClientOriginalExtension());
             $basename = pathinfo($uploadedFile->getBasename(), PATHINFO_FILENAME);
             $filename = $basename.'.'.$clientOriginalExtension;
-            $tempname = $destination.'/'.$filename;
+            $tempname = $destinationPath.'/'.$filename;
             $mimeType = $uploadedFile->getMimeType();
             $size = $uploadedFile->getSize();
 
-            $uploadedFile->move($path, $filename);
+            $uploadedFile->move($absolutePath, $filename);
 
             return $this->makeJsonResponse([
                 'name' => $clientOriginalName,

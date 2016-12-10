@@ -57,10 +57,62 @@ abstract class Base implements Uploader
     {
         $this->request = is_null($request) === true ? Request::capture() : $request;
         $this->filesystem = is_null($filesystem) === true ? new Filesystem : $filesystem;
-        $this->config = $config;
+        $this->setConfig($config);
+    }
 
+    /**
+     * setConfig.
+     *
+     * @param array $config
+     *
+     * @return static
+     */
+    public function setConfig($config)
+    {
+        $this->config = $config;
         $chunksPath = isset($config['chunksPath']) === false ? sys_get_temp_dir().'/temp/' : $config['chunksPath'];
         $this->chunksPath = $chunksPath;
+
+        return $this;
+    }
+
+    /**
+     * getConfig.
+     *
+     * @return array
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    /**
+     * makeDirectory.
+     *
+     * @return static
+     */
+    public function makeDirectory($path)
+    {
+        if ($this->filesystem->isDirectory($path) === false) {
+            $this->filesystem->makeDirectory($path, 0777, true, true);
+        }
+
+        return $this;
+    }
+
+    /**
+     * cleanDirectory.
+     */
+    public function cleanDirectory($path)
+    {
+        $time = time();
+        $maxFileAge = 3600;
+        $files = $this->filesystem->files($path);
+        foreach ((array) $files as $file) {
+            if ($this->filesystem->isFile($file) === true && $this->filesystem->lastModified($file) < ($time - $maxFileAge)) {
+                $this->filesystem->delete($file);
+            }
+        }
     }
 
     /**
@@ -109,17 +161,17 @@ abstract class Base implements Uploader
     /**
      * receive.
      *
-     * @param string $name
+     * @param string $inputName
      *
      * @throws ChunkedResponseException
      *
      * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      */
-    public function receive($name)
+    public function receive($inputName)
     {
         $uploadedFile = $this
             ->makeDirectory($this->chunksPath)
-            ->doReceive($name);
+            ->doReceive($inputName);
 
         $this->cleanDirectory($this->chunksPath);
 
@@ -129,42 +181,13 @@ abstract class Base implements Uploader
     /**
      * doReceive.
      *
-     * @param string $name
+     * @param string $inputName
      *
      * @throws ChunkedResponseException
      *
      * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      */
-    abstract protected function doReceive($name);
-
-    /**
-     * makeDirectory.
-     *
-     * @return static
-     */
-    public function makeDirectory($path)
-    {
-        if ($this->filesystem->isDirectory($path) === false) {
-            $this->filesystem->makeDirectory($path, 0777, true, true);
-        }
-
-        return $this;
-    }
-
-    /**
-     * cleanDirectory.
-     */
-    public function cleanDirectory($path)
-    {
-        $time = time();
-        $maxFileAge = 3600;
-        $files = $this->filesystem->files($path);
-        foreach ((array) $files as $file) {
-            if ($this->filesystem->isFile($file) === true && $this->filesystem->lastModified($file) < ($time - $maxFileAge)) {
-                $this->filesystem->delete($file);
-            }
-        }
-    }
+    abstract protected function doReceive($inputName);
 
     /**
      * deleteUploadedFile.

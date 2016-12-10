@@ -1,4 +1,4 @@
-## Ajax Upload for Laravel 5 (Support jQuery-File-Upload, FileApi, Plupload)
+## Pure Ajax Upload And for Laravel 5 (Support jQuery-File-Upload, FileApi, Plupload)
 
 [![StyleCI](https://styleci.io/repos/48772854/shield?style=flat)](https://styleci.io/repos/48772854)
 [![Build Status](https://travis-ci.org/recca0120/laravel-upload.svg)](https://travis-ci.org/recca0120/laravel-upload)
@@ -32,6 +32,32 @@ Instead, you may of course manually update your require block and run `composer 
 }
 ```
 
+## standalone
+
+```php
+
+use Recca0120\Upload\Receiver;
+use Recca0120\Upload\Uploaders\FileAPI;
+use Recca0120\Upload\Uploaders\Plupload;
+
+require __DIR__.'/vendor/autoload.php';
+
+$config = [
+    'chunk_path' => 'absolute path';
+    'base_path' => 'absolute path',
+    'base_url' => 'http://dev/'
+];
+
+$inputName = 'file';
+$destinationPath = 'relative path';
+
+$receiver = new Receiver(new FileAPI($config));
+// save to $config['base_path'].'/'.$destinationPath;
+echo $receiver->save($inputName, $destinationPath);
+```
+
+## Laravel 5
+
 Include the service provider within `config/app.php`. The service povider is needed for the generator artisan command.
 
 ```php
@@ -55,22 +81,11 @@ class UploadController extends Controller
     public function upload(UploadManager $manager)
     {
         $driver = 'plupload'; // or 'fileapi'
-        $name = 'file'; // $_FILES index;
+        $inputName = 'file'; // $_FILES index;
+        $destinationPath = 'storage/temp';
         return $manager
             ->driver($driver)
-            ->receive($name, function (UploadedFile $file) {
-
-                $clientOriginalName = $file->getClientOriginalName();
-                $pathName = $file->getPathname();
-                $mimeType = $file->getMimeType();
-                $size = $file->getSize();
-
-                return response()->json([
-                    'name' => $clientOriginalName,
-                    'type' => $mimeType,
-                    'size' => $size,
-                ]);
-            });
+            ->save($inputName, destinationPath);
     }
 }
 ```

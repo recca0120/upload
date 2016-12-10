@@ -22,7 +22,8 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         $uploader = m::spy('Recca0120\Upload\Contracts\Uploader');
         $uploadedFile = m::spy('Symfony\Component\HttpFoundation\File\UploadedFile');
         $response = m::spy('Illuminate\Http\JsonResponse');
-        $name = 'test';
+        $inputName = 'test';
+        $config = [];
 
         /*
         |------------------------------------------------------------
@@ -31,8 +32,9 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         */
 
         $uploader
+            ->shouldReceive('getConfig')->andReturn($config)
             ->shouldReceive('makeDirectory')->with(sys_get_temp_dir().'/storage/temp')->andReturnSelf()
-            ->shouldReceive('receive')->with($name)->andReturn($uploadedFile)
+            ->shouldReceive('receive')->with($inputName)->andReturn($uploadedFile)
             ->shouldReceive('deleteUploadedFile')->andReturnSelf();
 
         $receiver = new Receiver($uploader);
@@ -43,14 +45,15 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $receiver->receive($name, function ($uploaded) use ($response, $uploadedFile) {
+        $receiver->receive($inputName, function ($uploaded) use ($response, $uploadedFile) {
             $this->assertSame($uploaded, $uploadedFile);
 
             return $response;
         });
 
+        $uploader->shouldHaveReceived('getConfig')->once();
         $uploader->shouldHaveReceived('makeDirectory')->with(sys_get_temp_dir().'/storage/temp')->once();
-        $uploader->shouldHaveReceived('receive')->with($name)->once();
+        $uploader->shouldHaveReceived('receive')->with($inputName)->once();
         $uploader->shouldHaveReceived('deleteUploadedFile')->with($uploadedFile)->once();
         $uploader->shouldHaveReceived('completedResponse')->with($response)->once();
     }
@@ -65,7 +68,8 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
 
         $uploader = m::spy('Recca0120\Upload\Contracts\Uploader');
         $chunkedResponseException = new ChunkedResponseException();
-        $name = 'test';
+        $inputName = 'test';
+        $config = [];
 
         /*
         |------------------------------------------------------------
@@ -74,8 +78,9 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         */
 
         $uploader
+            ->shouldReceive('getConfig')->andReturn($config)
             ->shouldReceive('makeDirectory')->with(sys_get_temp_dir().'/storage/temp')->andReturnSelf()
-            ->shouldReceive('receive')->with($name)->andThrow($chunkedResponseException);
+            ->shouldReceive('receive')->with($inputName)->andThrow($chunkedResponseException);
 
         $receiver = new Receiver($uploader);
 
@@ -85,11 +90,12 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $response = $receiver->receive($name, function () {
+        $response = $receiver->receive($inputName, function () {
         });
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+        $uploader->shouldHaveReceived('getConfig')->once();
         $uploader->shouldHaveReceived('makeDirectory')->with(sys_get_temp_dir().'/storage/temp')->once();
-        $uploader->shouldHaveReceived('receive')->with($name)->once();
+        $uploader->shouldHaveReceived('receive')->with($inputName)->once();
     }
 
     public function test_save()
@@ -103,7 +109,7 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         $uploader = m::spy('Recca0120\Upload\Contracts\Uploader');
         $uploadedFile = m::spy('Symfony\Component\HttpFoundation\File\UploadedFile');
         $response = m::spy('Illuminate\Http\JsonResponse');
-        $name = 'test';
+        $inputName = 'test';
         $destination = 'destination';
         $basePath = 'base_path';
         $baseUrl = 'base_url';
@@ -125,8 +131,9 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         */
 
         $uploader
+            ->shouldReceive('getConfig')->andReturn($config)
             ->shouldReceive('makeDirectory')->with($basePath.'/'.$destination)->andReturnSelf()
-            ->shouldReceive('receive')->with($name)->andReturn($uploadedFile)
+            ->shouldReceive('receive')->with($inputName)->andReturn($uploadedFile)
             ->shouldReceive('deleteUploadedFile')->andReturnSelf()
             ->shouldReceive('completedResponse')->with(m::type('Illuminate\Http\JsonResponse'))->andReturn($response);
 
@@ -146,9 +153,10 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $this->assertSame($response, $receiver->save($name, $destination));
+        $this->assertSame($response, $receiver->save($inputName, $destination));
+        $uploader->shouldHaveReceived('getConfig')->once();
         $uploader->shouldHaveReceived('makeDirectory')->with($basePath.'/'.$destination)->once();
-        $uploader->shouldHaveReceived('receive')->with($name)->once();
+        $uploader->shouldHaveReceived('receive')->with($inputName)->once();
         $uploadedFile->shouldReceive('getClientOriginalName')->andReturn($clientOriginalName);
         $uploadedFile->shouldReceive('getClientOriginalExtension')->andReturn($clientOriginalExtension);
         $uploadedFile->shouldReceive('getBasename')->andReturn($clientOriginalName);

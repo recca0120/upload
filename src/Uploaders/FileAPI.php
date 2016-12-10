@@ -41,17 +41,17 @@ class FileAPI extends Base
     /**
      * receive.
      *
-     * @param string $name
+     * @param string $inputName
      *
      * @throws ChunkedResponseException
      *
      * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      */
-    protected function doReceive($name)
+    protected function doReceive($inputName)
     {
         $contentRange = $this->request->header('content-range');
         if (empty($contentRange) === true) {
-            return $this->request->file($name);
+            return $this->request->file($inputName);
         }
 
         list($start, $end, $total) = sscanf($contentRange, 'bytes %d-%d/%d');

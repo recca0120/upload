@@ -10,15 +10,15 @@ class Plupload extends Base
     /**
      * receive.
      *
-     * @param string $name
+     * @param string $inputName
      *
      * @throws ChunkedResponseException
      *
      * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      */
-    protected function doReceive($name)
+    protected function doReceive($inputName)
     {
-        $uploadedFile = $this->request->file($name);
+        $uploadedFile = $this->request->file($inputName);
         $chunks = $this->request->get('chunks');
 
         if (empty($chunks) === true) {

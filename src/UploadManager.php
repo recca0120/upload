@@ -42,7 +42,7 @@ class UploadManager extends Manager
     {
         $config = $this->app['config']['upload'];
 
-        return new Receiver(new FileAPI($config, $this->request, $this->filesystem), $config);
+        return new Receiver(new FileAPI($config, $this->request, $this->filesystem));
     }
 
     /**
@@ -54,6 +54,6 @@ class UploadManager extends Manager
     {
         $config = $this->app['config']['upload'];
 
-        return new Receiver(new Plupload($config, $this->request, $this->filesystem), $config);
+        return new Receiver(new Plupload($config, $this->request, $this->filesystem));
     }
 }

@@ -25,7 +25,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         $request = m::spy('Illuminate\Http\Request');
         $filesystem = m::spy('Recca0120\Upload\Filesystem');
         $uploadedFile = m::spy('Symfony\Component\HttpFoundation\File\UploadedFile');
-        $name = 'foo';
+        $inputName = 'foo';
 
         /*
         |------------------------------------------------------------
@@ -34,7 +34,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         */
 
         $request
-            ->shouldReceive('file')->with($name)->andReturn($uploadedFile);
+            ->shouldReceive('file')->with($inputName)->andReturn($uploadedFile);
 
         $filesystem
             ->shouldReceive('isDirectory')->with($config['chunksPath'])->andReturn(false)
@@ -50,12 +50,12 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $this->assertSame($uploadedFile, $uploader->receive($name));
+        $this->assertSame($uploadedFile, $uploader->receive($inputName));
 
         $filesystem->shouldHaveReceived('isDirectory')->with($config['chunksPath'])->once();
         $filesystem->shouldHaveReceived('makeDirectory')->with($config['chunksPath'], 0777, true, true)->once();
         $request->shouldHaveReceived('header')->with('content-range')->once();
-        $request->shouldHaveReceived('file')->with($name)->once();
+        $request->shouldHaveReceived('file')->with($inputName)->once();
         $filesystem->shouldHaveReceived('files')->with($config['chunksPath'])->once();
         $filesystem->shouldHaveReceived('isFile')->with('file')->once();
         $filesystem->shouldHaveReceived('lastModified')->with('file')->once();
@@ -76,7 +76,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         $request = m::spy('Illuminate\Http\Request');
         $filesystem = m::spy('Recca0120\Upload\Filesystem');
         $uploadedFile = m::spy('Symfony\Component\HttpFoundation\File\UploadedFile');
-        $name = 'foo';
+        $inputName = 'foo';
 
         $token = uniqid();
         $file = __FILE__;
@@ -119,7 +119,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         */
 
         try {
-            $uploader->receive($name);
+            $uploader->receive($inputName);
         } catch (ChunkedResponseException $e) {
             $response = $e->getResponse();
             $this->assertSame(201, $response->getStatusCode());
@@ -151,7 +151,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         $request = m::spy('Illuminate\Http\Request');
         $filesystem = m::spy('Recca0120\Upload\Filesystem');
         $uploadedFile = m::spy('Symfony\Component\HttpFoundation\File\UploadedFile');
-        $name = 'foo';
+        $inputName = 'foo';
 
         $token = uniqid();
         $file = __FILE__;
@@ -199,7 +199,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $uploader->receive($name);
+        $uploader->receive($inputName);
 
         $filesystem->shouldHaveReceived('isDirectory')->with($config['chunksPath'])->once();
         $filesystem->shouldHaveReceived('makeDirectory')->with($config['chunksPath'], 0777, true, true)->once();

@@ -20,15 +20,22 @@ interface Uploader
     public function __construct($config = [], Request $request = null, Filesystem $filesystem = null);
 
     /**
-     * receive.
+     * setConfig.
      *
-     * @param string $name
+     * @param array $config
      *
-     * @throws ChunkedResponseException
-     *
-     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
+     * @return static
      */
-    public function receive($name);
+    public function setConfig($config);
+
+    /**
+     * setConfig.
+     *
+     * @param array $config
+     *
+     * @return static
+     */
+    public function getConfig();
 
     /**
      * makeDirectory.
@@ -45,6 +52,17 @@ interface Uploader
      * @param string $path
      */
     public function cleanDirectory($path);
+
+    /**
+     * receive.
+     *
+     * @param string $name
+     *
+     * @throws ChunkedResponseException
+     *
+     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
+     */
+    public function receive($name);
 
     /**
      * deleteUploadedFile.
