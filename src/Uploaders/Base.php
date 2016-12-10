@@ -70,7 +70,7 @@ abstract class Base implements Uploader
     public function setConfig($config)
     {
         $this->config = $config;
-        $chunksPath = isset($config['chunksPath']) === false ? sys_get_temp_dir().'/temp/' : $config['chunksPath'];
+        $chunksPath = isset($config['chunks_path']) === false ? sys_get_temp_dir().'/temp/' : $config['chunks_path'];
         $this->chunksPath = $chunksPath;
 
         return $this;
