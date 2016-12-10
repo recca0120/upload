@@ -31,6 +31,7 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         */
 
         $uploader
+            ->shouldReceive('makeDirectory')->with(sys_get_temp_dir().'/storage/temp')->andReturnSelf()
             ->shouldReceive('receive')->with($name)->andReturn($uploadedFile)
             ->shouldReceive('deleteUploadedFile')->andReturnSelf();
 
@@ -48,6 +49,7 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
             return $response;
         });
 
+        $uploader->shouldHaveReceived('makeDirectory')->with(sys_get_temp_dir().'/storage/temp')->once();
         $uploader->shouldHaveReceived('receive')->with($name)->once();
         $uploader->shouldHaveReceived('deleteUploadedFile')->with($uploadedFile)->once();
         $uploader->shouldHaveReceived('completedResponse')->with($response)->once();
@@ -72,6 +74,7 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         */
 
         $uploader
+            ->shouldReceive('makeDirectory')->with(sys_get_temp_dir().'/storage/temp')->andReturnSelf()
             ->shouldReceive('receive')->with($name)->andThrow($chunkedResponseException);
 
         $receiver = new Receiver($uploader);
@@ -84,6 +87,7 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
 
         $response = $receiver->receive($name, function() {});
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+        $uploader->shouldHaveReceived('makeDirectory')->with(sys_get_temp_dir().'/storage/temp')->once();
         $uploader->shouldHaveReceived('receive')->with($name)->once();
     }
 
@@ -102,6 +106,10 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         $destination = 'destination';
         $basePath = 'base_path';
         $baseUrl = 'base_url';
+        $config = [
+            'base_path' => $basePath,
+            'base_url' => $baseUrl,
+        ];
 
         $clientOriginalName = 'client_original_name.PHP';
         $clientOriginalExtension = 'PHP';
@@ -116,7 +124,7 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         */
 
         $uploader
-            ->shouldReceive('makeDirectory')->with($basePath.'/'.$destination)
+            ->shouldReceive('makeDirectory')->with($basePath.'/'.$destination)->andReturnSelf()
             ->shouldReceive('receive')->with($name)->andReturn($uploadedFile)
             ->shouldReceive('deleteUploadedFile')->andReturnSelf()
             ->shouldReceive('completedResponse')->with(m::type('Illuminate\Http\JsonResponse'))->andReturn($response);
@@ -129,7 +137,7 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
             ->shouldReceive('getSize')->andReturn($size)
             ->shouldReceive('move')->with($basePath.'/'.$destination, $basename.'.'.$clientOriginalExtension);
 
-        $receiver = new Receiver($uploader);
+        $receiver = new Receiver($uploader, $config);
 
         /*
         |------------------------------------------------------------
@@ -137,7 +145,7 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $this->assertSame($response, $receiver->save($name, $destination, $basePath, $baseUrl));
+        $this->assertSame($response, $receiver->save($name, $destination));
         $uploader->shouldHaveReceived('makeDirectory')->with($basePath.'/'.$destination)->once();
         $uploader->shouldHaveReceived('receive')->with($name)->once();
         $uploadedFile->shouldReceive('getClientOriginalName')->andReturn($clientOriginalName);

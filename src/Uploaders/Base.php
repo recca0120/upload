@@ -40,16 +40,16 @@ abstract class Base implements Uploader
     protected $config;
 
     /**
-     * $path.
+     * $chunksPath.
      *
      * @var string
      */
-    protected $path;
+    protected $chunksPath;
 
     /**
      * __construct.
      *
-     * @param array    $path
+     * @param array    $config
      * @param \Illuminate\Http\Request    $request
      * @param \Recca0120\Upload\Filesystem $filesystem
      */
@@ -59,8 +59,8 @@ abstract class Base implements Uploader
         $this->filesystem = is_null($filesystem) === true ? new Filesystem : $filesystem;
         $this->config = $config;
 
-        $path = isset($config['path']) === false ? sys_get_temp_dir().'/temp/' : $config['path'];
-        $this->path = $path;
+        $chunksPath = isset($config['chunksPath']) === false ? sys_get_temp_dir().'/temp/' : $config['chunksPath'];
+        $this->chunksPath = $chunksPath;
     }
 
     /**
@@ -75,7 +75,7 @@ abstract class Base implements Uploader
         $extension = $this->filesystem->extension($originalName);
         $token = $this->request->get('token');
 
-        return $this->path.'/'.md5($originalName.$token).'.'.$extension;
+        return $this->chunksPath.'/'.md5($originalName.$token).'.'.$extension;
     }
 
     /**
@@ -118,10 +118,10 @@ abstract class Base implements Uploader
     public function receive($name)
     {
         $uploadedFile = $this
-            ->makeDirectory($this->path)
+            ->makeDirectory($this->chunksPath)
             ->doReceive($name);
 
-        $this->cleanDirectory($this->path);
+        $this->cleanDirectory($this->chunksPath);
 
         return $uploadedFile;
     }

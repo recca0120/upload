@@ -58,3 +58,11 @@ class UploadServiceProviderTest extends PHPUnit_Framework_TestCase
 function storage_path() {
 
 }
+
+function public_path() {
+
+}
+
+function url() {
+
+}

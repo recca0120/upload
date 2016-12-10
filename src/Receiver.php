@@ -7,6 +7,7 @@ use Recca0120\Upload\Contracts\Uploader;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Arr;
 
 class Receiver
 {
@@ -17,14 +18,52 @@ class Receiver
      */
     protected $uploader;
 
+    public $basePath = null;
+
+    public $baseUrl = null;
+
     /**
      * __construct.
      *
-     * @param \Recca0120\Upload\Contracts\Uploader   $uploader
+     * @param \Recca0120\Upload\Contracts\Uploader  $uploader
+     * @param array                                 $config
      */
-    public function __construct(Uploader $uploader)
+    public function __construct(Uploader $uploader, $config = [])
     {
         $this->uploader = $uploader;
+        $this->setBasePath(Arr::get($config, 'base_path'));
+        $this->setBaseUrl(Arr::get($config, 'base_url'));
+    }
+
+    /**
+     * setBasePath.
+     *
+     * @param string $basePath
+     */
+    public function setBasePath($basePath) {
+        $this->basePath = $basePath;
+
+        return $this;
+    }
+
+    /**
+     * getBasePath.
+     *
+     * @return string
+     */
+    public function getBasePath() {
+        return is_null($this->basePath) === true ? sys_get_temp_dir() : $this->basePath;
+    }
+
+    /**
+     * setBaseUrl.
+     *
+     * @param string $baseUrl
+     */
+    public function setBaseUrl($baseUrl) {
+        $this->baseUrl = $baseUrl;
+
+        return $this;
     }
 
     /**
@@ -32,14 +71,21 @@ class Receiver
      *
      * @param  string $name
      * @param  Closure $closure
+     * @param  string $destination
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function receive($name, Closure $closure)
+    public function receive($name = 'file', Closure $callback = null, $destination = 'storage/temp')
     {
+        $callback = is_null($callback) === true ? $this->callback() : $callback;
+        $path = $this->getBasePath().'/'.$destination;
+
         try {
-            $uploadedFile = $this->uploader->receive($name);
-            $response = $closure($uploadedFile);
+            $uploadedFile = $this->uploader
+                ->makeDirectory($path)
+                ->receive($name);
+
+            $response = $callback($uploadedFile, $destination, $path, $this->baseUrl);
 
             return $this->uploader
                 ->deleteUploadedFile($uploadedFile)
@@ -53,15 +99,21 @@ class Receiver
      * save.
      *
      * @param  string $name
-     * @param  Closure $closure
+     * @param  string $destination
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Closure
      */
-    public function save($name, $destination, $basePath = null, $baseUrl = null) {
-        $path = $basePath.'/'.$destination;
-        $this->uploader->makeDirectory($path);
+    public function save($name, $destination) {
+        return $this->receive($name, null, $destination);
+    }
 
-        return $this->receive($name, function(UploadedFile $uploadedFile) use ($destination, $path, $baseUrl) {
+    /**
+     * callback.
+     *
+     * @return \Closure
+     */
+    protected function callback() {
+        return function(UploadedFile $uploadedFile, $destination, $path, $baseUrl) {
             $clientOriginalName = $uploadedFile->getClientOriginalName();
             $clientOriginalExtension = strtolower($uploadedFile->getClientOriginalExtension());
             $basename = pathinfo($uploadedFile->getBasename(), PATHINFO_FILENAME);
@@ -78,7 +130,7 @@ class Receiver
                 'type' => $mimeType,
                 'size' => $size,
             ], $baseUrl);
-        });
+        };
     }
 
     /**
