@@ -1,7 +1,7 @@
 ## Pure Ajax Upload And for Laravel 5 (Support jQuery-File-Upload, FileApi, Plupload)
 
 [![StyleCI](https://styleci.io/repos/48772854/shield?style=flat)](https://styleci.io/repos/48772854)
-[![Build Status](https://travis-ci.org/recca0120/laravel-upload.svg)](https://travis-ci.org/recca0120/laravel-upload)
+[![Build Status](https://travis-ci.org/recca0120/upload.svg)](https://travis-ci.org/recca0120/upload)
 [![Total Downloads](https://poser.pugx.org/recca0120/upload/d/total.svg)](https://packagist.org/packages/recca0120/upload)
 [![Latest Stable Version](https://poser.pugx.org/recca0120/upload/v/stable.svg)](https://packagist.org/packages/recca0120/upload)
 [![Latest Unstable Version](https://poser.pugx.org/recca0120/upload/v/unstable.svg)](https://packagist.org/packages/recca0120/upload)
@@ -27,7 +27,7 @@ Instead, you may of course manually update your require block and run `composer 
 ```json
 {
     "require": {
-        "recca0120/upload": "^1.2.0"
+        "recca0120/upload": "^1.5.0"
     }
 }
 ```
