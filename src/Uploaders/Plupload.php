@@ -12,7 +12,7 @@ class Plupload extends Base
      *
      * @param string $inputName
      *
-     * @throws ChunkedResponseException
+     * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
      *
      * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      */

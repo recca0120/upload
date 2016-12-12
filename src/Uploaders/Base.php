@@ -70,8 +70,7 @@ abstract class Base implements Uploader
     public function setConfig($config)
     {
         $this->config = $config;
-        $chunksPath = isset($config['chunks_path']) === false ? sys_get_temp_dir().'/temp/' : $config['chunks_path'];
-        $this->chunksPath = $chunksPath;
+        $this->chunksPath = isset($config['chunks_path']) === false ? sys_get_temp_dir().'/temp/' : $config['chunks_path'];
 
         return $this;
     }
@@ -140,7 +139,9 @@ abstract class Base implements Uploader
      * @param  bool $isCompleted
      * @param  array  $headers
      *
-     * @return string
+     * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
+     *
+     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      */
     protected function receiveChunkedFile($originalName, $input, $start, $mimeType, $isCompleted = false, $headers = [])
     {
@@ -163,7 +164,7 @@ abstract class Base implements Uploader
      *
      * @param string $inputName
      *
-     * @throws ChunkedResponseException
+     * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
      *
      * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      */
@@ -183,7 +184,7 @@ abstract class Base implements Uploader
      *
      * @param string $inputName
      *
-     * @throws ChunkedResponseException
+     * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
      *
      * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      */
@@ -211,9 +212,9 @@ abstract class Base implements Uploader
      *
      * @method completedResponse
      *
-     * @param Illuminate\Http\JsonResponse $response
+     * @param \Illuminate\Http\JsonResponse $response
      *
-     * @return Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function completedResponse(JsonResponse $response)
     {
