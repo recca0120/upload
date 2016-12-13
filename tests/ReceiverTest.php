@@ -173,4 +173,92 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
             return is_a($response, 'Illuminate\Http\JsonResponse');
         }))->once();
     }
+
+    public function test_factory_default()
+    {
+        /*
+        |------------------------------------------------------------
+        | Arrange
+        |------------------------------------------------------------
+        */
+
+        $config = [];
+        $class = 'Recca0120\Upload\Uploaders\FileAPI';
+
+        /*
+        |------------------------------------------------------------
+        | Act
+        |------------------------------------------------------------
+        */
+
+        /*
+        |------------------------------------------------------------
+        | Assert
+        |------------------------------------------------------------
+        */
+
+        $this->assertAttributeInstanceOf($class, 'uploader', Receiver::factory($config));
+    }
+
+    public function test_factory_fileapi()
+    {
+        /*
+        |------------------------------------------------------------
+        | Arrange
+        |------------------------------------------------------------
+        */
+
+        $config = [];
+        $classes = [
+            'Recca0120\Upload\Uploaders\FileAPI' => 'Recca0120\Upload\Uploaders\FileAPI',
+            'filapi' => 'Recca0120\Upload\Uploaders\FileAPI',
+        ];
+
+        /*
+        |------------------------------------------------------------
+        | Act
+        |------------------------------------------------------------
+        */
+
+        /*
+        |------------------------------------------------------------
+        | Assert
+        |------------------------------------------------------------
+        */
+
+        foreach ($classes as $class) {
+            $this->assertAttributeInstanceOf($class, 'uploader', Receiver::factory($config, $class));
+        }
+    }
+
+    public function test_factory_plupload()
+    {
+        /*
+        |------------------------------------------------------------
+        | Arrange
+        |------------------------------------------------------------
+        */
+
+        $config = [];
+        $classes = [
+            'Recca0120\Upload\Uploaders\Plupload' => 'Recca0120\Upload\Uploaders\FileAPI',
+            'plupload' => 'Recca0120\Upload\Uploaders\Plupload',
+        ];
+
+        /*
+        |------------------------------------------------------------
+        | Act
+        |------------------------------------------------------------
+        */
+
+        /*
+        |------------------------------------------------------------
+        | Assert
+        |------------------------------------------------------------
+        */
+
+        foreach ($classes as $class) {
+            $this->assertAttributeInstanceOf($class, 'uploader', Receiver::factory($config, $class));
+        }
+    }
 }

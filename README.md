@@ -91,7 +91,7 @@ class UploadController extends Controller
         $destinationPath = 'storage/temp';
         return $manager
             ->driver($driver)
-            ->save($inputName, destinationPath);
+            ->save($inputName, $destinationPath);
     }
 }
 ```

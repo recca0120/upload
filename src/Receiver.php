@@ -5,7 +5,9 @@ namespace Recca0120\Upload;
 use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Http\JsonResponse;
+use Recca0120\Upload\Uploaders\FileAPI;
 use Recca0120\Upload\Contracts\Uploader;
+use Recca0120\Upload\Uploaders\Plupload;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
@@ -165,5 +167,25 @@ class Receiver
         }
 
         return new JsonResponse($data);
+    }
+
+    /**
+     * factory.
+     *
+     * @param  array $config
+     * @param  string $class
+     *
+     * @return \Recca0120\Upload\Contracts\Uploader
+     */
+    public static function factory($config = [], $class = FileAPI::class)
+    {
+        $map = [
+            'fileapi' => FileAPI::class,
+            'plupload' => Plupload::class,
+        ];
+
+        $class = isset($map[strtolower($class)]) === true ? $map[$class] : $class;
+
+        return new static(new $class($config));
     }
 }
