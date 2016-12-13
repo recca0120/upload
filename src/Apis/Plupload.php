@@ -1,6 +1,6 @@
 <?php
 
-namespace Recca0120\Upload\Uploaders;
+namespace Recca0120\Upload\Apis;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;

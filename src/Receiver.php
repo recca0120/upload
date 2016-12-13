@@ -5,20 +5,20 @@ namespace Recca0120\Upload;
 use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Http\JsonResponse;
-use Recca0120\Upload\Uploaders\FileAPI;
-use Recca0120\Upload\Contracts\Uploader;
-use Recca0120\Upload\Uploaders\Plupload;
+use Recca0120\Upload\Apis\FileAPI;
+use Recca0120\Upload\Apis\Plupload;
+use Recca0120\Upload\Contracts\Api;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
 class Receiver
 {
     /**
-     * $uploader.
+     * $api.
      *
-     * @var \Recca0120\Upload\Contracts\Uploader
+     * @var \Recca0120\Upload\Contracts\Api
      */
-    protected $uploader;
+    protected $api;
 
     /**
      * $basePath.
@@ -37,14 +37,14 @@ class Receiver
     /**
      * __construct.
      *
-     * @param \Recca0120\Upload\Contracts\Uploader  $uploader
+     * @param \Recca0120\Upload\Contracts\Api  $api
      */
-    public function __construct(Uploader $uploader)
+    public function __construct(Api $api)
     {
-        $config = $uploader->getConfig();
+        $config = $api->getConfig();
         $this->setBasePath(Arr::get($config, 'base_path'));
         $this->setBaseUrl(Arr::get($config, 'base_url'));
-        $this->uploader = $uploader;
+        $this->api = $api;
     }
 
     /**
@@ -98,13 +98,12 @@ class Receiver
         $absolutePath = $this->getBasePath().$destinationPath;
 
         try {
-            $uploadedFile = $this->uploader
-                ->makeDirectory($absolutePath)
+            $uploadedFile = $this->api
                 ->receive($inputName);
 
-            $response = $callback($uploadedFile, $destinationPath, $absolutePath, $this->baseUrl);
+            $response = $callback($uploadedFile, $destinationPath, $absolutePath, $this->baseUrl, $this->api);
 
-            return $this->uploader
+            return $this->api
                 ->deleteUploadedFile($uploadedFile)
                 ->completedResponse($response);
         } catch (ChunkedResponseException $e) {
@@ -132,7 +131,8 @@ class Receiver
      */
     protected function callback()
     {
-        return function (UploadedFile $uploadedFile, $destinationPath, $absolutePath, $baseUrl) {
+        return function (UploadedFile $uploadedFile, $destinationPath, $absolutePath, $baseUrl, $api) {
+            $api->makeDirectory($absolutePath);
             $clientOriginalName = $uploadedFile->getClientOriginalName();
             $clientOriginalExtension = strtolower($uploadedFile->getClientOriginalExtension());
             $basename = pathinfo($uploadedFile->getBasename(), PATHINFO_FILENAME);
@@ -175,7 +175,7 @@ class Receiver
      * @param  array $config
      * @param  string $class
      *
-     * @return \Recca0120\Upload\Contracts\Uploader
+     * @return \Recca0120\Upload\Contracts\Api
      */
     public static function factory($config = [], $class = FileAPI::class)
     {

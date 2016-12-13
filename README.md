@@ -32,13 +32,34 @@ Instead, you may of course manually update your require block and run `composer 
 }
 ```
 
+## Factory
+
+```php
+use Recca0120\Upload\Receiver;
+
+require __DIR__.'/vendor/autoload.php';
+
+$config = [
+    'chunk_path' => 'absolute path';
+    'base_path' => 'absolute path',
+    'base_url' => 'http://dev/'
+];
+
+$inputName = 'file';
+$destinationPath = 'relative path';
+$api = 'fileapi'; // or plupload
+
+Receiver::factory($config, $api)
+    ->save($inputName, $destinationPath);
+```
+
 ## Standalone
 
 ```php
 
 use Recca0120\Upload\Receiver;
-use Recca0120\Upload\Uploaders\FileAPI;
-use Recca0120\Upload\Uploaders\Plupload;
+use Recca0120\Upload\Apis\FileAPI;
+use Recca0120\Upload\Apis\Plupload;
 
 require __DIR__.'/vendor/autoload.php';
 
@@ -51,6 +72,7 @@ $config = [
 $inputName = 'file';
 $destinationPath = 'relative path';
 
+// if use Plupload, new Recca0120\Upload\Apis\Plupload
 $receiver = new Receiver(new FileAPI($config));
 // save to $config['base_path'].'/'.$destinationPath;
 echo $receiver->save($inputName, $destinationPath);

@@ -1,10 +1,10 @@
 <?php
 
 use Mockery as m;
-use Recca0120\Upload\Uploaders\FileAPI;
+use Recca0120\Upload\Apis\Plupload;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
-class FileAPITest extends PHPUnit_Framework_TestCase
+class PluploadTest extends PHPUnit_Framework_TestCase
 {
     public function tearDown()
     {
@@ -42,7 +42,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
             ->shouldReceive('isFile')->with('file')->andReturn(true)
             ->shouldReceive('lastModified')->with('file')->andReturn(-1);
 
-        $uploader = new FileAPI($config, $request, $filesystem);
+        $api = new Plupload($config, $request, $filesystem);
 
         /*
         |------------------------------------------------------------
@@ -50,11 +50,11 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $this->assertSame($uploadedFile, $uploader->receive($inputName));
+        $this->assertSame($uploadedFile, $api->receive($inputName));
 
         $filesystem->shouldHaveReceived('isDirectory')->with($config['chunks_path'])->once();
         $filesystem->shouldHaveReceived('makeDirectory')->with($config['chunks_path'], 0777, true, true)->once();
-        $request->shouldHaveReceived('header')->with('content-range')->once();
+        $request->shouldHaveReceived('get')->with('chunks')->once();
         $request->shouldHaveReceived('file')->with($inputName)->once();
         $filesystem->shouldHaveReceived('files')->with($config['chunks_path'])->once();
         $filesystem->shouldHaveReceived('isFile')->with('file')->once();
@@ -78,21 +78,9 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         $uploadedFile = m::spy('Symfony\Component\HttpFoundation\File\UploadedFile');
         $inputName = 'foo';
 
-        $token = uniqid();
-        $file = __FILE__;
-        $originalName = basename($file);
-        $extension = pathinfo($originalName, PATHINFO_EXTENSION);
-        $mimeType = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $file);
-        $tmpfile = $config['chunks_path'].'/'.md5($originalName.$token).'.'.$extension;
-        $tmpfileExtension = FileAPI::TMPFILE_EXTENSION;
-
-        $start = 5242880;
-        $end = 5767167;
-        $total = 7845180;
-
-        $contentRange = 'bytes '.$start.'-'.$end.'/'.$total;
-        $contentDisposition = 'attachment; filename='.$originalName;
-        $input = 'php://input';
+        $chunks = 8;
+        $chunk = 6;
+        $contentLength = 1049073;
 
         /*
         |------------------------------------------------------------
@@ -101,16 +89,15 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         */
 
         $request
-            ->shouldReceive('header')->with('content-range')->andReturn($contentRange)
-            ->shouldReceive('header')->with('content-type')->andReturn($mimeType)
-            ->shouldReceive('header')->with('content-disposition')->andReturn($contentDisposition)
-            ->shouldReceive('get')->with('token')->andReturn($token);
+            ->shouldReceive('get')->with('chunks')->andReturn($chunks)
+            ->shouldReceive('get')->with('chunk')->andReturn($chunk)
+            ->shouldReceive('header')->with('content-length')->andReturn($contentLength)
+            ->shouldReceive('file')->with($inputName)->andReturn($uploadedFile);
 
         $filesystem
-            ->shouldReceive('isDirectory')->with($config['chunks_path'])->andReturn(false)
-            ->shouldReceive('extension')->andReturn($extension);
+            ->shouldReceive('isDirectory')->with($config['chunks_path'])->andReturn(false);
 
-        $uploader = new FileAPI($config, $request, $filesystem);
+        $api = new Plupload($config, $request, $filesystem);
 
         /*
         |------------------------------------------------------------
@@ -119,22 +106,18 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         */
 
         try {
-            $uploader->receive($inputName);
+            $api->receive($inputName);
         } catch (ChunkedResponseException $e) {
             $response = $e->getResponse();
             $this->assertSame(201, $response->getStatusCode());
-            $this->assertSame($end, $response->headers->get('X-Last-Known-Byte'));
         }
 
         $filesystem->shouldHaveReceived('isDirectory')->with($config['chunks_path'])->once();
         $filesystem->shouldHaveReceived('makeDirectory')->with($config['chunks_path'], 0777, true, true)->once();
-        $request->shouldHaveReceived('header')->with('content-range')->once();
+        $request->shouldHaveReceived('get')->with('chunks')->once();
+        $request->shouldHaveReceived('file')->with($inputName)->once();
+        $request->shouldHaveReceived('get')->with('chunk')->once();
         $request->shouldHaveReceived('get')->with('name')->once();
-        $request->shouldHaveReceived('header')->with('content-disposition')->once();
-        $request->shouldHaveReceived('header')->with('content-type')->once();
-        $filesystem->shouldHaveReceived('extension')->with($originalName)->once();
-        $request->shouldHaveReceived('get')->with('token')->once();
-        $filesystem->shouldHaveReceived('appendStream')->with($tmpfile.$tmpfileExtension, $input, $start)->once();
     }
 
     public function test_upload_chunk_file()
@@ -159,16 +142,15 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         $extension = pathinfo($originalName, PATHINFO_EXTENSION);
         $mimeType = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $file);
         $tmpfile = $config['chunks_path'].'/'.md5($originalName.$token).'.'.$extension;
-        $tmpfileExtension = FileAPI::TMPFILE_EXTENSION;
+        $tmpfileExtension = Plupload::TMPFILE_EXTENSION;
 
-        $start = 5242880;
-        $end = 7845180;
-        $total = 7845180;
-
-        $contentRange = 'bytes '.$start.'-'.$end.'/'.$total;
-        $contentDisposition = 'attachment; filename='.$originalName;
+        $chunks = 8;
+        $chunk = 7;
+        $contentLength = 1049073;
         $input = 'php://input';
-        $size = $total;
+
+        $start = $chunk * $contentLength;
+        $size = $chunks * $contentLength;
 
         /*
         |------------------------------------------------------------
@@ -177,21 +159,27 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         */
 
         $request
-            ->shouldReceive('header')->with('content-range')->andReturn($contentRange)
-            ->shouldReceive('header')->with('content-disposition')->andReturn($contentDisposition)
+            ->shouldReceive('file')->with($inputName)->andReturn($uploadedFile)
+            ->shouldReceive('get')->with('chunks')->andReturn($chunks)
+            ->shouldReceive('get')->with('chunk')->andReturn($chunk)
+            ->shouldReceive('header')->with('content-length')->andReturn($contentLength)
+            ->shouldReceive('get')->with('name')->andReturn($originalName)
             ->shouldReceive('get')->with('token')->andReturn($token);
+
+        $uploadedFile
+            ->shouldReceive('getMimeType')->andReturn($mimeType)
+            ->shouldReceive('getPathname')->andReturn($input);
 
         $filesystem
             ->shouldReceive('isDirectory')->with($config['chunks_path'])->andReturn(false)
             ->shouldReceive('extension')->with($originalName)->andReturn($extension)
-            ->shouldReceive('mimeType')->with($originalName)->andReturn($mimeType)
             ->shouldReceive('move')->with($tmpfile.$tmpfileExtension, $tmpfile)
-            ->shouldReceive('size')->with($tmpfile)->andReturn($total)
+            ->shouldReceive('size')->with($tmpfile)->andReturn($size)
             ->shouldReceive('files')->with($config['chunks_path'])->andReturn(['file'])
             ->shouldReceive('isFile')->with('file')->andReturn(true)
             ->shouldReceive('lastModified')->with('file')->andReturn(-1);
 
-        $uploader = new FileAPI($config, $request, $filesystem);
+        $api = new Plupload($config, $request, $filesystem);
 
         /*
         |------------------------------------------------------------
@@ -199,19 +187,18 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $uploader->receive($inputName);
+        $api->receive($inputName);
 
         $filesystem->shouldHaveReceived('isDirectory')->with($config['chunks_path'])->once();
         $filesystem->shouldHaveReceived('makeDirectory')->with($config['chunks_path'], 0777, true, true)->once();
-        $request->shouldHaveReceived('header')->with('content-range')->once();
+        $request->shouldHaveReceived('get')->with('chunks')->once();
+        $request->shouldHaveReceived('file')->with($inputName)->once();
+        $request->shouldHaveReceived('get')->with('chunk')->once();
+        $request->shouldHaveReceived('header')->with('content-length')->once();
         $request->shouldHaveReceived('get')->with('name')->once();
-        $request->shouldHaveReceived('header')->with('content-disposition')->once();
-        $filesystem->shouldHaveReceived('extension')->with($originalName)->once();
-        $filesystem->shouldHaveReceived('mimeType')->with($originalName)->once();
         $request->shouldHaveReceived('get')->with('token')->once();
+        $filesystem->shouldHaveReceived('extension')->with($originalName)->once();
         $filesystem->shouldHaveReceived('appendStream')->with($tmpfile.$tmpfileExtension, $input, $start)->once();
-        $filesystem->shouldHaveReceived('move')->with($tmpfile.$tmpfileExtension, $tmpfile)->once();
-        $filesystem->shouldHaveReceived('size')->once();
         $filesystem->shouldHaveReceived('createUploadedFile')->with($tmpfile, $originalName, $mimeType, $size)->once();
         $filesystem->shouldHaveReceived('files')->with($config['chunks_path'])->once();
         $filesystem->shouldHaveReceived('isFile')->with('file')->once();
@@ -233,6 +220,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         $request = m::spy('Illuminate\Http\Request');
         $filesystem = m::spy('Recca0120\Upload\Filesystem');
         $response = m::spy('Illuminate\Http\JsonResponse');
+        $data = ['foo' => 'bar'];
 
         /*
         |------------------------------------------------------------
@@ -240,7 +228,10 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $uploader = new FileAPI($config, $request, $filesystem);
+        $response
+            ->shouldReceive('getData')->andReturn($data);
+
+        $api = new Plupload($config, $request, $filesystem);
 
         /*
         |------------------------------------------------------------
@@ -248,7 +239,12 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $this->assertSame($response, $uploader->completedResponse($response));
+        $this->assertSame($response, $api->completedResponse($response));
+
+        $response->shouldHaveReceived('setData')->with([
+            'jsonrpc' => '2.0',
+            'result' => $data,
+        ]);
     }
 
     public function test_delete_uploaded_file()
@@ -280,7 +276,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
             ->shouldReceive('isFile')->with($file)->andReturn(true)
             ->shouldReceive('delete')->with($file)->andReturn(true);
 
-        $uploader = new FileAPI($config, $request, $filesystem);
+        $api = new Plupload($config, $request, $filesystem);
 
         /*
         |------------------------------------------------------------
@@ -288,7 +284,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $this->assertSame($uploader, $uploader->deleteUploadedFile($uploadedFile));
+        $this->assertSame($api, $api->deleteUploadedFile($uploadedFile));
         $uploadedFile->shouldHaveReceived('getPathname')->once();
         $filesystem->shouldHaveReceived('isFile')->with($file)->once();
         $filesystem->shouldHaveReceived('delete')->with($file)->once();
