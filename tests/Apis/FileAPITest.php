@@ -19,8 +19,9 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
+        $chunksPath = sys_get_temp_dir().'/chunks/';
         $config = [
-            'chunks_path' => __DIR__,
+
         ];
         $request = m::spy('Illuminate\Http\Request');
         $filesystem = m::spy('Recca0120\Upload\Filesystem');
@@ -37,8 +38,8 @@ class FileAPITest extends PHPUnit_Framework_TestCase
             ->shouldReceive('file')->with($inputName)->andReturn($uploadedFile);
 
         $filesystem
-            ->shouldReceive('isDirectory')->with($config['chunks_path'])->andReturn(false)
-            ->shouldReceive('files')->with($config['chunks_path'])->andReturn(['file'])
+            ->shouldReceive('isDirectory')->with($chunksPath)->andReturn(false)
+            ->shouldReceive('files')->with($chunksPath)->andReturn(['file'])
             ->shouldReceive('isFile')->with('file')->andReturn(true)
             ->shouldReceive('lastModified')->with('file')->andReturn(-1);
 
@@ -52,11 +53,11 @@ class FileAPITest extends PHPUnit_Framework_TestCase
 
         $this->assertSame($uploadedFile, $api->receive($inputName));
 
-        $filesystem->shouldHaveReceived('isDirectory')->with($config['chunks_path'])->once();
-        $filesystem->shouldHaveReceived('makeDirectory')->with($config['chunks_path'], 0777, true, true)->once();
+        $filesystem->shouldHaveReceived('isDirectory')->with($chunksPath)->once();
+        $filesystem->shouldHaveReceived('makeDirectory')->with($chunksPath, 0777, true, true)->once();
         $request->shouldHaveReceived('header')->with('content-range')->once();
         $request->shouldHaveReceived('file')->with($inputName)->once();
-        $filesystem->shouldHaveReceived('files')->with($config['chunks_path'])->once();
+        $filesystem->shouldHaveReceived('files')->with($chunksPath)->once();
         $filesystem->shouldHaveReceived('isFile')->with('file')->once();
         $filesystem->shouldHaveReceived('lastModified')->with('file')->once();
         $filesystem->shouldHaveReceived('delete')->with('file')->once();
@@ -70,8 +71,9 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
+        $chunksPath = __DIR__.'/';
         $config = [
-            'chunks_path' => __DIR__,
+            'chunks' => $chunksPath,
         ];
         $request = m::spy('Illuminate\Http\Request');
         $filesystem = m::spy('Recca0120\Upload\Filesystem');
@@ -83,7 +85,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         $originalName = basename($file);
         $extension = pathinfo($originalName, PATHINFO_EXTENSION);
         $mimeType = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $file);
-        $tmpfile = $config['chunks_path'].'/'.md5($originalName.$token).'.'.$extension;
+        $tmpfile = $chunksPath.md5($originalName.$token).'.'.$extension;
         $tmpfileExtension = FileAPI::TMPFILE_EXTENSION;
 
         $start = 5242880;
@@ -107,7 +109,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
             ->shouldReceive('get')->with('token')->andReturn($token);
 
         $filesystem
-            ->shouldReceive('isDirectory')->with($config['chunks_path'])->andReturn(false)
+            ->shouldReceive('isDirectory')->with($chunksPath)->andReturn(false)
             ->shouldReceive('extension')->andReturn($extension);
 
         $api = new FileAPI($config, $request, $filesystem);
@@ -126,8 +128,8 @@ class FileAPITest extends PHPUnit_Framework_TestCase
             $this->assertSame($end, $response->headers->get('X-Last-Known-Byte'));
         }
 
-        $filesystem->shouldHaveReceived('isDirectory')->with($config['chunks_path'])->once();
-        $filesystem->shouldHaveReceived('makeDirectory')->with($config['chunks_path'], 0777, true, true)->once();
+        $filesystem->shouldHaveReceived('isDirectory')->with($chunksPath)->once();
+        $filesystem->shouldHaveReceived('makeDirectory')->with($chunksPath, 0777, true, true)->once();
         $request->shouldHaveReceived('header')->with('content-range')->once();
         $request->shouldHaveReceived('get')->with('name')->once();
         $request->shouldHaveReceived('header')->with('content-disposition')->once();
@@ -145,8 +147,9 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
+        $chunksPath = __DIR__.'/';
         $config = [
-            'chunks_path' => __DIR__,
+            'chunks' => $chunksPath,
         ];
         $request = m::spy('Illuminate\Http\Request');
         $filesystem = m::spy('Recca0120\Upload\Filesystem');
@@ -158,7 +161,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         $originalName = basename($file);
         $extension = pathinfo($originalName, PATHINFO_EXTENSION);
         $mimeType = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $file);
-        $tmpfile = $config['chunks_path'].'/'.md5($originalName.$token).'.'.$extension;
+        $tmpfile = $chunksPath.md5($originalName.$token).'.'.$extension;
         $tmpfileExtension = FileAPI::TMPFILE_EXTENSION;
 
         $start = 5242880;
@@ -182,12 +185,12 @@ class FileAPITest extends PHPUnit_Framework_TestCase
             ->shouldReceive('get')->with('token')->andReturn($token);
 
         $filesystem
-            ->shouldReceive('isDirectory')->with($config['chunks_path'])->andReturn(false)
+            ->shouldReceive('isDirectory')->with($chunksPath)->andReturn(false)
             ->shouldReceive('extension')->with($originalName)->andReturn($extension)
             ->shouldReceive('mimeType')->with($originalName)->andReturn($mimeType)
             ->shouldReceive('move')->with($tmpfile.$tmpfileExtension, $tmpfile)
             ->shouldReceive('size')->with($tmpfile)->andReturn($total)
-            ->shouldReceive('files')->with($config['chunks_path'])->andReturn(['file'])
+            ->shouldReceive('files')->with($chunksPath)->andReturn(['file'])
             ->shouldReceive('isFile')->with('file')->andReturn(true)
             ->shouldReceive('lastModified')->with('file')->andReturn(-1);
 
@@ -201,8 +204,8 @@ class FileAPITest extends PHPUnit_Framework_TestCase
 
         $api->receive($inputName);
 
-        $filesystem->shouldHaveReceived('isDirectory')->with($config['chunks_path'])->once();
-        $filesystem->shouldHaveReceived('makeDirectory')->with($config['chunks_path'], 0777, true, true)->once();
+        $filesystem->shouldHaveReceived('isDirectory')->with($chunksPath)->once();
+        $filesystem->shouldHaveReceived('makeDirectory')->with($chunksPath, 0777, true, true)->once();
         $request->shouldHaveReceived('header')->with('content-range')->once();
         $request->shouldHaveReceived('get')->with('name')->once();
         $request->shouldHaveReceived('header')->with('content-disposition')->once();
@@ -213,7 +216,7 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         $filesystem->shouldHaveReceived('move')->with($tmpfile.$tmpfileExtension, $tmpfile)->once();
         $filesystem->shouldHaveReceived('size')->once();
         $filesystem->shouldHaveReceived('createUploadedFile')->with($tmpfile, $originalName, $mimeType, $size)->once();
-        $filesystem->shouldHaveReceived('files')->with($config['chunks_path'])->once();
+        $filesystem->shouldHaveReceived('files')->with($chunksPath)->once();
         $filesystem->shouldHaveReceived('isFile')->with('file')->once();
         $filesystem->shouldHaveReceived('lastModified')->with('file')->once();
         $filesystem->shouldHaveReceived('delete')->with('file')->once();
@@ -227,8 +230,9 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
+        $chunksPath = __DIR__.'/';
         $config = [
-            'chunks_path' => __DIR__,
+            'chunks' => $chunksPath,
         ];
         $request = m::spy('Illuminate\Http\Request');
         $filesystem = m::spy('Recca0120\Upload\Filesystem');
@@ -259,8 +263,9 @@ class FileAPITest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
+        $chunksPath = __DIR__.'/';
         $config = [
-            'chunks_path' => __DIR__,
+            'chunks' => $chunksPath,
         ];
         $request = m::spy('Illuminate\Http\Request');
         $filesystem = m::spy('Recca0120\Upload\Filesystem');

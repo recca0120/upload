@@ -1,8 +1,8 @@
 <?php
 
 return [
-    'chunks_path' => storage_path('app/chunks'),
-    'base_path' => public_path(),
-    'storage_path' => 'storage/temp',
-    'base_url' => url('/'),
+    'chunks' => storage_path('app/chunks'),
+    'root' => public_path('storage/temp'),
+    'path' => 'storage/temp',
+    'url' => url('storage/temp'),
 ];

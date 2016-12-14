@@ -23,6 +23,9 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         $uploadedFile = m::spy('Symfony\Component\HttpFoundation\File\UploadedFile');
         $response = m::spy('Illuminate\Http\JsonResponse');
         $inputName = 'test';
+        $root = sys_get_temp_dir();
+        $path = '/storage';
+        $storagePath = $root.$path;
         $config = [];
 
         /*
@@ -33,7 +36,7 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
 
         $api
             ->shouldReceive('getConfig')->andReturn($config)
-            ->shouldReceive('makeDirectory')->with(sys_get_temp_dir().'/storage/temp')->andReturnSelf()
+            ->shouldReceive('makeDirectory')->with($storagePath)->andReturnSelf()
             ->shouldReceive('receive')->with($inputName)->andReturn($uploadedFile)
             ->shouldReceive('deleteUploadedFile')->andReturnSelf();
 
@@ -45,15 +48,14 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $receiver->receive($inputName, function ($uploaded, $storagePath, $basePath, $baseUrl, $api) use ($response, $uploadedFile) {
+        $receiver->receive($inputName, function ($uploaded, $path, $root, $url, $api) use ($response, $uploadedFile) {
             $this->assertSame($uploaded, $uploadedFile);
-            $api->makeDirectory($basePath.$storagePath);
 
             return $response;
         });
 
         $api->shouldHaveReceived('getConfig')->once();
-        $api->shouldHaveReceived('makeDirectory')->with(sys_get_temp_dir().'/storage/temp')->once();
+        $api->shouldHaveReceived('makeDirectory')->with($storagePath)->once();
         $api->shouldHaveReceived('receive')->with($inputName)->once();
         $api->shouldHaveReceived('deleteUploadedFile')->with($uploadedFile)->once();
         $api->shouldHaveReceived('completedResponse')->with($response)->once();
@@ -70,6 +72,9 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         $api = m::spy('Recca0120\Upload\Contracts\Api');
         $chunkedResponseException = new ChunkedResponseException();
         $inputName = 'test';
+        $root = sys_get_temp_dir();
+        $path = '/storage';
+        $storagePath = $root.$path;
         $config = [];
 
         /*
@@ -80,7 +85,7 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
 
         $api
             ->shouldReceive('getConfig')->andReturn($config)
-            ->shouldReceive('makeDirectory')->with(sys_get_temp_dir().'/storage/temp')->andReturnSelf()
+            ->shouldReceive('makeDirectory')->with($storagePath)->andReturnSelf()
             ->shouldReceive('receive')->with($inputName)->andThrow($chunkedResponseException);
 
         $receiver = new Receiver($api);
@@ -91,7 +96,7 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $response = $receiver->receive($inputName, function ($uploadedFile, $storagePath, $absolutePath, $baseUrl, $api) {
+        $response = $receiver->receive($inputName, function ($uploadedFile, $path, $root, $url, $api) {
         });
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
         $api->shouldHaveReceived('getConfig')->once();
@@ -110,12 +115,14 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         $uploadedFile = m::spy('Symfony\Component\HttpFoundation\File\UploadedFile');
         $response = m::spy('Illuminate\Http\JsonResponse');
         $inputName = 'test';
-        $destination = 'destination';
-        $basePath = 'base_path';
-        $baseUrl = 'base_url';
+
+        $root = sys_get_temp_dir();
+        $path = '/storage';
+        $storagePath = $root.$path;
+        $url = 'url';
         $config = [
-            'base_path' => $basePath,
-            'base_url' => $baseUrl,
+            'root' => $root,
+            'url' => $url,
         ];
 
         $clientOriginalName = 'client_original_name.PHP';
@@ -132,7 +139,7 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
 
         $api
             ->shouldReceive('getConfig')->andReturn($config)
-            ->shouldReceive('makeDirectory')->with($basePath.'/'.$destination)->andReturnSelf()
+            ->shouldReceive('makeDirectory')->with($storagePath)->andReturnSelf()
             ->shouldReceive('receive')->with($inputName)->andReturn($uploadedFile)
             ->shouldReceive('deleteUploadedFile')->andReturnSelf()
             ->shouldReceive('completedResponse')->with(m::type('Illuminate\Http\JsonResponse'))->andReturn($response);
@@ -143,7 +150,7 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
             ->shouldReceive('getBasename')->andReturn($clientOriginalName)
             ->shouldReceive('getMimeType')->andReturn($mimeType)
             ->shouldReceive('getSize')->andReturn($size)
-            ->shouldReceive('move')->with($basePath.'/'.$destination, $basename.'.'.$clientOriginalExtension);
+            ->shouldReceive('move')->with($storagePath, $basename.'.'.$clientOriginalExtension);
 
         $receiver = new Receiver($api, $config);
 
@@ -153,16 +160,16 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $this->assertSame($response, $receiver->receive($inputName, null, $destination));
+        $this->assertSame($response, $receiver->receive($inputName, null, $path));
         $api->shouldHaveReceived('getConfig')->once();
-        $api->shouldHaveReceived('makeDirectory')->with($basePath.'/'.$destination)->once();
+        $api->shouldHaveReceived('makeDirectory')->with($storagePath)->once();
         $api->shouldHaveReceived('receive')->with($inputName)->once();
         $uploadedFile->shouldReceive('getClientOriginalName')->andReturn($clientOriginalName);
         $uploadedFile->shouldReceive('getClientOriginalExtension')->andReturn($clientOriginalExtension);
         $uploadedFile->shouldReceive('getBasename')->andReturn($clientOriginalName);
         $uploadedFile->shouldReceive('getMimeType')->andReturn($mimeType);
         $uploadedFile->shouldReceive('getSize')->andReturn($size);
-        $uploadedFile->shouldReceive('move')->with($basePath.'/'.$destination, $basename.'.'.$clientOriginalExtension);
+        $uploadedFile->shouldReceive('move')->with($storagePath, $basename.'.'.$clientOriginalExtension);
         $api->shouldHaveReceived('deleteUploadedFile')->with($uploadedFile)->once();
         $api->shouldHaveReceived('completedResponse')->with(m::on(function ($response) use ($clientOriginalName, $mimeType, $size) {
             $data = $response->getData();

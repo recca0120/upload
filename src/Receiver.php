@@ -21,25 +21,25 @@ class Receiver
     protected $api;
 
     /**
-     * $basePath.
+     * $root.
      *
      * @var string
      */
-    public $basePath = null;
+    public $root = null;
 
     /**
-     * $baseUrl.
+     * $path.
      *
      * @var string
      */
-    public $baseUrl = null;
+    public $path = null;
 
     /**
-     * $storagePath.
+     * $url.
      *
      * @var string
      */
-    public $storagePath = null;
+    public $url = null;
 
     /**
      * __construct.
@@ -49,56 +49,64 @@ class Receiver
     public function __construct(Api $api)
     {
         $config = $api->getConfig();
-        $this->setBasePath(Arr::get($config, 'base_path', sys_get_temp_dir()));
-        $this->setBaseUrl(Arr::get($config, 'base_url'));
-        $this->setStoragePath(Arr::get($config, 'destination_url', 'storage/temp'));
+        $this->setRoot(Arr::get($config, 'root', sys_get_temp_dir()));
+        $this->setPath(Arr::get($config, 'path', '/storage/'));
+        $this->setUrl(Arr::get($config, 'url'));
         $this->api = $api;
     }
 
     /**
-     * getBasePath.
+     * getRoot.
      *
      * @return string
      */
-    public function getBasePath()
+    public function getRoot()
     {
-        return rtrim($this->basePath, '/').'/';
+        return rtrim($this->root, '/').'/';
     }
 
     /**
-     * setBasePath.
+     * setRoot.
      *
-     * @param string $basePath
+     * @param string $root
      */
-    public function setBasePath($basePath)
+    public function setRoot($root)
     {
-        $this->basePath = $basePath;
+        $this->root = $root;
 
         return $this;
     }
 
     /**
-     * setBaseUrl.
+     * getPath.
      *
-     * @param string $baseUrl
+     * @return string
      */
-    public function setBaseUrl($baseUrl)
+    public function getPath()
     {
-        $this->baseUrl = $baseUrl;
+        return trim($this->path, '/');
+    }
+
+    /**
+     * setPath.
+     *
+     * @param string $path
+     */
+    public function setPath($path)
+    {
+        $this->path = $path;
 
         return $this;
     }
 
     /**
-     * setStoragePath.
+     * setUrl.
      *
-     * @param string $storagePath
-     *
-     * @return static
+     * @param string $url
      */
-    public function setStoragePath($storagePath)
+    public function setUrl($url)
     {
-        $this->storagePath = $storagePath;
+        $this->url = $url;
 
         return $this;
     }
@@ -108,21 +116,21 @@ class Receiver
      *
      * @param  string $name
      * @param  Closure $closure
-     * @param  string $storagePath
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function receive($inputName = 'file', Closure $callback = null, $storagePath = null)
+    public function receive($inputName = 'file', Closure $callback = null, $path = null)
     {
-        $storagePath = is_null($storagePath) === true ? $this->storagePath : $storagePath;
         $callback = is_null($callback) === true ? $this->callback() : $callback;
-        $absolutePath = $this->getBasePath().$storagePath;
+        $path = trim(is_null($path) === true ? $this->path : $path, '/');
+        $root = $this->getRoot();
 
         try {
             $uploadedFile = $this->api
+                ->makeDirectory($root.$path)
                 ->receive($inputName);
 
-            $response = $callback($uploadedFile, $storagePath, $this->getBasePath(), $this->baseUrl, $this->api);
+            $response = $callback($uploadedFile, $path, $root, $this->url, $this->api);
 
             return $this->api
                 ->deleteUploadedFile($uploadedFile)
@@ -139,42 +147,32 @@ class Receiver
      */
     protected function callback()
     {
-        return function (UploadedFile $uploadedFile, $storagePath, $basePath, $baseUrl, $api) {
-            $api->makeDirectory($basePath.$storagePath);
+        return function (UploadedFile $uploadedFile, $path, $root, $url, $api) {
+            $storagePath = $root.$path;
+
             $clientOriginalName = $uploadedFile->getClientOriginalName();
             $clientOriginalExtension = strtolower($uploadedFile->getClientOriginalExtension());
             $basename = pathinfo($uploadedFile->getBasename(), PATHINFO_FILENAME);
             $filename = $basename.'.'.$clientOriginalExtension;
-            $tempname = $storagePath.'/'.$filename;
+            $tempname = '/'.$path.$filename;
             $mimeType = $uploadedFile->getMimeType();
             $size = $uploadedFile->getSize();
 
-            $uploadedFile->move($basePath.$storagePath);
+            $uploadedFile->move($storagePath);
 
-            return $this->makeJsonResponse([
+            $response = [
                 'name' => $clientOriginalName,
                 'tmp_name' => $tempname,
                 'type' => $mimeType,
                 'size' => $size,
-            ], $baseUrl);
+            ];
+
+            if (is_null($url) === false) {
+                $response['url'] = rtrim($url, '/').'/'.$path.'/'.$filename;
+            }
+
+            return new JsonResponse($response);
         };
-    }
-
-    /**
-     * makeJsonResponse.
-     *
-     * @param array $data
-     * @param string $baseUrl
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    protected function makeJsonResponse($data, $baseUrl = null)
-    {
-        if (is_null($baseUrl) === false) {
-            $data['url'] = rtrim($baseUrl, '/').'/'.$data['tmp_name'];
-        }
-
-        return new JsonResponse($data);
     }
 
     /**

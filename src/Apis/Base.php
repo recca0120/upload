@@ -2,6 +2,7 @@
 
 namespace Recca0120\Upload\Apis;
 
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Recca0120\Upload\Filesystem;
 use Illuminate\Http\JsonResponse;
@@ -61,6 +62,16 @@ abstract class Base implements Api
     }
 
     /**
+     * getConfig.
+     *
+     * @return array
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    /**
      * setConfig.
      *
      * @param array $config
@@ -70,19 +81,19 @@ abstract class Base implements Api
     public function setConfig($config)
     {
         $this->config = $config;
-        $this->chunksPath = isset($config['chunks_path']) === false ? sys_get_temp_dir().'/temp/' : $config['chunks_path'];
+        $this->chunksPath = Arr::get($config, 'chunks', sys_get_temp_dir().'/chunks');
 
         return $this;
     }
 
     /**
-     * getConfig.
+     * getChunksPath.
      *
-     * @return array
+     * @return string
      */
-    public function getConfig()
+    public function getChunksPath()
     {
-        return $this->config;
+        return rtrim($this->chunksPath, '/').'/';
     }
 
     /**
@@ -126,7 +137,7 @@ abstract class Base implements Api
         $extension = $this->filesystem->extension($originalName);
         $token = $this->request->get('token');
 
-        return $this->chunksPath.'/'.md5($originalName.$token).'.'.$extension;
+        return $this->getChunksPath().md5($originalName.$token).'.'.$extension;
     }
 
     /**
@@ -170,11 +181,12 @@ abstract class Base implements Api
      */
     public function receive($inputName)
     {
+        $chunksPath = $this->getChunksPath();
         $uploadedFile = $this
-            ->makeDirectory($this->chunksPath)
+            ->makeDirectory($chunksPath)
             ->doReceive($inputName);
 
-        $this->cleanDirectory($this->chunksPath);
+        $this->cleanDirectory($chunksPath);
 
         return $uploadedFile;
     }
