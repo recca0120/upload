@@ -68,7 +68,7 @@ class UploadController extends Controller
 
         return $manager
             ->driver($driver)
-            ->receive($inputName, function (UploadedFile $uploadedFile, $storagePath, $basePath, $baseUrl, $api) {
+            ->receive($inputName, function (UploadedFile $uploadedFile, $path, $root, $url, $api) {
                 // do something
 
             });
@@ -84,9 +84,10 @@ use Recca0120\Upload\Receiver;
 require __DIR__.'/vendor/autoload.php';
 
 $config = [
-    'chunk_path' => 'absolute path',
-    'base_path' => 'absolute path',
-    'base_url' => 'http://dev/',
+    'chunks' => 'path_to_chunks',
+    'root' => 'path_to_root',
+    'path' => 'storage',
+    'url' => 'http://app.dev/storage/',
 ];
 
 $inputName = 'file';
@@ -94,7 +95,7 @@ $storagePath = 'relative path';
 $api = 'fileapi'; // or plupload
 
 Receiver::factory($config, $api)
-    ->receive($inputName, function (UploadedFile $uploadedFile, $storagePath, $basePath, $baseUrl, $api) {
+    ->receive($inputName, function (UploadedFile $uploadedFile, $path, $root, $url, $api) {
         // do something
 
     });
@@ -111,9 +112,10 @@ use Recca0120\Upload\Apis\Plupload;
 require __DIR__.'/vendor/autoload.php';
 
 $config = [
-    'chunk_path' => 'absolute path',
-    'base_path' => 'absolute path',
-    'base_url' => 'http://dev/'
+    'chunks' => 'path_to_chunks',
+    'root' => 'path_to_root',
+    'path' => 'storage',
+    'url' => 'http://app.dev/storage/',
 ];
 
 $inputName = 'file';
@@ -122,7 +124,7 @@ $storagePath = 'relative path';
 // if use Plupload, new Recca0120\Upload\Apis\Plupload
 $receiver = new Receiver(new FileAPI($config));
 // save to $config['base_path'].'/'.$storagePath;
-echo $receiver->receive($inputName, function (UploadedFile $uploadedFile, $storagePath, $basePath, $baseUrl, $api) {
+echo $receiver->receive($inputName, function (UploadedFile $uploadedFile, $path, $root, $url, $api) {
     // do something
 
 });
