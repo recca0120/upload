@@ -27,55 +27,9 @@ Instead, you may of course manually update your require block and run `composer 
 ```json
 {
     "require": {
-        "recca0120/upload": "^1.5.0"
+        "recca0120/upload": "^1.5.3"
     }
 }
-```
-
-## Factory
-
-```php
-use Recca0120\Upload\Receiver;
-
-require __DIR__.'/vendor/autoload.php';
-
-$config = [
-    'chunk_path' => 'absolute path';
-    'base_path' => 'absolute path',
-    'base_url' => 'http://dev/'
-];
-
-$inputName = 'file';
-$destinationPath = 'relative path';
-$api = 'fileapi'; // or plupload
-
-Receiver::factory($config, $api)
-    ->save($inputName, $destinationPath);
-```
-
-## Standalone
-
-```php
-
-use Recca0120\Upload\Receiver;
-use Recca0120\Upload\Apis\FileAPI;
-use Recca0120\Upload\Apis\Plupload;
-
-require __DIR__.'/vendor/autoload.php';
-
-$config = [
-    'chunk_path' => 'absolute path';
-    'base_path' => 'absolute path',
-    'base_url' => 'http://dev/'
-];
-
-$inputName = 'file';
-$destinationPath = 'relative path';
-
-// if use Plupload, new Recca0120\Upload\Apis\Plupload
-$receiver = new Receiver(new FileAPI($config));
-// save to $config['base_path'].'/'.$destinationPath;
-echo $receiver->save($inputName, $destinationPath);
 ```
 
 ## Laravel 5
@@ -110,10 +64,66 @@ class UploadController extends Controller
     {
         $driver = 'plupload'; // or 'fileapi'
         $inputName = 'file'; // $_FILES index;
-        $destinationPath = 'storage/temp';
+        $storagePath = 'storage/temp';
+
         return $manager
             ->driver($driver)
-            ->save($inputName, $destinationPath);
+            ->receive($inputName, function (UploadedFile $uploadedFile, $storagePath, $basePath, $baseUrl, $api) {
+                // do something
+
+            });
     }
 }
+```
+
+## Factory
+
+```php
+use Recca0120\Upload\Receiver;
+
+require __DIR__.'/vendor/autoload.php';
+
+$config = [
+    'chunk_path' => 'absolute path',
+    'base_path' => 'absolute path',
+    'base_url' => 'http://dev/',
+];
+
+$inputName = 'file';
+$storagePath = 'relative path';
+$api = 'fileapi'; // or plupload
+
+Receiver::factory($config, $api)
+    ->receive($inputName, function (UploadedFile $uploadedFile, $storagePath, $basePath, $baseUrl, $api) {
+        // do something
+
+    });
+```
+
+## Standalone
+
+```php
+
+use Recca0120\Upload\Receiver;
+use Recca0120\Upload\Apis\FileAPI;
+use Recca0120\Upload\Apis\Plupload;
+
+require __DIR__.'/vendor/autoload.php';
+
+$config = [
+    'chunk_path' => 'absolute path',
+    'base_path' => 'absolute path',
+    'base_url' => 'http://dev/'
+];
+
+$inputName = 'file';
+$storagePath = 'relative path';
+
+// if use Plupload, new Recca0120\Upload\Apis\Plupload
+$receiver = new Receiver(new FileAPI($config));
+// save to $config['base_path'].'/'.$storagePath;
+echo $receiver->receive($inputName, function (UploadedFile $uploadedFile, $storagePath, $basePath, $baseUrl, $api) {
+    // do something
+
+});
 ```

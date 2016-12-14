@@ -35,6 +35,13 @@ class Receiver
     public $baseUrl = null;
 
     /**
+     * $storagePath.
+     *
+     * @var string
+     */
+    public $storagePath = null;
+
+    /**
      * __construct.
      *
      * @param \Recca0120\Upload\Contracts\Api  $api
@@ -42,9 +49,20 @@ class Receiver
     public function __construct(Api $api)
     {
         $config = $api->getConfig();
-        $this->setBasePath(Arr::get($config, 'base_path'));
+        $this->setBasePath(Arr::get($config, 'base_path', sys_get_temp_dir()));
         $this->setBaseUrl(Arr::get($config, 'base_url'));
+        $this->setStoragePath(Arr::get($config, 'destination_url', 'storage/temp'));
         $this->api = $api;
+    }
+
+    /**
+     * getBasePath.
+     *
+     * @return string
+     */
+    public function getBasePath()
+    {
+        return rtrim($this->basePath, '/').'/';
     }
 
     /**
@@ -60,18 +78,6 @@ class Receiver
     }
 
     /**
-     * getBasePath.
-     *
-     * @return string
-     */
-    public function getBasePath()
-    {
-        $basePath = is_null($this->basePath) === true ? sys_get_temp_dir() : $this->basePath;
-
-        return rtrim($basePath, '/').'/';
-    }
-
-    /**
      * setBaseUrl.
      *
      * @param string $baseUrl
@@ -84,24 +90,39 @@ class Receiver
     }
 
     /**
+     * setStoragePath.
+     *
+     * @param string $storagePath
+     *
+     * @return static
+     */
+    public function setStoragePath($storagePath)
+    {
+        $this->storagePath = $storagePath;
+
+        return $this;
+    }
+
+    /**
      * receive.
      *
      * @param  string $name
      * @param  Closure $closure
-     * @param  string $destinationPath
+     * @param  string $storagePath
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function receive($inputName = 'file', Closure $callback = null, $destinationPath = 'storage/temp')
+    public function receive($inputName = 'file', Closure $callback = null, $storagePath = null)
     {
+        $storagePath = is_null($storagePath) === true ? $this->storagePath : $storagePath;
         $callback = is_null($callback) === true ? $this->callback() : $callback;
-        $absolutePath = $this->getBasePath().$destinationPath;
+        $absolutePath = $this->getBasePath().$storagePath;
 
         try {
             $uploadedFile = $this->api
                 ->receive($inputName);
 
-            $response = $callback($uploadedFile, $destinationPath, $absolutePath, $this->baseUrl, $this->api);
+            $response = $callback($uploadedFile, $storagePath, $this->getBasePath(), $this->baseUrl, $this->api);
 
             return $this->api
                 ->deleteUploadedFile($uploadedFile)
@@ -112,36 +133,23 @@ class Receiver
     }
 
     /**
-     * save.
-     *
-     * @param  string $inputName
-     * @param  string $destinationPath
-     *
-     * @return Closure
-     */
-    public function save($inputName, $destinationPath = 'storage/temp')
-    {
-        return $this->receive($inputName, null, $destinationPath);
-    }
-
-    /**
      * callback.
      *
      * @return \Closure
      */
     protected function callback()
     {
-        return function (UploadedFile $uploadedFile, $destinationPath, $absolutePath, $baseUrl, $api) {
-            $api->makeDirectory($absolutePath);
+        return function (UploadedFile $uploadedFile, $storagePath, $basePath, $baseUrl, $api) {
+            $api->makeDirectory($basePath.$storagePath);
             $clientOriginalName = $uploadedFile->getClientOriginalName();
             $clientOriginalExtension = strtolower($uploadedFile->getClientOriginalExtension());
             $basename = pathinfo($uploadedFile->getBasename(), PATHINFO_FILENAME);
             $filename = $basename.'.'.$clientOriginalExtension;
-            $tempname = $destinationPath.'/'.$filename;
+            $tempname = $storagePath.'/'.$filename;
             $mimeType = $uploadedFile->getMimeType();
             $size = $uploadedFile->getSize();
 
-            $uploadedFile->move($absolutePath, $filename);
+            $uploadedFile->move($basePath.$storagePath);
 
             return $this->makeJsonResponse([
                 'name' => $clientOriginalName,

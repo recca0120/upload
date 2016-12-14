@@ -45,9 +45,9 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $receiver->receive($inputName, function ($uploaded, $destinationPath, $absolutePath, $baseUrl, $api) use ($response, $uploadedFile) {
+        $receiver->receive($inputName, function ($uploaded, $storagePath, $basePath, $baseUrl, $api) use ($response, $uploadedFile) {
             $this->assertSame($uploaded, $uploadedFile);
-            $api->makeDirectory($absolutePath);
+            $api->makeDirectory($basePath.$storagePath);
 
             return $response;
         });
@@ -91,14 +91,14 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $response = $receiver->receive($inputName, function ($uploadedFile, $destinationPath, $absolutePath, $baseUrl, $api) {
+        $response = $receiver->receive($inputName, function ($uploadedFile, $storagePath, $absolutePath, $baseUrl, $api) {
         });
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
         $api->shouldHaveReceived('getConfig')->once();
         $api->shouldHaveReceived('receive')->with($inputName)->once();
     }
 
-    public function test_save()
+    public function test_receive_with_default_callback()
     {
         /*
         |------------------------------------------------------------
@@ -153,7 +153,7 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $this->assertSame($response, $receiver->save($inputName, $destination));
+        $this->assertSame($response, $receiver->receive($inputName, null, $destination));
         $api->shouldHaveReceived('getConfig')->once();
         $api->shouldHaveReceived('makeDirectory')->with($basePath.'/'.$destination)->once();
         $api->shouldHaveReceived('receive')->with($inputName)->once();
