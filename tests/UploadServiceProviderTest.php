@@ -32,12 +32,14 @@ class UploadServiceProviderTest extends PHPUnit_Framework_TestCase
         $app
             ->shouldReceive('offsetGet')->with('config')->andReturn($config)
             ->shouldReceive('offsetGet')->with('request')->andReturn($request)
-            ->shouldReceive('make')->with('Recca0120\Upload\Filesystem')->andReturn($filesystem);
+            ->shouldReceive('make')->with('Recca0120\Upload\Filesystem')->andReturn($filesystem)
+            ->shouldReceive('runningInConsole')->andReturn(false);
 
         $config->shouldReceive('get')->andReturn([]);
 
         $serviceProvider = new UploadServiceProvider($app);
         $serviceProvider->register();
+        $serviceProvider->boot();
 
         /*
         |------------------------------------------------------------
@@ -52,6 +54,7 @@ class UploadServiceProviderTest extends PHPUnit_Framework_TestCase
         $app->shouldHaveReceived('offsetGet')->with('request')->twice();
         $app->shouldHaveReceived('make')->with('Recca0120\Upload\Filesystem')->twice();
         $app->shouldHaveReceived('singleton')->with('Recca0120\Upload\Manager', 'Recca0120\Upload\UploadManager')->once();
+        $app->shouldHaveReceived('runningInConsole')->once();
     }
 
     public function test_boot_running_in_console()

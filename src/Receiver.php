@@ -78,16 +78,6 @@ class Receiver
     }
 
     /**
-     * getPath.
-     *
-     * @return string
-     */
-    public function getPath()
-    {
-        return trim($this->path, '/');
-    }
-
-    /**
      * setPath.
      *
      * @param string $path
