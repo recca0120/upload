@@ -48,8 +48,10 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $receiver->receive($inputName, function ($uploaded, $path, $root, $url, $api) use ($response, $uploadedFile) {
-            $this->assertSame($uploaded, $uploadedFile);
+        $receiver->receive($inputName, function ($receiveUploadedFile, $receivePath, $receiveRoot, $receiveUrl, $api) use ($response, $uploadedFile, $path, $root) {
+            $this->assertSame($receiveUploadedFile, $uploadedFile);
+            $this->assertSame($receivePath, trim($path, '/').'/');
+            $this->assertSame($receiveRoot, rtrim($root, '/').'/');
 
             return $response;
         });
@@ -96,7 +98,8 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $response = $receiver->receive($inputName, function ($uploadedFile, $path, $root, $url, $api) {});
+        $response = $receiver->receive($inputName, function ($uploadedFile, $path, $root, $url, $api) {
+        });
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
         $api->shouldHaveReceived('getConfig')->once();
         $api->shouldHaveReceived('receive')->with($inputName)->once();
@@ -171,11 +174,12 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         $uploadedFile->shouldReceive('getSize')->andReturn($size);
         $uploadedFile->shouldReceive('move')->with($storagePath, $basename.'.'.$clientOriginalExtension);
         $api->shouldHaveReceived('deleteUploadedFile')->with($uploadedFile)->once();
-        $api->shouldHaveReceived('completedResponse')->with(m::on(function ($response) use ($clientOriginalName, $mimeType, $size) {
+        $api->shouldHaveReceived('completedResponse')->with(m::on(function ($response) use ($clientOriginalName, $clientOriginalExtension, $mimeType, $basename, $size, $url) {
             $data = $response->getData();
-            $this->assertSame($data->name, $clientOriginalName);
-            $this->assertSame($data->type, $mimeType);
-            $this->assertSame($data->size, $size);
+            $this->assertSame($clientOriginalName, $data->name);
+            $this->assertSame($mimeType, $data->type);
+            $this->assertSame($size, $data->size);
+            $this->assertSame($url.'/'.$basename.'.'.strtolower($clientOriginalExtension), $data->url);
 
             return is_a($response, 'Illuminate\Http\JsonResponse');
         }))->once();
