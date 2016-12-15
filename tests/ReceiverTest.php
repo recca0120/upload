@@ -24,7 +24,7 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         $response = m::spy('Illuminate\Http\JsonResponse');
         $inputName = 'test';
         $root = sys_get_temp_dir();
-        $path = '/storage';
+        $path = '/storage/';
         $storagePath = $root.$path;
         $config = [];
 
@@ -73,7 +73,7 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         $chunkedResponseException = new ChunkedResponseException();
         $inputName = 'test';
         $root = sys_get_temp_dir();
-        $path = '/storage';
+        $path = '/storage/';
         $storagePath = $root.$path;
         $config = [];
 
@@ -96,8 +96,7 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $response = $receiver->receive($inputName, function ($uploadedFile, $path, $root, $url, $api) {
-        });
+        $response = $receiver->receive($inputName, function ($uploadedFile, $path, $root, $url, $api) {});
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
         $api->shouldHaveReceived('getConfig')->once();
         $api->shouldHaveReceived('receive')->with($inputName)->once();
@@ -117,12 +116,13 @@ class ReceiverTest extends PHPUnit_Framework_TestCase
         $inputName = 'test';
 
         $root = sys_get_temp_dir();
-        $path = '/storage';
+        $path = '/storage/';
         $storagePath = $root.$path;
         $url = 'url';
         $config = [
             'root' => $root,
             'url' => $url,
+            'path' => $path,
         ];
 
         $clientOriginalName = 'client_original_name.PHP';

@@ -112,7 +112,7 @@ class Receiver
     public function receive($inputName = 'file', Closure $callback = null, $path = null)
     {
         $callback = is_null($callback) === true ? $this->callback() : $callback;
-        $path = trim(is_null($path) === true ? $this->path : $path, '/');
+        $path = trim(is_null($path) === true ? $this->path : $path, '/').'/';
         $root = $this->getRoot();
 
         try {
@@ -144,7 +144,7 @@ class Receiver
             $clientOriginalExtension = strtolower($uploadedFile->getClientOriginalExtension());
             $basename = pathinfo($uploadedFile->getBasename(), PATHINFO_FILENAME);
             $filename = $basename.'.'.$clientOriginalExtension;
-            $tempname = '/'.$path.$filename;
+            $tempname = $path.$filename;
             $mimeType = $uploadedFile->getMimeType();
             $size = $uploadedFile->getSize();
 
@@ -158,7 +158,7 @@ class Receiver
             ];
 
             if (is_null($url) === false) {
-                $response['url'] = rtrim($url, '/').'/'.$path.'/'.$filename;
+                $response['url'] = rtrim($url, '/').'/'.$filename;
             }
 
             return new JsonResponse($response);
