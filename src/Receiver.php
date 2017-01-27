@@ -111,8 +111,8 @@ class Receiver
      */
     public function receive($inputName = 'file', Closure $callback = null, $path = null)
     {
-        $callback = is_null($callback) === true ? $this->callback() : $callback;
-        $path = trim(is_null($path) === true ? $this->path : $path, '/').'/';
+        $callback = $callback ?: $this->callback();
+        $path = trim($path ?: $this->path, '/').'/';
         $root = $this->getRoot();
 
         try {
@@ -175,12 +175,10 @@ class Receiver
      */
     public static function factory($config = [], $class = FileAPI::class)
     {
-        $map = [
+        $class = Arr::get([
             'fileapi' => FileAPI::class,
             'plupload' => Plupload::class,
-        ];
-
-        $class = isset($map[strtolower($class)]) === true ? $map[$class] : $class;
+        ], strtolower($class), $class);
 
         return new static(new $class($config));
     }

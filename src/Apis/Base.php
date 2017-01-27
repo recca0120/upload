@@ -56,8 +56,8 @@ abstract class Base implements Api
      */
     public function __construct($config = [], Request $request = null, Filesystem $filesystem = null)
     {
-        $this->request = is_null($request) === true ? Request::capture() : $request;
-        $this->filesystem = is_null($filesystem) === true ? new Filesystem : $filesystem;
+        $this->request = $request ?: Request::capture();
+        $this->filesystem = $filesystem ?: new Filesystem;
         $this->setConfig($config);
     }
 

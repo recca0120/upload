@@ -19,8 +19,8 @@ class UploadManager extends Manager
     public function __construct($app, Request $request = null, Filesystem $filesystem = null)
     {
         parent::__construct($app);
-        $this->request = is_null($request) === true ? Request::capture() : $request;
-        $this->filesystem = is_null($filesystem) === true ? new Filesystem : $filesystem;
+        $this->request = $request ?: Request::capture();
+        $this->filesystem = $filesystem ?: new Filesystem;
     }
 
     /**

@@ -13,8 +13,6 @@ class UploadServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole() === true) {
             $this->handlePublishes();
-
-            return;
         }
     }
 
