@@ -40,9 +40,7 @@ class UploadManager extends Manager
      */
     protected function createFileapiDriver()
     {
-        $config = $this->app['config']['upload'];
-
-        return new Receiver(new FileAPI($config, $this->request, $this->filesystem));
+        return new Receiver(new FileAPI($this->app['config']['upload'], $this->request, $this->filesystem));
     }
 
     /**
@@ -52,8 +50,6 @@ class UploadManager extends Manager
      */
     protected function createPluploadDriver()
     {
-        $config = $this->app['config']['upload'];
-
-        return new Receiver(new Plupload($config, $this->request, $this->filesystem));
+        return new Receiver(new Plupload($this->app['config']['upload'], $this->request, $this->filesystem));
     }
 }

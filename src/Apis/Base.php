@@ -119,7 +119,9 @@ abstract class Base implements Api
         $maxFileAge = 3600;
         $files = $this->filesystem->files($path);
         foreach ((array) $files as $file) {
-            if ($this->filesystem->isFile($file) === true && $this->filesystem->lastModified($file) < ($time - $maxFileAge)) {
+            if ($this->filesystem->isFile($file) === true &&
+                $this->filesystem->lastModified($file) < ($time - $maxFileAge)
+            ) {
                 $this->filesystem->delete($file);
             }
         }
@@ -182,10 +184,7 @@ abstract class Base implements Api
     public function receive($inputName)
     {
         $chunksPath = $this->getChunksPath();
-        $uploadedFile = $this
-            ->makeDirectory($chunksPath)
-            ->doReceive($inputName);
-
+        $uploadedFile = $this->makeDirectory($chunksPath)->doReceive($inputName);
         $this->cleanDirectory($chunksPath);
 
         return $uploadedFile;

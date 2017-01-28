@@ -15,7 +15,10 @@ class FileAPI extends Base
     {
         $originalName = $this->request->get('name');
         if (empty($originalName) === true) {
-            list($originalName) = sscanf($this->request->header('content-disposition'), 'attachment; filename=%s');
+            list($originalName) = sscanf(
+                $this->request->header('content-disposition'),
+                'attachment; filename=%s'
+            );
         }
 
         return $originalName;

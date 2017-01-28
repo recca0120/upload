@@ -49,9 +49,9 @@ class Receiver
     public function __construct(Api $api)
     {
         $config = $api->getConfig();
-        $this->setRoot(Arr::get($config, 'root', sys_get_temp_dir()));
-        $this->setPath(Arr::get($config, 'path', '/storage/'));
-        $this->setUrl(Arr::get($config, 'url'));
+        $this->setRoot(Arr::get($config, 'root', sys_get_temp_dir()))
+            ->setPath(Arr::get($config, 'path', '/storage/'))
+            ->setUrl(Arr::get($config, 'url'));
         $this->api = $api;
     }
 
