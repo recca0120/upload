@@ -27,7 +27,7 @@ class FileAPI extends Base
     /**
      * getMimeType.
      *
-     * @param  string $originalName
+     * @param string $originalName
      *
      * @return string
      */

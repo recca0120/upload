@@ -50,14 +50,14 @@ abstract class Base implements Api
     /**
      * __construct.
      *
-     * @param array    $config
-     * @param \Illuminate\Http\Request    $request
+     * @param array                        $config
+     * @param \Illuminate\Http\Request     $request
      * @param \Recca0120\Upload\Filesystem $filesystem
      */
     public function __construct($config = [], Request $request = null, Filesystem $filesystem = null)
     {
         $this->request = $request ?: Request::capture();
-        $this->filesystem = $filesystem ?: new Filesystem;
+        $this->filesystem = $filesystem ?: new Filesystem();
         $this->setConfig($config);
     }
 
@@ -130,7 +130,7 @@ abstract class Base implements Api
     /**
      * tmpfile.
      *
-     * @param  string $originalName
+     * @param string $originalName
      *
      * @return string
      */
@@ -145,12 +145,12 @@ abstract class Base implements Api
     /**
      * receiveChunkedFile.
      *
-     * @param  string|resource  $originalName
-     * @param  string|resource  $input
-     * @param  int  $start
-     * @param  string  $mimeType
-     * @param  bool $isCompleted
-     * @param  array  $headers
+     * @param string|resource $originalName
+     * @param string|resource $input
+     * @param int             $start
+     * @param string          $mimeType
+     * @param bool            $isCompleted
+     * @param array           $headers
      *
      * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
      *

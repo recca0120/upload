@@ -44,7 +44,7 @@ class Receiver
     /**
      * __construct.
      *
-     * @param \Recca0120\Upload\Contracts\Api  $api
+     * @param \Recca0120\Upload\Contracts\Api $api
      */
     public function __construct(Api $api)
     {
@@ -104,8 +104,8 @@ class Receiver
     /**
      * receive.
      *
-     * @param  string $name
-     * @param  Closure $closure
+     * @param string  $name
+     * @param Closure $closure
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -168,8 +168,8 @@ class Receiver
     /**
      * factory.
      *
-     * @param  array $config
-     * @param  string $class
+     * @param array  $config
+     * @param string $class
      *
      * @return \Recca0120\Upload\Contracts\Api
      */

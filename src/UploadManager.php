@@ -20,7 +20,7 @@ class UploadManager extends Manager
     {
         parent::__construct($app);
         $this->request = $request ?: Request::capture();
-        $this->filesystem = $filesystem ?: new Filesystem;
+        $this->filesystem = $filesystem ?: new Filesystem();
     }
 
     /**

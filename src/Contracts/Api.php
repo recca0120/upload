@@ -13,8 +13,8 @@ interface Api
     /**
      * __construct.
      *
-     * @param array    $config
-     * @param \Illuminate\Http\Request    $request
+     * @param array                        $config
+     * @param \Illuminate\Http\Request     $request
      * @param \Recca0120\Upload\Filesystem $filesystem
      */
     public function __construct($config = [], Request $request = null, Filesystem $filesystem = null);

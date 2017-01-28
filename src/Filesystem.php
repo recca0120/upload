@@ -10,7 +10,8 @@ class Filesystem extends IlluminateFilesystem
     /**
      * Extract the trailing name component from a file path.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public function basename($path)
@@ -23,7 +24,7 @@ class Filesystem extends IlluminateFilesystem
      *
      * @param string|resource $output
      * @param string|resource $input
-     * @param int $offset
+     * @param int             $offset
      */
     public function appendStream($output, $input, $offset = 0)
     {
@@ -44,8 +45,8 @@ class Filesystem extends IlluminateFilesystem
      * convertToResource.
      *
      * @param string|resource $resource [description]
-     * @param string $mode     string
-     * @param string $type     string
+     * @param string          $mode     string
+     * @param string          $type     string
      *
      * @return resource
      */
@@ -70,7 +71,7 @@ class Filesystem extends IlluminateFilesystem
      * @param string $path
      * @param string $originalName
      * @param string $mimeType
-     * @param int $size
+     * @param int    $size
      *
      * @return \Illuminate\Http\UploadedFile
      */
