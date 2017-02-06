@@ -27,7 +27,6 @@ class UploadServiceProvider extends ServiceProvider
         $this->app->singleton(UploadManager::class, function ($app) {
             return new UploadManager($app, $app['request'], $app->make(Filesystem::class));
         });
-        $this->app->singleton(Manager::class, UploadManager::class);
     }
 
     /**

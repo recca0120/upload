@@ -25,7 +25,13 @@
             "Recca0120\\Upload\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Recca0120\\Upload\\Tests\\": "tests/"
+        }
+    },
     "config": {
-        "preferred-install": "dist"
+        "preferred-install": "dist",
+        "sort-packages": true
     }
 }

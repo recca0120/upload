@@ -1,74 +1,43 @@
 <?php
 
+namespace Recca0120\Upload\Tests;
+
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Recca0120\Upload\UploadManager;
 
-class UploadManagerTest extends PHPUnit_Framework_TestCase
+class UploadManagerTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }
 
-    public function test_create_default_driver()
+    public function testCreateDefaultDriver()
     {
-        /*
-        |------------------------------------------------------------
-        | Arrange
-        |------------------------------------------------------------
-        */
-
-        $app = [
-            'config' => [
-                'upload' => [],
+        $uploadManager = new UploadManager(
+            [
+                'config' => [
+                    'upload' => [],
+                ],
             ],
-        ];
-
-        /*
-        |------------------------------------------------------------
-        | Act
-        |------------------------------------------------------------
-        */
-
-        $uploadManager = new UploadManager($app);
-
-        /*
-        |------------------------------------------------------------
-        | Assert
-        |------------------------------------------------------------
-        */
-
+            m::mock('Illuminate\Http\Request'),
+            m::mock('Recca0120\Upload\Filesystem')
+        );
         $this->assertInstanceOf('Recca0120\Upload\Receiver', $uploadManager->driver());
     }
 
-    public function test_create_plupload_driver()
+    public function testCreatePluploadDriver()
     {
-        /*
-        |------------------------------------------------------------
-        | Arrange
-        |------------------------------------------------------------
-        */
-
-        $app = [
-            'config' => [
-                'upload' => [],
+        $uploadManager = new UploadManager(
+            [
+                'config' => [
+                    'upload' => [],
+                ],
             ],
-        ];
-
-        /*
-        |------------------------------------------------------------
-        | Act
-        |------------------------------------------------------------
-        */
-
-        $uploadManager = new UploadManager($app);
-
-        /*
-        |------------------------------------------------------------
-        | Assert
-        |------------------------------------------------------------
-        */
-
+            m::mock('Illuminate\Http\Request'),
+            m::mock('Recca0120\Upload\Filesystem')
+        );
         $this->assertInstanceOf('Recca0120\Upload\Receiver', $uploadManager->driver('plupload'));
     }
 }

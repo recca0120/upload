@@ -117,8 +117,8 @@ abstract class Base implements Api
     {
         $time = time();
         $maxFileAge = 3600;
-        $files = $this->filesystem->files($path);
-        foreach ((array) $files as $file) {
+        $files = (array) $this->filesystem->files($path);
+        foreach ($files as $file) {
             if ($this->filesystem->isFile($file) === true &&
                 $this->filesystem->lastModified($file) < ($time - $maxFileAge)
             ) {
@@ -128,48 +128,39 @@ abstract class Base implements Api
     }
 
     /**
-     * tmpfile.
-     *
-     * @param string $originalName
-     *
-     * @return string
-     */
-    protected function tmpfile($originalName)
-    {
-        $extension = $this->filesystem->extension($originalName);
-        $token = $this->request->get('token');
-
-        return $this->getChunksPath().md5($originalName.$token).'.'.$extension;
-    }
-
-    /**
      * receiveChunkedFile.
      *
      * @param string|resource $originalName
      * @param string|resource $input
      * @param int             $start
      * @param string          $mimeType
-     * @param bool            $isCompleted
+     * @param bool            $completed
      * @param array           $headers
      *
      * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
      *
      * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      */
-    protected function receiveChunkedFile($originalName, $input, $start, $mimeType, $isCompleted = false, $headers = [])
+    protected function receiveChunkedFile($originalName, $input, $start, $mimeType, $completed = false, $headers = [])
     {
-        $tmpfile = $this->tmpfile($originalName);
+        $tmpfilename = $this->getChunksPath().$this->filesystem->tmpfilename(
+            $originalName, $this->request->get('token')
+        );
         $extension = static::TMPFILE_EXTENSION;
-        $this->filesystem->appendStream($tmpfile.$extension, $input, $start);
+        $this->filesystem->appendStream($tmpfilename.$extension, $input, $start);
 
-        if ($isCompleted === false) {
+        if ($completed === false) {
             throw new ChunkedResponseException($headers);
         }
 
-        $this->filesystem->move($tmpfile.$extension, $tmpfile);
-        $size = $this->filesystem->size($tmpfile);
+        $this->filesystem->move($tmpfilename.$extension, $tmpfilename);
 
-        return $this->filesystem->createUploadedFile($tmpfile, $originalName, $mimeType, $size);
+        return $this->filesystem->createUploadedFile(
+            $tmpfilename,
+            $originalName,
+            $mimeType,
+            $this->filesystem->size($tmpfilename)
+        );
     }
 
     /**

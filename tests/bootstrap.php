@@ -10,9 +10,14 @@
 | loading of any our classes "manually". Feels great to relax.
 |
 */
+
 require __DIR__.'/../vendor/autoload.php';
 
 use Carbon\Carbon;
+
+if (class_exists('PHPUnit\Framework\TestCase') === false) {
+    class_alias('PHPUnit_Framework_TestCase', 'PHPUnit\Framework\TestCase');
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -24,5 +29,25 @@ use Carbon\Carbon;
 | the PHP date and date-time functions throughout the application.
 |
 */
+
 date_default_timezone_set('UTC');
+
 Carbon::setTestNow(Carbon::now());
+
+if (! function_exists('storage_path')) {
+    function storage_path()
+    {
+    }
+}
+
+if (! function_exists('public_path')) {
+    function public_path()
+    {
+    }
+}
+
+if (! function_exists('url')) {
+    function url()
+    {
+    }
+}

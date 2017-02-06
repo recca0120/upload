@@ -138,23 +138,18 @@ class Receiver
     protected function callback()
     {
         return function (UploadedFile $uploadedFile, $path, $root, $url, $api) {
-            $storagePath = $root.$path;
-
             $clientOriginalName = $uploadedFile->getClientOriginalName();
             $clientOriginalExtension = strtolower($uploadedFile->getClientOriginalExtension());
             $basename = pathinfo($uploadedFile->getBasename(), PATHINFO_FILENAME);
             $filename = $basename.'.'.$clientOriginalExtension;
-            $tempname = $path.$filename;
-            $mimeType = $uploadedFile->getMimeType();
-            $size = $uploadedFile->getSize();
 
-            $uploadedFile->move($storagePath);
+            $uploadedFile->move($root.$path);
 
             $response = [
                 'name' => $clientOriginalName,
-                'tmp_name' => $tempname,
-                'type' => $mimeType,
-                'size' => $size,
+                'tmp_name' => $path.$filename,
+                'type' => $uploadedFile->getMimeType(),
+                'size' => $uploadedFile->getSize(),
             ];
 
             if (is_null($url) === false) {

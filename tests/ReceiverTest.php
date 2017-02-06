@@ -1,275 +1,133 @@
 <?php
 
+namespace Recca0120\Upload\Tests;
+
 use Mockery as m;
 use Recca0120\Upload\Receiver;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
-class ReceiverTest extends PHPUnit_Framework_TestCase
+class ReceiverTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }
 
-    public function test_receive()
+    public function testReceive()
     {
-        /*
-        |------------------------------------------------------------
-        | Arrange
-        |------------------------------------------------------------
-        */
-
-        $api = m::spy('Recca0120\Upload\Contracts\Api');
-        $uploadedFile = m::spy('Symfony\Component\HttpFoundation\File\UploadedFile');
-        $response = m::spy('Illuminate\Http\JsonResponse');
-        $inputName = 'test';
-        $root = sys_get_temp_dir();
-        $path = '/storage/';
-        $storagePath = $root.$path;
-        $config = [];
-
-        /*
-        |------------------------------------------------------------
-        | Act
-        |------------------------------------------------------------
-        */
-
-        $api
-            ->shouldReceive('getConfig')->andReturn($config)
-            ->shouldReceive('makeDirectory')->with($storagePath)->andReturnSelf()
-            ->shouldReceive('receive')->with($inputName)->andReturn($uploadedFile)
-            ->shouldReceive('deleteUploadedFile')->andReturnSelf();
-
+        $api = m::mock('Recca0120\Upload\Contracts\Api');
+        $api->shouldReceive('getConfig')->once()->andReturn([
+            'root' => $root = 'foo/',
+            'path' => $path = 'foo/',
+            'url' => $url = 'foo',
+        ]);
         $receiver = new Receiver($api);
-
-        /*
-        |------------------------------------------------------------
-        | Assert
-        |------------------------------------------------------------
-        */
-
-        $receiver->receive($inputName, function ($receiveUploadedFile, $receivePath, $receiveRoot, $receiveUrl, $api) use ($response, $uploadedFile, $path, $root) {
-            $this->assertSame($receiveUploadedFile, $uploadedFile);
-            $this->assertSame($receivePath, trim($path, '/').'/');
-            $this->assertSame($receiveRoot, rtrim($root, '/').'/');
-
+        $inputName = 'foo';
+        $api->shouldReceive('makeDirectory')->once()->with($root.$path)->andReturnSelf();
+        $api->shouldReceive('receive')->once()->with($inputName)->andReturn(
+            $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
+        );
+        $uploadedFile->shouldReceive('getClientOriginalName')->once()->andReturn(
+            $clientOriginalName = 'foo.PHP'
+        );
+        $uploadedFile->shouldReceive('getClientOriginalExtension')->once()->andReturn(
+            $clientOriginalExtension = 'PHP'
+        );
+        $uploadedFile->shouldReceive('getBasename')->once()->andReturn(
+            $basename = 'foo'
+        );
+        $uploadedFile->shouldReceive('getMimeType')->once()->andReturn(
+            $mimeType = 'foo'
+        );
+        $uploadedFile->shouldReceive('getSize')->once()->andReturn(
+            $size = 1000
+        );
+        $uploadedFile->shouldReceive('move')->once()->with($root.$path);
+        $api->shouldReceive('deleteUploadedFile')->once()->with($uploadedFile)->andReturnSelf();
+        $api->shouldReceive('completedResponse')->once()->with(m::type('Illuminate\Http\JsonResponse'))->andReturnUsing(function ($response) {
             return $response;
         });
-
-        $api->shouldHaveReceived('getConfig')->once();
-        $api->shouldHaveReceived('makeDirectory')->with($storagePath)->once();
-        $api->shouldHaveReceived('receive')->with($inputName)->once();
-        $api->shouldHaveReceived('deleteUploadedFile')->with($uploadedFile)->once();
-        $api->shouldHaveReceived('completedResponse')->with($response)->once();
+        $response = $receiver->receive($inputName);
+        $this->assertSame([
+            'name' => $clientOriginalName,
+            'tmp_name' => $path.$basename.'.'.strtolower($clientOriginalExtension),
+            'type' => $mimeType,
+            'size' => $size,
+            'url' => $path.$basename.'.'.strtolower($clientOriginalExtension),
+        ], (array) $response->getData());
     }
 
-    public function test_receive_and_throw_chunked_response_exception()
+    public function testReceiveCustomCallback()
     {
-        /*
-        |------------------------------------------------------------
-        | Arrange
-        |------------------------------------------------------------
-        */
-
-        $api = m::spy('Recca0120\Upload\Contracts\Api');
-        $chunkedResponseException = new ChunkedResponseException();
-        $inputName = 'test';
-        $root = sys_get_temp_dir();
-        $path = '/storage/';
-        $storagePath = $root.$path;
-        $config = [];
-
-        /*
-        |------------------------------------------------------------
-        | Act
-        |------------------------------------------------------------
-        */
-
-        $api
-            ->shouldReceive('getConfig')->andReturn($config)
-            ->shouldReceive('makeDirectory')->with($storagePath)->andReturnSelf()
-            ->shouldReceive('receive')->with($inputName)->andThrow($chunkedResponseException);
-
+        $api = m::mock('Recca0120\Upload\Contracts\Api');
+        $api->shouldReceive('getConfig')->once()->andReturn([
+            'root' => $root = 'foo/',
+            'path' => $path = 'foo/',
+            'url' => $url = 'foo',
+        ]);
         $receiver = new Receiver($api);
+        $inputName = 'foo';
+        $api->shouldReceive('makeDirectory')->once()->with($root.$path)->andReturnSelf();
+        $api->shouldReceive('receive')->once()->with($inputName)->andReturn(
+            $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
+        );
+        $response = m::mock('Illuminate\Http\JsonResponse');
+        $api->shouldReceive('deleteUploadedFile')->once()->with($uploadedFile)->andReturnSelf();
+        $api->shouldReceive('completedResponse')->once()->with($response)->andReturn($response);
 
-        /*
-        |------------------------------------------------------------
-        | Assert
-        |------------------------------------------------------------
-        */
-
-        $response = $receiver->receive($inputName, function ($uploadedFile, $path, $root, $url, $api) {
-        });
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
-        $api->shouldHaveReceived('getConfig')->once();
-        $api->shouldHaveReceived('receive')->with($inputName)->once();
+        $this->assertSame(
+            $response,
+            $receiver->receive($inputName, function (UploadedFile $uploadedFile, $path, $root, $url, $api) use ($response) {
+                return $response;
+            })
+        );
     }
 
-    public function test_receive_with_default_callback()
+    public function testReceiveAndThroChunkedResponseException()
     {
-        /*
-        |------------------------------------------------------------
-        | Arrange
-        |------------------------------------------------------------
-        */
-
-        $api = m::spy('Recca0120\Upload\Contracts\Api');
-        $uploadedFile = m::spy('Symfony\Component\HttpFoundation\File\UploadedFile');
-        $response = m::spy('Illuminate\Http\JsonResponse');
-        $inputName = 'test';
-
-        $root = sys_get_temp_dir();
-        $path = '/storage/';
-        $storagePath = $root.$path;
-        $url = 'url';
-        $config = [
-            'root' => $root,
-            'url' => $url,
-            'path' => $path,
-        ];
-
-        $clientOriginalName = 'client_original_name.PHP';
-        $clientOriginalExtension = 'PHP';
-        $basename = 'client_original_name';
-        $mimeType = 'mimetype';
-        $size = 100;
-
-        /*
-        |------------------------------------------------------------
-        | Act
-        |------------------------------------------------------------
-        */
-
-        $api
-            ->shouldReceive('getConfig')->andReturn($config)
-            ->shouldReceive('makeDirectory')->with($storagePath)->andReturnSelf()
-            ->shouldReceive('receive')->with($inputName)->andReturn($uploadedFile)
-            ->shouldReceive('deleteUploadedFile')->andReturnSelf()
-            ->shouldReceive('completedResponse')->with(m::type('Illuminate\Http\JsonResponse'))->andReturn($response);
-
-        $uploadedFile
-            ->shouldReceive('getClientOriginalName')->andReturn($clientOriginalName)
-            ->shouldReceive('getClientOriginalExtension')->andReturn($clientOriginalExtension)
-            ->shouldReceive('getBasename')->andReturn($clientOriginalName)
-            ->shouldReceive('getMimeType')->andReturn($mimeType)
-            ->shouldReceive('getSize')->andReturn($size)
-            ->shouldReceive('move')->with($storagePath, $basename.'.'.$clientOriginalExtension);
-
-        $receiver = new Receiver($api, $config);
-
-        /*
-        |------------------------------------------------------------
-        | Assert
-        |------------------------------------------------------------
-        */
-
-        $this->assertSame($response, $receiver->receive($inputName, null, $path));
-        $api->shouldHaveReceived('getConfig')->once();
-        $api->shouldHaveReceived('makeDirectory')->with($storagePath)->once();
-        $api->shouldHaveReceived('receive')->with($inputName)->once();
-        $uploadedFile->shouldReceive('getClientOriginalName')->andReturn($clientOriginalName);
-        $uploadedFile->shouldReceive('getClientOriginalExtension')->andReturn($clientOriginalExtension);
-        $uploadedFile->shouldReceive('getBasename')->andReturn($clientOriginalName);
-        $uploadedFile->shouldReceive('getMimeType')->andReturn($mimeType);
-        $uploadedFile->shouldReceive('getSize')->andReturn($size);
-        $uploadedFile->shouldReceive('move')->with($storagePath, $basename.'.'.$clientOriginalExtension);
-        $api->shouldHaveReceived('deleteUploadedFile')->with($uploadedFile)->once();
-        $api->shouldHaveReceived('completedResponse')->with(m::on(function ($response) use ($clientOriginalName, $clientOriginalExtension, $mimeType, $basename, $size, $url) {
-            $data = $response->getData();
-            $this->assertSame($clientOriginalName, $data->name);
-            $this->assertSame($mimeType, $data->type);
-            $this->assertSame($size, $data->size);
-            $this->assertSame($url.'/'.$basename.'.'.strtolower($clientOriginalExtension), $data->url);
-
-            return is_a($response, 'Illuminate\Http\JsonResponse');
-        }))->once();
+        $api = m::mock('Recca0120\Upload\Contracts\Api');
+        $api->shouldReceive('getConfig')->once()->andReturn([
+            'root' => $root = 'foo/',
+            'path' => $path = 'foo/',
+            'url' => $url = 'foo',
+        ]);
+        $receiver = new Receiver($api);
+        $inputName = 'foo';
+        $api->shouldReceive('makeDirectory')->once()->with($root.$path)->andReturnSelf();
+        $api->shouldReceive('receive')->once()->with($inputName)->andThrow(
+            $chunkedResponseException = new ChunkedResponseException()
+        );
+        $this->assertInstanceOf(
+            'Symfony\Component\HttpFoundation\Response',
+            $receiver->receive($inputName, function (UploadedFile $uploadedFile, $path, $root, $url, $api) {
+                return $response;
+            })
+        );
     }
 
-    public function test_factory_default()
+    public function testFactory()
     {
-        /*
-        |------------------------------------------------------------
-        | Arrange
-        |------------------------------------------------------------
-        */
-
-        $config = [];
-        $class = 'Recca0120\Upload\Apis\FileAPI';
-
-        /*
-        |------------------------------------------------------------
-        | Act
-        |------------------------------------------------------------
-        */
-
-        /*
-        |------------------------------------------------------------
-        | Assert
-        |------------------------------------------------------------
-        */
-
-        $this->assertAttributeInstanceOf($class, 'api', Receiver::factory($config));
-    }
-
-    public function test_factory_fileapi()
-    {
-        /*
-        |------------------------------------------------------------
-        | Arrange
-        |------------------------------------------------------------
-        */
-
-        $config = [];
-        $classes = [
-            'Recca0120\Upload\Apis\FileAPI' => 'Recca0120\Upload\Apis\FileAPI',
-            'filapi' => 'Recca0120\Upload\Apis\FileAPI',
-        ];
-
-        /*
-        |------------------------------------------------------------
-        | Act
-        |------------------------------------------------------------
-        */
-
-        /*
-        |------------------------------------------------------------
-        | Assert
-        |------------------------------------------------------------
-        */
-
-        foreach ($classes as $class) {
-            $this->assertAttributeInstanceOf($class, 'api', Receiver::factory($config, $class));
-        }
-    }
-
-    public function test_factory_plupload()
-    {
-        /*
-        |------------------------------------------------------------
-        | Arrange
-        |------------------------------------------------------------
-        */
-
-        $config = [];
-        $classes = [
-            'Recca0120\Upload\Apis\Plupload' => 'Recca0120\Upload\Apis\FileAPI',
-            'plupload' => 'Recca0120\Upload\Apis\Plupload',
-        ];
-
-        /*
-        |------------------------------------------------------------
-        | Act
-        |------------------------------------------------------------
-        */
-
-        /*
-        |------------------------------------------------------------
-        | Assert
-        |------------------------------------------------------------
-        */
-
-        foreach ($classes as $class) {
-            $this->assertAttributeInstanceOf($class, 'api', Receiver::factory($config, $class));
-        }
+        $this->assertAttributeInstanceOf(
+            'Recca0120\Upload\Apis\FileAPI',
+            'api',
+            Receiver::factory([], 'Recca0120\Upload\Apis\FileAPI')
+        );
+        $this->assertAttributeInstanceOf(
+            'Recca0120\Upload\Apis\FileAPI',
+            'api',
+            Receiver::factory([], 'FILEAPI')
+        );
+        $this->assertAttributeInstanceOf(
+            'Recca0120\Upload\Apis\Plupload',
+            'api',
+            Receiver::factory([], 'Recca0120\Upload\Apis\Plupload')
+        );
+        $this->assertAttributeInstanceOf(
+            'Recca0120\Upload\Apis\Plupload',
+            'api',
+            Receiver::factory([], 'PLUPLOAD')
+        );
     }
 }

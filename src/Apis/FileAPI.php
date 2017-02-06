@@ -59,14 +59,15 @@ class FileAPI extends Base
 
         list($start, $end, $total) = sscanf($contentRange, 'bytes %d-%d/%d');
 
-        $originalName = $this->getOriginalName();
-        $mimeType = $this->getMimeType($originalName);
-
-        $isCompleted = ($end >= $total - 1);
-        $input = 'php://input';
-
-        return $this->receiveChunkedFile($originalName, $input, $start, $mimeType, $isCompleted, [
-            'X-Last-Known-Byte' => $end,
-        ]);
+        return $this->receiveChunkedFile(
+            $originalName = $this->getOriginalName(),
+            'php://input',
+            $start,
+            $this->getMimeType($originalName),
+            $end >= $total - 1,
+            [
+                'X-Last-Known-Byte' => $end,
+            ]
+        );
     }
 }

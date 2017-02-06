@@ -1,103 +1,57 @@
 <?php
 
+namespace Recca0120\Upload\Tests;
+
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Recca0120\Upload\UploadServiceProvider;
 
-class UploadServiceProviderTest extends PHPUnit_Framework_TestCase
+class UploadServiceProviderTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }
 
-    public function test_register()
+    public function testRegister()
     {
-        /*
-        |------------------------------------------------------------
-        | Arrange
-        |------------------------------------------------------------
-        */
+        $serviceProvider = new UploadServiceProvider(
+            $app = m::mock('Illuminate\Contracts\Foundation\Application, ArrayAccess')
+        );
+        $app->shouldReceive('offsetGet')->twice()->with('config')->andReturn(
+            $config = m::mock('Illuminate\Contracts\Config\Repository, ArrayAccess')
+        );
+        $config->shouldReceive('get')->once()->with('upload', [])->andReturn([]);
+        $config->shouldReceive('set')->once()->with('upload', m::type('array'));
 
-        $app = m::spy('Illuminate\Contracts\Foundation\Application, ArrayAccess');
-        $config = m::spy('Illuminate\Contracts\Config\Repository, ArrayAccess');
-        $request = m::spy('Illuminate\Http\Request');
-        $filesystem = m::spy('Recca0120\Upload\Filesystem');
+        $app->shouldReceive('singleton')->once()->with(
+            'Recca0120\Upload\Filesystem', 'Recca0120\Upload\Filesystem'
+        );
+        $app->shouldReceive('singleton')->once()->with(
+            'Recca0120\Upload\UploadManager', m::on(function ($closure) use ($app) {
+                $app->shouldReceive('offsetGet')->once()->with('request')->andReturn(
+                    $request = m::mock('Illuminate\Http\Request')
+                );
+                $app->shouldReceive('make')->once()->with(
+                    'Recca0120\Upload\Filesystem'
+                )->andReturn(
+                    m::mock('Recca0120\Upload\Filesystem')
+                );
+                $closure($app);
 
-        /*
-        |------------------------------------------------------------
-        | Act
-        |------------------------------------------------------------
-        */
-
-        $app
-            ->shouldReceive('offsetGet')->with('config')->andReturn($config)
-            ->shouldReceive('offsetGet')->with('request')->andReturn($request)
-            ->shouldReceive('make')->with('Recca0120\Upload\Filesystem')->andReturn($filesystem)
-            ->shouldReceive('runningInConsole')->andReturn(false);
-
-        $config->shouldReceive('get')->andReturn([]);
-
-        $serviceProvider = new UploadServiceProvider($app);
+                return true;
+            })
+        );
         $serviceProvider->register();
-        $serviceProvider->boot();
-
-        /*
-        |------------------------------------------------------------
-        | Assert
-        |------------------------------------------------------------
-        */
-
-        $app->shouldHaveReceived('singleton')->with('Recca0120\Upload\Filesystem', 'Recca0120\Upload\Filesystem')->once();
-        $app->shouldHaveReceived('singleton')->with('Recca0120\Upload\UploadManager', m::on(function ($closure) use ($app) {
-            return is_a($closure($app), 'Recca0120\Upload\UploadManager');
-        }))->once();
-        $app->shouldHaveReceived('offsetGet')->with('request')->twice();
-        $app->shouldHaveReceived('make')->with('Recca0120\Upload\Filesystem')->twice();
-        $app->shouldHaveReceived('singleton')->with('Recca0120\Upload\Manager', 'Recca0120\Upload\UploadManager')->once();
-        $app->shouldHaveReceived('runningInConsole')->once();
     }
 
-    public function test_boot_running_in_console()
+    public function testBoot()
     {
-        /*
-        |------------------------------------------------------------
-        | Arrange
-        |------------------------------------------------------------
-        */
-
-        $app = m::spy('Illuminate\Contracts\Foundation\Application, ArrayAccess');
-
-        /*
-        |------------------------------------------------------------
-        | Act
-        |------------------------------------------------------------
-        */
-
-        $app
-            ->shouldReceive('runningInConsole')->andReturn(true);
-
-        $serviceProvider = new UploadServiceProvider($app);
+        $serviceProvider = new UploadServiceProvider(
+            $app = m::mock('Illuminate\Contracts\Foundation\Application, ArrayAccess')
+        );
+        $app->shouldReceive('runningInConsole')->once()->andReturn(true);
+        $app->shouldReceive('configPath')->once();
         $serviceProvider->boot();
-
-        /*
-        |------------------------------------------------------------
-        | Assert
-        |------------------------------------------------------------
-        */
-
-        $app->shouldHaveReceived('runningInConsole')->once();
-        $app->shouldHaveReceived('configPath')->once();
     }
-}
-
-function storage_path()
-{
-}
-
-function public_path()
-{
-}
-
-function url()
-{
 }

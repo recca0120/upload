@@ -26,15 +26,14 @@ class Plupload extends Base
         }
 
         $chunk = $this->request->get('chunk');
-        $start = $chunk * $this->request->header('content-length');
 
-        $originalName = $this->request->get('name');
-        $mimeType = $uploadedFile->getMimeType();
-
-        $isCompleted = ($chunk >= $chunks - 1);
-        $input = $uploadedFile->getPathname();
-
-        return $this->receiveChunkedFile($originalName, $input, $start, $mimeType, $isCompleted);
+        return $this->receiveChunkedFile(
+            $this->request->get('name'),
+            $uploadedFile->getPathname(),
+            $chunk * $this->request->header('content-length'),
+            $uploadedFile->getMimeType(),
+            $chunk >= $chunks - 1
+        );
     }
 
     /**
