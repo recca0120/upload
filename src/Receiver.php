@@ -143,14 +143,13 @@ class Receiver
             $basename = pathinfo($uploadedFile->getBasename(), PATHINFO_FILENAME);
             $filename = $basename.'.'.$clientOriginalExtension;
 
-            $uploadedFile->move($root.$path);
-
             $response = [
                 'name' => $clientOriginalName,
                 'tmp_name' => $path.$filename,
                 'type' => $uploadedFile->getMimeType(),
                 'size' => $uploadedFile->getSize(),
             ];
+            $uploadedFile->move($root.$path);
 
             if (is_null($url) === false) {
                 $response['url'] = rtrim($url, '/').'/'.$filename;
