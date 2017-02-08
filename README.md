@@ -85,9 +85,9 @@ require __DIR__.'/vendor/autoload.php';
 
 $config = [
     'chunks' => 'path_to_chunks',
-    'root' => 'path_to_root',
-    'path' => 'storage',
-    'url' => 'http://app.dev/storage/',
+    'storage' => 'path_to_storage',
+    'domain' => 'http://app.dev/',
+    'path' => 'web_path'
 ];
 
 $inputName = 'file';
@@ -95,7 +95,7 @@ $storagePath = 'relative path';
 $api = 'fileapi'; // or plupload
 
 Receiver::factory($config, $api)
-    ->receive($inputName, function (UploadedFile $uploadedFile, $path, $root, $url, $api) {
+    ->receive($inputName, function (UploadedFile $uploadedFile, $path, $domain, $api) {
         // do something
 
     });
@@ -113,9 +113,9 @@ require __DIR__.'/vendor/autoload.php';
 
 $config = [
     'chunks' => 'path_to_chunks',
-    'root' => 'path_to_root',
-    'path' => 'storage',
-    'url' => 'http://app.dev/storage/',
+    'storage' => 'path_to_storage',
+    'domain' => 'http://app.dev/',
+    'path' => 'web_path'
 ];
 
 $inputName = 'file';
@@ -124,7 +124,7 @@ $storagePath = 'relative path';
 // if use Plupload, new Recca0120\Upload\Apis\Plupload
 $receiver = new Receiver(new FileAPI($config));
 // save to $config['base_path'].'/'.$storagePath;
-echo $receiver->receive($inputName, function (UploadedFile $uploadedFile, $path, $root, $url, $api) {
+echo $receiver->receive($inputName, function (UploadedFile $uploadedFile, $path, $domain, $api) {
     // do something
 
 });

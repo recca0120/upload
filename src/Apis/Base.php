@@ -2,7 +2,6 @@
 
 namespace Recca0120\Upload\Apis;
 
-use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Recca0120\Upload\Filesystem;
 use Illuminate\Http\JsonResponse;
@@ -41,13 +40,6 @@ abstract class Base implements Api
     protected $config;
 
     /**
-     * $chunksPath.
-     *
-     * @var string
-     */
-    protected $chunksPath;
-
-    /**
      * __construct.
      *
      * @param array                        $config
@@ -58,42 +50,56 @@ abstract class Base implements Api
     {
         $this->request = $request ?: Request::capture();
         $this->filesystem = $filesystem ?: new Filesystem();
-        $this->setConfig($config);
-    }
 
-    /**
-     * getConfig.
-     *
-     * @return array
-     */
-    public function getConfig()
-    {
-        return $this->config;
-    }
+        $config['chunks'] = empty($config['chunks']) === false ? $config['chunks'] : sys_get_temp_dir().'/chunks';
+        $config['storage'] = empty($config['storage']) === false ? $config['storage'] : 'storage/temp';
+        $config['domain'] = empty($config['domain']) === false ? $config['domain'] : $this->request->root();
+        $config['path'] = empty($config['path']) === false ? $config['path'] : 'storage/temp';
 
-    /**
-     * setConfig.
-     *
-     * @param array $config
-     *
-     * @return static
-     */
-    public function setConfig($config)
-    {
+        foreach (['chunks', 'storage', 'domain', 'path'] as $key) {
+            $config[$key] = rtrim($config[$key], '/').'/';
+        }
         $this->config = $config;
-        $this->chunksPath = Arr::get($config, 'chunks', sys_get_temp_dir().'/chunks');
-
-        return $this;
     }
 
     /**
-     * getChunksPath.
+     * chunksPath.
      *
      * @return string
      */
-    public function getChunksPath()
+    public function chunksPath()
     {
-        return rtrim($this->chunksPath, '/').'/';
+        return $this->config['chunks'];
+    }
+
+    /**
+     * storagePath.
+     *
+     * @return string
+     */
+    public function storagePath()
+    {
+        return $this->config['storage'];
+    }
+
+    /**
+     * domain.
+     *
+     * @return string
+     */
+    public function domain()
+    {
+        return $this->config['domain'];
+    }
+
+    /**
+     * path.
+     *
+     * @return string
+     */
+    public function path()
+    {
+        return $this->config['path'];
     }
 
     /**
@@ -143,23 +149,26 @@ abstract class Base implements Api
      */
     protected function receiveChunkedFile($originalName, $input, $start, $mimeType, $completed = false, $headers = [])
     {
-        $tmpfilename = $this->getChunksPath().$this->filesystem->tmpfilename(
+        $tmpfilename = $this->filesystem->tmpfilename(
             $originalName, $this->request->get('token')
         );
-        $extension = static::TMPFILE_EXTENSION;
-        $this->filesystem->appendStream($tmpfilename.$extension, $input, $start);
+
+        $chunkFile = $this->chunksPath().$tmpfilename.static::TMPFILE_EXTENSION;
+        $storageFile = $this->storagePath().$tmpfilename;
+
+        $this->filesystem->appendStream($chunkFile, $input, $start);
 
         if ($completed === false) {
             throw new ChunkedResponseException($headers);
         }
 
-        $this->filesystem->move($tmpfilename.$extension, $tmpfilename);
+        $this->filesystem->move($chunkFile, $storageFile);
 
         return $this->filesystem->createUploadedFile(
-            $tmpfilename,
+            $storageFile,
             $originalName,
             $mimeType,
-            $this->filesystem->size($tmpfilename)
+            $this->filesystem->size($storageFile)
         );
     }
 
@@ -174,8 +183,11 @@ abstract class Base implements Api
      */
     public function receive($inputName)
     {
-        $chunksPath = $this->getChunksPath();
-        $uploadedFile = $this->makeDirectory($chunksPath)->doReceive($inputName);
+        $chunksPath = $this->chunksPath();
+        $storagePath = $this->storagePath();
+        $uploadedFile = $this->makeDirectory($chunksPath)
+            ->makeDirectory($storagePath)
+            ->doReceive($inputName);
         $this->cleanDirectory($chunksPath);
 
         return $uploadedFile;

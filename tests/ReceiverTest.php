@@ -17,18 +17,15 @@ class ReceiverTest extends TestCase
 
     public function testReceive()
     {
-        $api = m::mock('Recca0120\Upload\Contracts\Api');
-        $api->shouldReceive('getConfig')->once()->andReturn([
-            'root' => $root = 'foo/',
-            'path' => $path = 'foo/',
-            'url' => $url = 'foo',
-        ]);
-        $receiver = new Receiver($api);
+        $receiver = new Receiver(
+            $api = m::mock('Recca0120\Upload\Contracts\Api')
+        );
         $inputName = 'foo';
-        $api->shouldReceive('makeDirectory')->once()->with($root.$path)->andReturnSelf();
         $api->shouldReceive('receive')->once()->with($inputName)->andReturn(
             $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
         );
+        $api->shouldReceive('domain')->once()->andReturn($domain = 'foo/');
+        $api->shouldReceive('path')->once()->andReturn($path = 'foo/');
         $uploadedFile->shouldReceive('getClientOriginalName')->once()->andReturn(
             $clientOriginalName = 'foo.PHP'
         );
@@ -44,7 +41,7 @@ class ReceiverTest extends TestCase
         $uploadedFile->shouldReceive('getSize')->once()->andReturn(
             $size = 1000
         );
-        $uploadedFile->shouldReceive('move')->once()->with($root.$path);
+
         $api->shouldReceive('deleteUploadedFile')->once()->with($uploadedFile)->andReturnSelf();
         $api->shouldReceive('completedResponse')->once()->with(m::type('Illuminate\Http\JsonResponse'))->andReturnUsing(function ($response) {
             return $response;
@@ -55,31 +52,28 @@ class ReceiverTest extends TestCase
             'tmp_name' => $path.$basename.'.'.strtolower($clientOriginalExtension),
             'type' => $mimeType,
             'size' => $size,
-            'url' => $path.$basename.'.'.strtolower($clientOriginalExtension),
+            'url' => $domain.$path.$basename.'.'.strtolower($clientOriginalExtension),
         ], (array) $response->getData());
     }
 
     public function testReceiveCustomCallback()
     {
-        $api = m::mock('Recca0120\Upload\Contracts\Api');
-        $api->shouldReceive('getConfig')->once()->andReturn([
-            'root' => $root = 'foo/',
-            'path' => $path = 'foo/',
-            'url' => $url = 'foo',
-        ]);
-        $receiver = new Receiver($api);
+        $receiver = new Receiver(
+            $api = m::mock('Recca0120\Upload\Contracts\Api')
+        );
         $inputName = 'foo';
-        $api->shouldReceive('makeDirectory')->once()->with($root.$path)->andReturnSelf();
         $api->shouldReceive('receive')->once()->with($inputName)->andReturn(
             $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
         );
+        $api->shouldReceive('domain')->once()->andReturn($domain = 'foo/');
+        $api->shouldReceive('path')->once()->andReturn($path = 'foo/');
         $response = m::mock('Illuminate\Http\JsonResponse');
         $api->shouldReceive('deleteUploadedFile')->once()->with($uploadedFile)->andReturnSelf();
         $api->shouldReceive('completedResponse')->once()->with($response)->andReturn($response);
 
         $this->assertSame(
             $response,
-            $receiver->receive($inputName, function (UploadedFile $uploadedFile, $path, $root, $url, $api) use ($response) {
+            $receiver->receive($inputName, function (UploadedFile $uploadedFile, $path, $domain, $api) use ($response) {
                 return $response;
             })
         );
@@ -87,21 +81,16 @@ class ReceiverTest extends TestCase
 
     public function testReceiveAndThroChunkedResponseException()
     {
-        $api = m::mock('Recca0120\Upload\Contracts\Api');
-        $api->shouldReceive('getConfig')->once()->andReturn([
-            'root' => $root = 'foo/',
-            'path' => $path = 'foo/',
-            'url' => $url = 'foo',
-        ]);
-        $receiver = new Receiver($api);
+        $receiver = new Receiver(
+            $api = m::mock('Recca0120\Upload\Contracts\Api')
+        );
         $inputName = 'foo';
-        $api->shouldReceive('makeDirectory')->once()->with($root.$path)->andReturnSelf();
         $api->shouldReceive('receive')->once()->with($inputName)->andThrow(
             $chunkedResponseException = new ChunkedResponseException()
         );
         $this->assertInstanceOf(
             'Symfony\Component\HttpFoundation\Response',
-            $receiver->receive($inputName, function (UploadedFile $uploadedFile, $path, $root, $url, $api) {
+            $receiver->receive($inputName, function (UploadedFile $uploadedFile, $path, $domain, $url, $api) {
                 return $response;
             })
         );

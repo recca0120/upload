@@ -16,12 +16,14 @@ class FileAPITest extends TestCase
 
     public function testReceiveSingleFile()
     {
+        $request = m::mock('Illuminate\Http\Request');
+        $request->shouldReceive('root')->once()->andReturn($root = 'root');
         $api = new FileAPI(
-            $config = ['chunks' => $chunksPath = 'foo/'],
-            $request = m::mock('Illuminate\Http\Request'),
+            $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
+            $request,
             $filesystem = m::mock('Recca0120\Upload\Filesystem')
         );
-        $filesystem->shouldReceive('isDirectory')->once()->andReturn(true);
+        $filesystem->shouldReceive('isDirectory')->twice()->andReturn(true);
         $request->shouldReceive('header')->once()->with('content-range')->andReturn('');
         $inputName = 'foo';
         $request->shouldReceive('file')->once()->with($inputName)->andReturn(
@@ -33,12 +35,14 @@ class FileAPITest extends TestCase
 
     public function testReceiveChunkedFile()
     {
+        $request = m::mock('Illuminate\Http\Request');
+        $request->shouldReceive('root')->once()->andReturn($root = 'root');
         $api = new FileAPI(
-            $config = ['chunks' => $chunksPath = 'foo/'],
-            $request = m::mock('Illuminate\Http\Request'),
+            $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
+            $request,
             $filesystem = m::mock('Recca0120\Upload\Filesystem')
         );
-        $filesystem->shouldReceive('isDirectory')->once()->andReturn(true);
+        $filesystem->shouldReceive('isDirectory')->twice()->andReturn(true);
 
         $start = 5242880;
         $end = 7845180;
@@ -53,11 +57,10 @@ class FileAPITest extends TestCase
         $request->shouldReceive('header')->once()->with('content-type')->andReturn(
             $mimeType = 'foo'
         );
-
         $request->shouldReceive('get')->once()->with('token')->andReturn($token = 'foo');
         $filesystem->shouldReceive('tmpfilename')->once()->with($originalName, $token)->andReturn($tmpfilename = 'foo');
         $filesystem->shouldReceive('appendStream')->once()->with($chunksPath.$tmpfilename.'.part', 'php://input', $start);
-        $filesystem->shouldReceive('move')->once()->with($chunksPath.$tmpfilename.'.part', $chunksPath.$tmpfilename);
+        $filesystem->shouldReceive('move')->once()->with($chunksPath.$tmpfilename.'.part', $storagePath.$tmpfilename);
         $filesystem->shouldReceive('size')->once()->with($chunksPath.$tmpfilename)->andReturn($size = 1024);
         $filesystem->shouldReceive('createUploadedFile')->once()->with(
             $chunksPath.$tmpfilename,
@@ -74,12 +77,14 @@ class FileAPITest extends TestCase
 
     public function testReceiveChunkedFileAndThrowChunkedResponseException()
     {
+        $request = m::mock('Illuminate\Http\Request');
+        $request->shouldReceive('root')->once()->andReturn($root = 'root');
         $api = new FileAPI(
-            $config = ['chunks' => $chunksPath = 'foo/'],
-            $request = m::mock('Illuminate\Http\Request'),
+            $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
+            $request,
             $filesystem = m::mock('Recca0120\Upload\Filesystem')
         );
-        $filesystem->shouldReceive('isDirectory')->once()->andReturn(true);
+        $filesystem->shouldReceive('isDirectory')->twice()->andReturn(true);
 
         $start = 5242880;
         $end = 5767167;

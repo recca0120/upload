@@ -13,22 +13,60 @@ class BaseTest extends TestCase
         m::close();
     }
 
-    public function testGetConfig()
+    public function testChunksPath()
     {
+        $request = m::mock('Illuminate\Http\Request');
+        $request->shouldReceive('root')->once()->andReturn($root = 'root');
         $api = new Api(
             $config = ['chunks' => $chunksPath = 'foo/'],
-            $request = m::mock('Illuminate\Http\Request'),
+            $request,
             $filesystem = m::mock('Recca0120\Upload\Filesystem')
         );
-        $this->assertSame($config, $api->getConfig());
-        $this->assertSame($chunksPath, $api->getChunksPath());
+        $this->assertSame($chunksPath, $api->chunksPath());
+    }
+
+    public function testStoragePath()
+    {
+        $request = m::mock('Illuminate\Http\Request');
+        $request->shouldReceive('root')->once()->andReturn($root = 'root');
+        $api = new Api(
+            $config = ['storage' => $storagePath = 'foo/'],
+            $request,
+            $filesystem = m::mock('Recca0120\Upload\Filesystem')
+        );
+        $this->assertSame($storagePath, $api->storagePath());
+    }
+
+    public function testDomain()
+    {
+        $request = m::mock('Illuminate\Http\Request');
+        $api = new Api(
+            $config = ['domain' => $domain = 'foo/'],
+            $request,
+            $filesystem = m::mock('Recca0120\Upload\Filesystem')
+        );
+        $this->assertSame($domain, $api->domain());
+    }
+
+    public function testPath()
+    {
+        $request = m::mock('Illuminate\Http\Request');
+        $request->shouldReceive('root')->once()->andReturn($root = 'root');
+        $api = new Api(
+            $config = ['path' => $path = 'foo/'],
+            $request,
+            $filesystem = m::mock('Recca0120\Upload\Filesystem')
+        );
+        $this->assertSame($path, $api->path());
     }
 
     public function testMakeDirectory()
     {
+        $request = m::mock('Illuminate\Http\Request');
+        $request->shouldReceive('root')->once()->andReturn($root = 'root');
         $api = new Api(
             $config = ['chunks' => $chunksPath = 'foo/'],
-            $request = m::mock('Illuminate\Http\Request'),
+            $request,
             $filesystem = m::mock('Recca0120\Upload\Filesystem')
         );
         $path = __DIR__;
@@ -39,9 +77,11 @@ class BaseTest extends TestCase
 
     public function testCleanDirectory()
     {
+        $request = m::mock('Illuminate\Http\Request');
+        $request->shouldReceive('root')->once()->andReturn($root = 'root');
         $api = new Api(
             $config = ['chunks' => $chunksPath = 'foo/'],
-            $request = m::mock('Illuminate\Http\Request'),
+            $request,
             $filesystem = m::mock('Recca0120\Upload\Filesystem')
         );
         $path = __DIR__;
@@ -54,9 +94,11 @@ class BaseTest extends TestCase
 
     public function testDeleteUploadedFile()
     {
+        $request = m::mock('Illuminate\Http\Request');
+        $request->shouldReceive('root')->once()->andReturn($root = 'root');
         $api = new Api(
             $config = ['chunks' => $chunksPath = 'foo/'],
-            $request = m::mock('Illuminate\Http\Request'),
+            $request,
             $filesystem = m::mock('Recca0120\Upload\Filesystem')
         );
         $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile');
@@ -68,9 +110,11 @@ class BaseTest extends TestCase
 
     public function testCompletedResponse()
     {
+        $request = m::mock('Illuminate\Http\Request');
+        $request->shouldReceive('root')->once()->andReturn($root = 'root');
         $api = new Api(
             $config = ['chunks' => $chunksPath = 'foo/'],
-            $request = m::mock('Illuminate\Http\Request'),
+            $request,
             $filesystem = m::mock('Recca0120\Upload\Filesystem')
         );
         $api->completedResponse(

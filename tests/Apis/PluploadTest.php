@@ -16,12 +16,14 @@ class PluploadTest extends TestCase
 
     public function testReceiveUploadSingleFile()
     {
+        $request = m::mock('Illuminate\Http\Request');
+        $request->shouldReceive('root')->once()->andReturn($root = 'root');
         $api = new Plupload(
-            $config = ['chunks' => $chunksPath = 'foo/'],
-            $request = m::mock('Illuminate\Http\Request'),
+            $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
+            $request,
             $filesystem = m::mock('Recca0120\Upload\Filesystem')
         );
-        $filesystem->shouldReceive('isDirectory')->once()->andReturn(true);
+        $filesystem->shouldReceive('isDirectory')->twice()->andReturn(true);
         $inputName = 'foo';
         $request->shouldReceive('file')->once()->with($inputName)->andReturn(
             $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
@@ -33,12 +35,14 @@ class PluploadTest extends TestCase
 
     public function testReceiveChunkedFile()
     {
+        $request = m::mock('Illuminate\Http\Request');
+        $request->shouldReceive('root')->once()->andReturn($root = 'root');
         $api = new Plupload(
-            $config = ['chunks' => $chunksPath = 'foo/'],
-            $request = m::mock('Illuminate\Http\Request'),
+            $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
+            $request,
             $filesystem = m::mock('Recca0120\Upload\Filesystem')
         );
-        $filesystem->shouldReceive('isDirectory')->once()->andReturn(true);
+        $filesystem->shouldReceive('isDirectory')->twice()->andReturn(true);
 
         $inputName = 'foo';
         $request->shouldReceive('file')->once()->with($inputName)->andReturn(
@@ -55,7 +59,7 @@ class PluploadTest extends TestCase
         $filesystem->shouldReceive('tmpfilename')->once()->with($originalName, $token)->andReturn($tmpfilename = 'foo');
         $filesystem->shouldReceive('appendStream')->once()->with($chunksPath.$tmpfilename.'.part', $pathname, $chunk * $contentLength);
 
-        $filesystem->shouldReceive('move')->once()->with($chunksPath.$tmpfilename.'.part', $chunksPath.$tmpfilename);
+        $filesystem->shouldReceive('move')->once()->with($chunksPath.$tmpfilename.'.part', $storagePath.$tmpfilename);
         $filesystem->shouldReceive('size')->once()->with($chunksPath.$tmpfilename)->andReturn($size = 1024);
         $filesystem->shouldReceive('createUploadedFile')->once()->with(
             $chunksPath.$tmpfilename,
@@ -72,12 +76,14 @@ class PluploadTest extends TestCase
 
     public function testReceiveChunkedFileAndThrowChunkedResponseException()
     {
+        $request = m::mock('Illuminate\Http\Request');
+        $request->shouldReceive('root')->once()->andReturn($root = 'root');
         $api = new Plupload(
-            $config = ['chunks' => $chunksPath = 'foo/'],
-            $request = m::mock('Illuminate\Http\Request'),
+            $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
+            $request,
             $filesystem = m::mock('Recca0120\Upload\Filesystem')
         );
-        $filesystem->shouldReceive('isDirectory')->once()->andReturn(true);
+        $filesystem->shouldReceive('isDirectory')->twice()->andReturn(true);
 
         $inputName = 'foo';
         $request->shouldReceive('file')->once()->with($inputName)->andReturn(
@@ -104,9 +110,11 @@ class PluploadTest extends TestCase
 
     public function testCompletedResponse()
     {
+        $request = m::mock('Illuminate\Http\Request');
+        $request->shouldReceive('root')->once()->andReturn($root = 'root');
         $api = new Plupload(
-            $config = ['chunks' => $chunksPath = 'foo/'],
-            $request = m::mock('Illuminate\Http\Request'),
+            $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
+            $request,
             $filesystem = m::mock('Recca0120\Upload\Filesystem')
         );
         $response = m::mock('Illuminate\Http\JsonResponse');

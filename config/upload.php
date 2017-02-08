@@ -2,7 +2,7 @@
 
 return [
     'chunks' => storage_path('app/chunks'),
-    'root' => public_path(),
+    'storage' => public_path('/storage/temp'),
+    'domain' => null,
     'path' => 'storage/temp',
-    'url' => url('storage/temp'),
 ];

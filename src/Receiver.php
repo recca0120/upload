@@ -21,72 +21,13 @@ class Receiver
     protected $api;
 
     /**
-     * $root.
-     *
-     * @var string
-     */
-    public $root = null;
-
-    /**
-     * $path.
-     *
-     * @var string
-     */
-    public $path = null;
-
-    /**
-     * $url.
-     *
-     * @var string
-     */
-    public $url = null;
-
-    /**
      * __construct.
      *
      * @param \Recca0120\Upload\Contracts\Api $api
      */
     public function __construct(Api $api)
     {
-        $config = $api->getConfig();
-        $this->setRoot(Arr::get($config, 'root', sys_get_temp_dir()))
-            ->setPath(Arr::get($config, 'path', '/storage/'))
-            ->setUrl(Arr::get($config, 'url'));
         $this->api = $api;
-    }
-
-    /**
-     * getRoot.
-     *
-     * @return string
-     */
-    public function getRoot()
-    {
-        return rtrim($this->root, '/').'/';
-    }
-
-    /**
-     * setRoot.
-     *
-     * @param string $root
-     */
-    public function setRoot($root)
-    {
-        $this->root = $root;
-
-        return $this;
-    }
-
-    /**
-     * setPath.
-     *
-     * @param string $path
-     */
-    public function setPath($path)
-    {
-        $this->path = $path;
-
-        return $this;
     }
 
     /**
@@ -111,20 +52,16 @@ class Receiver
      */
     public function receive($inputName = 'file', Closure $callback = null, $path = null)
     {
-        $callback = $callback ?: $this->callback();
-        $path = trim($path ?: $this->path, '/').'/';
-        $root = $this->getRoot();
-
         try {
-            $uploadedFile = $this->api
-                ->makeDirectory($root.$path)
-                ->receive($inputName);
+            $callback = $callback ?: $this->callback();
+            $response = $callback(
+                $uploadedFile = $this->api->receive($inputName),
+                $this->api->path(),
+                $this->api->domain(),
+                $this->api
+            );
 
-            $response = $callback($uploadedFile, $path, $root, $this->url, $this->api);
-
-            return $this->api
-                ->deleteUploadedFile($uploadedFile)
-                ->completedResponse($response);
+            return $this->api->deleteUploadedFile($uploadedFile)->completedResponse($response);
         } catch (ChunkedResponseException $e) {
             return $e->getResponse();
         }
@@ -137,7 +74,7 @@ class Receiver
      */
     protected function callback()
     {
-        return function (UploadedFile $uploadedFile, $path, $root, $url, $api) {
+        return function (UploadedFile $uploadedFile, $path, $domain, $api) {
             $clientOriginalName = $uploadedFile->getClientOriginalName();
             $clientOriginalExtension = strtolower($uploadedFile->getClientOriginalExtension());
             $basename = pathinfo($uploadedFile->getBasename(), PATHINFO_FILENAME);
@@ -148,12 +85,8 @@ class Receiver
                 'tmp_name' => $path.$filename,
                 'type' => $uploadedFile->getMimeType(),
                 'size' => $uploadedFile->getSize(),
+                'url' => $domain.$path.$filename,
             ];
-            $uploadedFile->move($root.$path);
-
-            if (is_null($url) === false) {
-                $response['url'] = rtrim($url, '/').'/'.$filename;
-            }
 
             return new JsonResponse($response);
         };
