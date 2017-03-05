@@ -53,7 +53,7 @@ class Receiver
      * receive.
      *
      * @param string  $inputName
-     * @param Closure $closure
+     * @param Closure $callback
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function receive($inputName = 'file', Closure $callback = null)

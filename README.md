@@ -8,6 +8,8 @@
 [![License](https://poser.pugx.org/recca0120/upload/license.svg)](https://packagist.org/packages/recca0120/upload)
 [![Monthly Downloads](https://poser.pugx.org/recca0120/upload/d/monthly)](https://packagist.org/packages/recca0120/upload)
 [![Daily Downloads](https://poser.pugx.org/recca0120/upload/d/daily)](https://packagist.org/packages/recca0120/upload)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/recca0120/upload/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/recca0120/upload/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/recca0120/upload/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/recca0120/upload/?branch=master)
 
 ## Features
 - Support Chunks [jQuery-File-Upload](https://github.com/blueimp/jQuery-File-Upload) $driver = 'fileapi';
