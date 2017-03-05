@@ -41,6 +41,7 @@ class Receiver
      * setUrl.
      *
      * @param string $url
+     * @return $this
      */
     public function setUrl($url)
     {

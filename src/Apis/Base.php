@@ -105,7 +105,7 @@ abstract class Base implements Api
     /**
      * makeDirectory.
      *
-     * @return static
+     * @return $this
      */
     public function makeDirectory($path)
     {
@@ -205,7 +205,7 @@ abstract class Base implements Api
      * deleteUploadedFile.
      *
      * @param \Symfony\Component\HttpFoundation\File\UploadedFile
-     * @return static
+     * @return $this
      */
     public function deleteUploadedFile(UploadedFile $uploadedFile)
     {
