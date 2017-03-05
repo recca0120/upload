@@ -28,7 +28,6 @@ class FileAPI extends Base
      * getMimeType.
      *
      * @param string $originalName
-     *
      * @return string
      */
     protected function getMimeType($originalName)
@@ -46,9 +45,9 @@ class FileAPI extends Base
      *
      * @param string $inputName
      *
-     * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
-     *
      * @return \Symfony\Component\HttpFoundation\File\UploadedFile
+     *
+     * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
      */
     protected function doReceive($inputName)
     {

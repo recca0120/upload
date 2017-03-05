@@ -40,7 +40,6 @@ interface Api
      * makeDirectory.
      *
      * @param string $path
-     *
      * @return static
      */
     public function makeDirectory($path);
@@ -56,10 +55,9 @@ interface Api
      * receive.
      *
      * @param string $name
-     *
-     * @throws ChunkedResponseException
-     *
      * @return \Symfony\Component\HttpFoundation\File\UploadedFile
+     *
+     * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
      */
     public function receive($name);
 
@@ -74,9 +72,7 @@ interface Api
      * completedResponse.
      *
      * @method completedResponse
-     *
      * @param \Illuminate\Http\JsonResponse $response
-     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function completedResponse(JsonResponse $response);

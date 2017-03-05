@@ -142,10 +142,9 @@ abstract class Base implements Api
      * @param string          $mimeType
      * @param bool            $completed
      * @param array           $headers
+     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      *
      * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
-     *
-     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      */
     protected function receiveChunkedFile($originalName, $input, $start, $mimeType, $completed = false, $headers = [])
     {
@@ -176,10 +175,9 @@ abstract class Base implements Api
      * receive.
      *
      * @param string $inputName
+     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      *
      * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
-     *
-     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      */
     public function receive($inputName)
     {
@@ -197,10 +195,9 @@ abstract class Base implements Api
      * doReceive.
      *
      * @param string $inputName
+     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      *
      * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
-     *
-     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      */
     abstract protected function doReceive($inputName);
 
@@ -208,7 +205,6 @@ abstract class Base implements Api
      * deleteUploadedFile.
      *
      * @param \Symfony\Component\HttpFoundation\File\UploadedFile
-     *
      * @return static
      */
     public function deleteUploadedFile(UploadedFile $uploadedFile)
@@ -224,10 +220,7 @@ abstract class Base implements Api
     /**
      * completedResponse.
      *
-     * @method completedResponse
-     *
      * @param \Illuminate\Http\JsonResponse $response
-     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function completedResponse(JsonResponse $response)

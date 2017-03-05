@@ -14,6 +14,12 @@ class ChunkedResponseException extends RuntimeException
      */
     protected $headers;
 
+    /**
+     * __construct.
+     *
+     * @param array $headers
+     * @param ubt $code
+     */
     public function __construct($headers = [], $code = Response::HTTP_CREATED)
     {
         parent::__construct('', $code);

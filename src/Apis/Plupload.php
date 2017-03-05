@@ -11,10 +11,9 @@ class Plupload extends Base
      * receive.
      *
      * @param string $inputName
+     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      *
      * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
-     *
-     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      */
     protected function doReceive($inputName)
     {
@@ -39,10 +38,7 @@ class Plupload extends Base
     /**
      * completedResponse.
      *
-     * @method completedResponse
-     *
      * @param Illuminate\Http\JsonResponse $response
-     *
      * @return Illuminate\Http\JsonResponse
      */
     public function completedResponse(JsonResponse $response)
