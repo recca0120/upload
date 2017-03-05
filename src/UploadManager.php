@@ -28,7 +28,7 @@ class UploadManager extends Manager
      *
      * @param \Illuminate\Contracts\Foundation\Application $app
      * @param \Illuminate\Http\Request $request
-     * @param \Recca0120\Upload\Filesyste $filesystem
+     * @param Filesystem $filesystem
      */
     public function __construct($app, Request $request = null, Filesystem $filesystem = null)
     {
@@ -50,7 +50,7 @@ class UploadManager extends Manager
     /**
      * create fileapi driver.
      *
-     * @return \Recca0120\Upload\Apis\FileAPI
+     * @return Receiver
      */
     protected function createFileapiDriver()
     {
@@ -60,7 +60,7 @@ class UploadManager extends Manager
     /**
      * create fileapi driver.
      *
-     * @return \Recca0120\Upload\Apis\Plupload
+     * @return Receiver
      */
     protected function createPluploadDriver()
     {

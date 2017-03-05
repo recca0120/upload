@@ -2,8 +2,6 @@
 
 namespace Recca0120\Upload\Apis;
 
-use Illuminate\Http\Request;
-
 class FileAPI extends Base
 {
     /**

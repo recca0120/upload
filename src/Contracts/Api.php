@@ -4,7 +4,6 @@ namespace Recca0120\Upload\Contracts;
 
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
 interface Api
 {

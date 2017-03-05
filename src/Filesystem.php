@@ -33,7 +33,7 @@ class Filesystem extends IlluminateFilesystem
     /**
      * appendStream.
      *
-     * @param string|resource $output
+     * @param string $output
      * @param string|resource $input
      * @param int             $offset
      */
