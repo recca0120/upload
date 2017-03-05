@@ -52,8 +52,8 @@ class Receiver
     /**
      * receive.
      *
-     * @param string  $inputName
-     * @param Closure $callback
+     * @param string $inputName
+     * @param \Closure $callback
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function receive($inputName = 'file', Closure $callback = null)
@@ -101,7 +101,7 @@ class Receiver
     /**
      * factory.
      *
-     * @param array  $config
+     * @param array $config
      * @param string $class
      * @return \Recca0120\Upload\Contracts\Api
      */

@@ -42,8 +42,8 @@ abstract class Base implements Api
     /**
      * __construct.
      *
-     * @param array                        $config
-     * @param \Illuminate\Http\Request     $request
+     * @param array $config
+     * @param \Illuminate\Http\Request $request
      * @param \Recca0120\Upload\Filesystem $filesystem
      */
     public function __construct($config = [], Request $request = null, Filesystem $filesystem = null)
@@ -138,10 +138,10 @@ abstract class Base implements Api
      *
      * @param string $originalName
      * @param string|resource $input
-     * @param int             $start
-     * @param string          $mimeType
-     * @param bool            $completed
-     * @param array           $headers
+     * @param int $start
+     * @param string $mimeType
+     * @param bool $completed
+     * @param array $headers
      * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      *
      * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
