@@ -136,7 +136,7 @@ abstract class Base implements Api
     /**
      * receiveChunkedFile.
      *
-     * @param string|resource $originalName
+     * @param string $originalName
      * @param string|resource $input
      * @param int             $start
      * @param string          $mimeType

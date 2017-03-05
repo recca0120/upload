@@ -10,11 +10,25 @@ use Recca0120\Upload\Apis\Plupload;
 class UploadManager extends Manager
 {
     /**
+     * $request.
+     *
+     * @var [type]
+     */
+    protected $request;
+
+    /**
+     * $filesystem.
+     *
+     * @var [type]
+     */
+    protected $filesystem;
+
+    /**
      * __construct.
      *
-     * @param $app
-     * @param $request
-     * @param $filesystem
+     * @param \Illuminate\Contracts\Foundation\Application $app
+     * @param \Illuminate\Http\Request $request
+     * @param \Recca0120\Upload\Filesyste $filesystem
      */
     public function __construct($app, Request $request = null, Filesystem $filesystem = null)
     {

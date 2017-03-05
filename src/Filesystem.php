@@ -48,8 +48,8 @@ class Filesystem extends IlluminateFilesystem
             fwrite($output, $buffer);
         }
 
-        @fclose($output);
-        @fclose($input);
+        fclose($output);
+        fclose($input);
     }
 
     /**

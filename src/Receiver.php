@@ -21,6 +21,13 @@ class Receiver
     protected $api;
 
     /**
+     * $url.
+     *
+     * @var string
+     */
+    protected $url;
+
+    /**
      * __construct.
      *
      * @param \Recca0120\Upload\Contracts\Api $api
@@ -45,11 +52,11 @@ class Receiver
     /**
      * receive.
      *
-     * @param string  $name
+     * @param string  $inputName
      * @param Closure $closure
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function receive($inputName = 'file', Closure $callback = null, $path = null)
+    public function receive($inputName = 'file', Closure $callback = null)
     {
         try {
             $callback = $callback ?: $this->callback();
@@ -73,7 +80,7 @@ class Receiver
      */
     protected function callback()
     {
-        return function (UploadedFile $uploadedFile, $path, $domain, $api) {
+        return function (UploadedFile $uploadedFile, $path, $domain) {
             $clientOriginalName = $uploadedFile->getClientOriginalName();
             $clientOriginalExtension = strtolower($uploadedFile->getClientOriginalExtension());
             $basename = pathinfo($uploadedFile->getBasename(), PATHINFO_FILENAME);
