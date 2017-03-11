@@ -60,13 +60,13 @@ class Receiver
     public function receive($inputName = 'file', Closure $callback = null)
     {
         try {
-            $callback = $callback ?: $this->callback();
-            $response = $callback(
+            $callback = $callback ?: [$this, 'callback'];
+            $response = call_user_func_array($callback, [
                 $uploadedFile = $this->api->receive($inputName),
                 $this->api->path(),
                 $this->api->domain(),
                 $this->api
-            );
+            ]);
 
             return $this->api->deleteUploadedFile($uploadedFile)->completedResponse($response);
         } catch (ChunkedResponseException $e) {
@@ -79,24 +79,24 @@ class Receiver
      *
      * @return \Closure
      */
-    protected function callback()
+    protected function callback(UploadedFile $uploadedFile, $path, $domain)
     {
-        return function (UploadedFile $uploadedFile, $path, $domain) {
-            $clientOriginalName = $uploadedFile->getClientOriginalName();
-            $clientOriginalExtension = strtolower($uploadedFile->getClientOriginalExtension());
-            $basename = pathinfo($uploadedFile->getBasename(), PATHINFO_FILENAME);
-            $filename = $basename.'.'.$clientOriginalExtension;
+        $clientOriginalName = $uploadedFile->getClientOriginalName();
+        $clientOriginalExtension = strtolower($uploadedFile->getClientOriginalExtension());
+        $basename = pathinfo($uploadedFile->getBasename(), PATHINFO_FILENAME);
+        $filename = pathinfo($clientOriginalName, PATHINFO_FILENAME).'.'.$clientOriginalExtension;
+        $mimeType = $uploadedFile->getMimeType();
+        $size = $uploadedFile->getSize();
+        $uploadedFile->move($path, $filename);
+        $response = [
+            'name' => $filename,
+            'tmp_name' => $path.$filename,
+            'type' => $mimeType,
+            'size' => $size,
+            'url' => $domain.$path.$filename,
+        ];
 
-            $response = [
-                'name' => $clientOriginalName,
-                'tmp_name' => $path.$filename,
-                'type' => $uploadedFile->getMimeType(),
-                'size' => $uploadedFile->getSize(),
-                'url' => $domain.$path.$filename,
-            ];
-
-            return new JsonResponse($response);
-        };
+        return new JsonResponse($response);
     }
 
     /**

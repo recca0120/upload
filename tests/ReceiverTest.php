@@ -41,18 +41,22 @@ class ReceiverTest extends TestCase
         $uploadedFile->shouldReceive('getSize')->once()->andReturn(
             $size = 1000
         );
+        $uploadedFile->shouldReceive('move')->once()->with(
+            $path, $filename = pathinfo($clientOriginalName, PATHINFO_FILENAME).'.'.strtolower($clientOriginalExtension)
+        );
 
         $api->shouldReceive('deleteUploadedFile')->once()->with($uploadedFile)->andReturnSelf();
         $api->shouldReceive('completedResponse')->once()->with(m::type('Illuminate\Http\JsonResponse'))->andReturnUsing(function ($response) {
             return $response;
         });
+
         $response = $receiver->receive($inputName);
         $this->assertSame([
-            'name' => $clientOriginalName,
-            'tmp_name' => $path.$basename.'.'.strtolower($clientOriginalExtension),
+            'name' => $filename,
+            'tmp_name' => $path.$filename,
             'type' => $mimeType,
             'size' => $size,
-            'url' => $domain.$path.$basename.'.'.strtolower($clientOriginalExtension),
+            'url' => $domain.$path.$filename,
         ], (array) $response->getData());
     }
 
