@@ -62,9 +62,7 @@ class FileAPI extends Base
             $start,
             $this->getMimeType($originalName),
             $end >= $total - 1,
-            [
-                'X-Last-Known-Byte' => $end,
-            ]
+            ['X-Last-Known-Byte' => $end]
         );
     }
 }

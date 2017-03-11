@@ -65,7 +65,7 @@ class Receiver
                 $uploadedFile = $this->api->receive($inputName),
                 $this->api->path(),
                 $this->api->domain(),
-                $this->api
+                $this->api,
             ]);
 
             return $this->api->deleteUploadedFile($uploadedFile)->completedResponse($response);

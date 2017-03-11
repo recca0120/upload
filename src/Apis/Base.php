@@ -160,7 +160,6 @@ abstract class Base implements Api
         if ($completed === false) {
             throw new ChunkedResponseException($headers);
         }
-
         $this->filesystem->move($chunkFile, $storageFile);
 
         return $this->filesystem->createUploadedFile(
@@ -182,9 +181,8 @@ abstract class Base implements Api
     public function receive($inputName)
     {
         $chunksPath = $this->chunksPath();
-        $storagePath = $this->storagePath();
         $uploadedFile = $this->makeDirectory($chunksPath)
-            ->makeDirectory($storagePath)
+            ->makeDirectory($this->storagePath())
             ->doReceive($inputName);
         $this->cleanDirectory($chunksPath);
 
