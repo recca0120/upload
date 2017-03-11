@@ -2,6 +2,7 @@
 /resources/assets/vendor
 /node_modules
 /build
+/docs
 composer.phar
 composer.lock
 .php_cs.cache
