@@ -84,7 +84,7 @@ class Receiver
         $clientOriginalName = $uploadedFile->getClientOriginalName();
         $clientOriginalExtension = strtolower($uploadedFile->getClientOriginalExtension());
         $basename = pathinfo($uploadedFile->getBasename(), PATHINFO_FILENAME);
-        $filename = pathinfo($clientOriginalName, PATHINFO_FILENAME).'.'.$clientOriginalExtension;
+        $filename = md5($basename).'.'.$clientOriginalExtension;
         $mimeType = $uploadedFile->getMimeType();
         $size = $uploadedFile->getSize();
         $uploadedFile->move($path, $filename);

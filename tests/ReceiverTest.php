@@ -32,6 +32,7 @@ class ReceiverTest extends TestCase
         $uploadedFile->shouldReceive('getClientOriginalExtension')->once()->andReturn(
             $clientOriginalExtension = 'PHP'
         );
+
         $uploadedFile->shouldReceive('getBasename')->once()->andReturn(
             $basename = 'foo'
         );
@@ -42,7 +43,7 @@ class ReceiverTest extends TestCase
             $size = 1000
         );
         $uploadedFile->shouldReceive('move')->once()->with(
-            $path, $filename = pathinfo($clientOriginalName, PATHINFO_FILENAME).'.'.strtolower($clientOriginalExtension)
+            $path, $filename = md5($basename).'.'.strtolower($clientOriginalExtension)
         );
 
         $api->shouldReceive('deleteUploadedFile')->once()->with($uploadedFile)->andReturnSelf();
