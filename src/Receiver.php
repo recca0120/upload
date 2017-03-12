@@ -89,7 +89,7 @@ class Receiver
         $size = $uploadedFile->getSize();
         $uploadedFile->move($path, $filename);
         $response = [
-            'name' => $filename,
+            'name' => pathinfo($clientOriginalName, PATHINFO_FILENAME).'.'.$clientOriginalExtension,
             'tmp_name' => $path.$filename,
             'type' => $mimeType,
             'size' => $size,

@@ -53,7 +53,7 @@ class ReceiverTest extends TestCase
 
         $response = $receiver->receive($inputName);
         $this->assertSame([
-            'name' => $filename,
+            'name' => pathinfo($clientOriginalName, PATHINFO_FILENAME).'.'.strtolower($clientOriginalExtension),
             'tmp_name' => $path.$filename,
             'type' => $mimeType,
             'size' => $size,
