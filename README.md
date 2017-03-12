@@ -1,3 +1,5 @@
+ [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YNNLC9V28YDPN)
+
 ## Pure Ajax Upload And for Laravel 5 (Support jQuery-File-Upload, FileApi, Plupload)
 
 [![StyleCI](https://styleci.io/repos/48772854/shield?style=flat)](https://styleci.io/repos/48772854)
