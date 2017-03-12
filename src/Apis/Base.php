@@ -139,33 +139,31 @@ abstract class Base implements Api
      * @param string $originalName
      * @param string|resource $input
      * @param int $start
-     * @param string $mimeType
      * @param bool $completed
-     * @param array $headers
+     * @param array $options
      * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      *
      * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
      */
-    protected function receiveChunkedFile($originalName, $input, $start, $mimeType, $completed = false, $headers = [])
+    protected function receiveChunkedFile($originalName, $input, $start, $completed = false, $options = [])
     {
         $tmpfilename = $this->filesystem->tmpfilename(
             $originalName, $this->request->get('token')
         );
-
         $chunkFile = $this->chunksPath().$tmpfilename.static::TMPFILE_EXTENSION;
         $storageFile = $this->storagePath().$tmpfilename;
-
         $this->filesystem->appendStream($chunkFile, $input, $start);
-
         if ($completed === false) {
-            throw new ChunkedResponseException($headers);
+            throw new ChunkedResponseException(
+                empty($options['headers']) === false ? $options['headers'] : []
+            );
         }
         $this->filesystem->move($chunkFile, $storageFile);
 
         return $this->filesystem->createUploadedFile(
             $storageFile,
             $originalName,
-            $mimeType,
+            empty($options['mimeType']) === false ? $options['mimeType'] : $this->filesystem->mimeType($originalName),
             $this->filesystem->size($storageFile)
         );
     }
@@ -181,8 +179,9 @@ abstract class Base implements Api
     public function receive($inputName)
     {
         $chunksPath = $this->chunksPath();
+        $storagePath = $this->storagePath();
         $uploadedFile = $this->makeDirectory($chunksPath)
-            ->makeDirectory($this->storagePath())
+            ->makeDirectory($storagePath)
             ->doReceive($inputName);
         $this->cleanDirectory($chunksPath);
 

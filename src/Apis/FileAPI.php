@@ -42,7 +42,6 @@ class FileAPI extends Base
      * receive.
      *
      * @param string $inputName
-     *
      * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      *
      * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
@@ -53,16 +52,14 @@ class FileAPI extends Base
         if (empty($contentRange) === true) {
             return $this->request->file($inputName);
         }
-
         list($start, $end, $total) = sscanf($contentRange, 'bytes %d-%d/%d');
 
         return $this->receiveChunkedFile(
             $originalName = $this->getOriginalName(),
             'php://input',
             $start,
-            $this->getMimeType($originalName),
             $end >= $total - 1,
-            ['X-Last-Known-Byte' => $end]
+            ['mimeType' => $this->getMimeType($originalName), 'headers' => ['X-Last-Known-Byte' => $end]]
         );
     }
 }

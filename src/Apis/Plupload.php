@@ -2,7 +2,6 @@
 
 namespace Recca0120\Upload\Apis;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class Plupload extends Base
@@ -19,27 +18,25 @@ class Plupload extends Base
     {
         $uploadedFile = $this->request->file($inputName);
         $chunks = $this->request->get('chunks');
-
         if (empty($chunks) === true) {
             return $uploadedFile;
         }
-
         $chunk = $this->request->get('chunk');
 
         return $this->receiveChunkedFile(
             $this->request->get('name'),
             $uploadedFile->getPathname(),
             $chunk * $this->request->header('content-length'),
-            $uploadedFile->getMimeType(),
-            $chunk >= $chunks - 1
+            $chunk >= $chunks - 1,
+            ['mimeType' => $uploadedFile->getMimeType()]
         );
     }
 
     /**
      * completedResponse.
      *
-     * @param Illuminate\Http\JsonResponse $response
-     * @return Illuminate\Http\JsonResponse
+     * @param \Illuminate\Http\JsonResponse $response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function completedResponse(JsonResponse $response)
     {
