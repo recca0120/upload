@@ -5,9 +5,7 @@ namespace Recca0120\Upload;
 use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Http\JsonResponse;
-use Recca0120\Upload\Apis\FileAPI;
-use Recca0120\Upload\Apis\Plupload;
-use Recca0120\Upload\Contracts\Api;
+use Recca0120\Upload\Contracts\Api as ApiContract;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
@@ -21,33 +19,13 @@ class Receiver
     protected $api;
 
     /**
-     * $url.
-     *
-     * @var string
-     */
-    protected $url;
-
-    /**
      * __construct.
      *
      * @param \Recca0120\Upload\Contracts\Api $api
      */
-    public function __construct(Api $api)
+    public function __construct(ApiContract $api)
     {
         $this->api = $api;
-    }
-
-    /**
-     * setUrl.
-     *
-     * @param string $url
-     * @return $this
-     */
-    public function setUrl($url)
-    {
-        $this->url = $url;
-
-        return $this;
     }
 
     /**

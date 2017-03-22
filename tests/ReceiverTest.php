@@ -104,22 +104,22 @@ class ReceiverTest extends TestCase
     public function testFactory()
     {
         $this->assertAttributeInstanceOf(
-            'Recca0120\Upload\Apis\FileAPI',
+            'Recca0120\Upload\FileAPI',
             'api',
-            Receiver::factory([], 'Recca0120\Upload\Apis\FileAPI')
+            Receiver::factory([], 'Recca0120\Upload\FileAPI')
         );
         $this->assertAttributeInstanceOf(
-            'Recca0120\Upload\Apis\FileAPI',
+            'Recca0120\Upload\FileAPI',
             'api',
             Receiver::factory([], 'FILEAPI')
         );
         $this->assertAttributeInstanceOf(
-            'Recca0120\Upload\Apis\Plupload',
+            'Recca0120\Upload\Plupload',
             'api',
-            Receiver::factory([], 'Recca0120\Upload\Apis\Plupload')
+            Receiver::factory([], 'Recca0120\Upload\Plupload')
         );
         $this->assertAttributeInstanceOf(
-            'Recca0120\Upload\Apis\Plupload',
+            'Recca0120\Upload\Plupload',
             'api',
             Receiver::factory([], 'PLUPLOAD')
         );

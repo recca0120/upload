@@ -1,12 +1,12 @@
 <?php
 
-namespace Recca0120\Upload\Tests\Apis;
+namespace Recca0120\Upload\Tests;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Recca0120\Upload\Apis\Base;
+use Recca0120\Upload\Api as ApiBase;
 
-class BaseTest extends TestCase
+class ApiTest extends TestCase
 {
     protected function tearDown()
     {
@@ -123,7 +123,7 @@ class BaseTest extends TestCase
     }
 }
 
-class Api extends Base
+class Api extends ApiBase
 {
     protected function doReceive($inputName)
     {

@@ -1,8 +1,8 @@
 <?php
 
-namespace Recca0120\Upload\Apis;
+namespace Recca0120\Upload;
 
-class FileAPI extends Base
+class FileAPI extends Api
 {
     /**
      * getOriginalName.

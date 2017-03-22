@@ -1,15 +1,15 @@
 <?php
 
-namespace Recca0120\Upload\Apis;
+namespace Recca0120\Upload;
 
 use Illuminate\Http\Request;
 use Recca0120\Upload\Filesystem;
 use Illuminate\Http\JsonResponse;
-use Recca0120\Upload\Contracts\Api;
+use Recca0120\Upload\Contracts\Api as ApiContract;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
-abstract class Base implements Api
+abstract class Api implements ApiContract
 {
     /**
      * TMPFILE_EXTENSION.

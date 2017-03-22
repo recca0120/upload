@@ -1,10 +1,10 @@
 <?php
 
-namespace Recca0120\Upload\Apis;
+namespace Recca0120\Upload;
 
 use Illuminate\Http\JsonResponse;
 
-class Plupload extends Base
+class Plupload extends Api
 {
     /**
      * receive.
