@@ -9,17 +9,17 @@ class FileAPI extends Base
      *
      * @return string
      */
-    protected function getOriginalName()
+    protected function getOriginalName($contentDisposition)
     {
         $originalName = $this->request->get('name');
         if (empty($originalName) === true) {
             list($originalName) = sscanf(
-                $this->request->header('content-disposition'),
+                $contentDisposition,
                 'attachment; filename=%s'
             );
         }
 
-        return $originalName;
+        return preg_replace('/[\'"]/', '', $originalName);
     }
 
     /**
@@ -48,14 +48,22 @@ class FileAPI extends Base
      */
     protected function doReceive($inputName)
     {
-        $contentRange = $this->request->header('content-range');
-        if (empty($contentRange) === true) {
+        $contentDisposition = $this->request->header('content-disposition');
+        if (empty($contentDisposition) === true) {
             return $this->request->file($inputName);
         }
-        list($start, $end, $total) = sscanf($contentRange, 'bytes %d-%d/%d');
+
+        $contentRange = $this->request->header('content-range');
+        if (empty($contentRange) === false) {
+            list($start, $end, $total) = sscanf($contentRange, 'bytes %d-%d/%d');
+        } else {
+            $start = 0;
+            $end = $this->request->header('content-length');
+            $total = $end;
+        }
 
         return $this->receiveChunkedFile(
-            $originalName = $this->getOriginalName(),
+            $originalName = $this->getOriginalName($contentDisposition),
             'php://input',
             $start,
             $end >= $total - 1,
