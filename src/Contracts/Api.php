@@ -8,20 +8,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 interface Api
 {
     /**
-     * chunksPath.
-     *
-     * @return string
-     */
-    public function chunksPath();
-
-    /**
-     * storagePath.
-     *
-     * @return string
-     */
-    public function storagePath();
-
-    /**
      * domain.
      *
      * @return string

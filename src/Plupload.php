@@ -9,27 +9,29 @@ class Plupload extends Api
     /**
      * receive.
      *
-     * @param string $inputName
+     * @param string $name
      * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      *
      * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
      */
-    protected function doReceive($inputName)
+    public function receive($name)
     {
-        $uploadedFile = $this->request->file($inputName);
+        $uploadedFile = $this->request->file($name);
         $chunks = $this->request->get('chunks');
         if (empty($chunks) === true) {
             return $uploadedFile;
         }
         $chunk = $this->request->get('chunk');
 
-        return $this->receiveChunkedFile(
-            $this->request->get('name'),
-            $uploadedFile->getPathname(),
-            $chunk * $this->request->header('content-length'),
-            $chunk >= $chunks - 1,
-            ['mimeType' => $uploadedFile->getMimeType()]
-        );
+        $originalName = $this->request->get('name');
+        $input = $uploadedFile->getPathname();
+        $start = $chunk * $this->request->header('content-length');
+        $completed = $chunk >= $chunks - 1;
+        $options = [
+            'mimeType' => $uploadedFile->getMimeType(),
+        ];
+
+        return $this->receiveChunks($originalName, $input, $start, $completed, $options);
     }
 
     /**

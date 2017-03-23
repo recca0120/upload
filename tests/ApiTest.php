@@ -13,33 +13,10 @@ class ApiTest extends TestCase
         m::close();
     }
 
-    public function testChunksPath()
-    {
-        $request = m::mock('Illuminate\Http\Request');
-        $request->shouldReceive('root')->once()->andReturn($root = 'root');
-        $api = new Api(
-            $config = ['chunks' => $chunksPath = 'foo/'],
-            $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem')
-        );
-        $this->assertSame($chunksPath, $api->chunksPath());
-    }
-
-    public function testStoragePath()
-    {
-        $request = m::mock('Illuminate\Http\Request');
-        $request->shouldReceive('root')->once()->andReturn($root = 'root');
-        $api = new Api(
-            $config = ['storage' => $storagePath = 'foo/'],
-            $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem')
-        );
-        $this->assertSame($storagePath, $api->storagePath());
-    }
-
     public function testDomain()
     {
         $request = m::mock('Illuminate\Http\Request');
+        $request->shouldReceive('root')->once()->andReturn(null);
         $api = new Api(
             $config = ['domain' => $domain = 'foo/'],
             $request,
@@ -105,6 +82,7 @@ class ApiTest extends TestCase
         $uploadedFile->shouldReceive('getPathname')->once()->andReturn($file = __FILE__);
         $filesystem->shouldReceive('isFile')->once()->with($file)->andReturn(true);
         $filesystem->shouldReceive('delete')->once()->with($file);
+        $filesystem->shouldReceive('files')->once()->andReturn([]);
         $api->deleteUploadedFile($uploadedFile);
     }
 
@@ -125,7 +103,7 @@ class ApiTest extends TestCase
 
 class Api extends ApiBase
 {
-    protected function doReceive($inputName)
+    public function receive($inputName)
     {
     }
 }

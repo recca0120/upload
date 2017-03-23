@@ -50,36 +50,38 @@ abstract class Api implements ApiContract
     {
         $this->request = $request ?: Request::capture();
         $this->filesystem = $filesystem ?: new Filesystem();
-
-        $config['chunks'] = empty($config['chunks']) === false ? $config['chunks'] : sys_get_temp_dir().'/chunks';
-        $config['storage'] = empty($config['storage']) === false ? $config['storage'] : 'storage/temp';
-        $config['domain'] = empty($config['domain']) === false ? $config['domain'] : $this->request->root();
-        $config['path'] = empty($config['path']) === false ? $config['path'] : 'storage/temp';
-
-        foreach (['chunks', 'storage', 'domain', 'path'] as $key) {
-            $config[$key] = rtrim($config[$key], '/').'/';
-        }
-        $this->config = $config;
+        $this->config = array_merge([
+            'chunks' => sys_get_temp_dir().'/chunks',
+            'storage' => 'storage/temp',
+            'domain' => $this->request->root(),
+            'path' => 'storage/temp',
+        ], $config);
     }
 
     /**
-     * chunksPath.
+     * chunkFile.
      *
+     * @param string $tmpfilename
      * @return string
      */
-    public function chunksPath()
+    protected function chunkFile($tmpfilename)
     {
-        return $this->config['chunks'];
+        $this->makeDirectory($this->config['chunks']);
+
+        return rtrim($this->config['chunks'], '/').'/'.$tmpfilename.static::TMPFILE_EXTENSION;
     }
 
     /**
-     * storagePath.
+     * storageFile.
      *
+     * @param string $tmpfilename
      * @return string
      */
-    public function storagePath()
+    protected function storageFile($tmpfilename)
     {
-        return $this->config['storage'];
+        $this->makeDirectory($this->config['storage']);
+
+        return rtrim($this->config['storage'], '/').'/'.$tmpfilename;
     }
 
     /**
@@ -89,7 +91,7 @@ abstract class Api implements ApiContract
      */
     public function domain()
     {
-        return $this->config['domain'];
+        return rtrim($this->config['domain'], '/').'/';
     }
 
     /**
@@ -99,7 +101,7 @@ abstract class Api implements ApiContract
      */
     public function path()
     {
-        return $this->config['path'];
+        return rtrim($this->config['path'], '/').'/';
     }
 
     /**
@@ -134,7 +136,7 @@ abstract class Api implements ApiContract
     }
 
     /**
-     * receiveChunkedFile.
+     * receiveChunks.
      *
      * @param string $originalName
      * @param string|resource $input
@@ -145,20 +147,24 @@ abstract class Api implements ApiContract
      *
      * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
      */
-    protected function receiveChunkedFile($originalName, $input, $start, $completed = false, $options = [])
+    protected function receiveChunks($originalName, $input, $start, $completed = false, $options = [])
     {
         $tmpfilename = $this->filesystem->tmpfilename(
             $originalName, $this->request->get('token')
         );
-        $chunkFile = $this->chunksPath().$tmpfilename.static::TMPFILE_EXTENSION;
-        $storageFile = $this->storagePath().$tmpfilename;
+        $chunkFile = $this->chunkFile($tmpfilename);
         $this->filesystem->appendStream($chunkFile, $input, $start);
+
         if ($completed === false) {
             throw new ChunkedResponseException(
+                empty($options['message']) === false ? $options['message'] : '',
                 empty($options['headers']) === false ? $options['headers'] : []
             );
         }
-        $this->filesystem->move($chunkFile, $storageFile);
+
+        $this->filesystem->move(
+            $chunkFile, $storageFile = $this->storageFile($tmpfilename)
+        );
 
         return $this->filesystem->createUploadedFile(
             $storageFile,
@@ -176,27 +182,7 @@ abstract class Api implements ApiContract
      *
      * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
      */
-    public function receive($inputName)
-    {
-        $chunksPath = $this->chunksPath();
-        $storagePath = $this->storagePath();
-        $uploadedFile = $this->makeDirectory($chunksPath)
-            ->makeDirectory($storagePath)
-            ->doReceive($inputName);
-        $this->cleanDirectory($chunksPath);
-
-        return $uploadedFile;
-    }
-
-    /**
-     * doReceive.
-     *
-     * @param string $inputName
-     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
-     *
-     * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
-     */
-    abstract protected function doReceive($inputName);
+    abstract public function receive($inputName);
 
     /**
      * deleteUploadedFile.
@@ -210,6 +196,7 @@ abstract class Api implements ApiContract
         if ($this->filesystem->isFile($file) === true) {
             $this->filesystem->delete($file);
         }
+        $this->cleanDirectory($this->config['chunks']);
 
         return $this;
     }

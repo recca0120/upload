@@ -23,13 +23,11 @@ class PluploadTest extends TestCase
             $request,
             $filesystem = m::mock('Recca0120\Upload\Filesystem')
         );
-        $filesystem->shouldReceive('isDirectory')->twice()->andReturn(true);
         $inputName = 'foo';
         $request->shouldReceive('file')->once()->with($inputName)->andReturn(
             $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
         );
         $request->shouldReceive('get')->once()->with('chunks')->andReturn('');
-        $filesystem->shouldReceive('files')->once()->andReturn([]);
         $this->assertSame($uploadedFile, $api->receive($inputName));
     }
 
@@ -69,7 +67,6 @@ class PluploadTest extends TestCase
         )->andReturn(
             $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
         );
-        $filesystem->shouldReceive('files')->once()->andReturn([]);
 
         $api->receive($inputName);
     }
@@ -83,7 +80,7 @@ class PluploadTest extends TestCase
             $request,
             $filesystem = m::mock('Recca0120\Upload\Filesystem')
         );
-        $filesystem->shouldReceive('isDirectory')->twice()->andReturn(true);
+        $filesystem->shouldReceive('isDirectory')->once()->andReturn(true);
 
         $inputName = 'foo';
         $request->shouldReceive('file')->once()->with($inputName)->andReturn(

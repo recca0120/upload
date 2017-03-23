@@ -8,6 +8,13 @@ use Symfony\Component\HttpFoundation\Response;
 class ChunkedResponseException extends RuntimeException
 {
     /**
+     * $message.
+     *
+     * @var string
+     */
+    protected $message;
+
+    /**
      * $headers.
      *
      * @var array
@@ -20,9 +27,10 @@ class ChunkedResponseException extends RuntimeException
      * @param array $headers
      * @param int $code
      */
-    public function __construct($headers = [], $code = Response::HTTP_CREATED)
+    public function __construct($message = '', $headers = [], $code = Response::HTTP_CREATED)
     {
         parent::__construct('', $code);
+        $this->message = $message;
         $this->headers = $headers;
     }
 
@@ -33,6 +41,6 @@ class ChunkedResponseException extends RuntimeException
      */
     public function getResponse()
     {
-        return new Response(null, $this->getCode(), $this->headers);
+        return new Response($this->message, $this->getCode(), $this->headers);
     }
 }

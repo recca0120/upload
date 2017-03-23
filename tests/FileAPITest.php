@@ -23,13 +23,11 @@ class FileAPITest extends TestCase
             $request,
             $filesystem = m::mock('Recca0120\Upload\Filesystem')
         );
-        $filesystem->shouldReceive('isDirectory')->twice()->andReturn(true);
         $request->shouldReceive('header')->once()->with('content-disposition')->andReturn('');
         $inputName = 'foo';
         $request->shouldReceive('file')->once()->with($inputName)->andReturn(
             $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
         );
-        $filesystem->shouldReceive('files')->once()->andReturn([]);
         $this->assertSame($uploadedFile, $api->receive($inputName));
     }
 
@@ -70,7 +68,6 @@ class FileAPITest extends TestCase
         )->andReturn(
             $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
         );
-        $filesystem->shouldReceive('files')->once()->andReturn([]);
 
         $api->receive($inputName = 'foo');
     }
@@ -108,7 +105,6 @@ class FileAPITest extends TestCase
         )->andReturn(
             $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
         );
-        $filesystem->shouldReceive('files')->once()->andReturn([]);
 
         $api->receive($inputName = 'foo');
     }
@@ -122,7 +118,7 @@ class FileAPITest extends TestCase
             $request,
             $filesystem = m::mock('Recca0120\Upload\Filesystem')
         );
-        $filesystem->shouldReceive('isDirectory')->twice()->andReturn(true);
+        $filesystem->shouldReceive('isDirectory')->once()->andReturn(true);
 
         $start = 5242880;
         $end = 5767167;

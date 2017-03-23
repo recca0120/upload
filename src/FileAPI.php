@@ -41,16 +41,16 @@ class FileAPI extends Api
     /**
      * receive.
      *
-     * @param string $inputName
+     * @param string $name
      * @return \Symfony\Component\HttpFoundation\File\UploadedFile
      *
      * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
      */
-    protected function doReceive($inputName)
+    public function receive($name)
     {
         $contentDisposition = $this->request->header('content-disposition');
         if (empty($contentDisposition) === true) {
-            return $this->request->file($inputName);
+            return $this->request->file($name);
         }
 
         $contentRange = $this->request->header('content-range');
@@ -62,12 +62,22 @@ class FileAPI extends Api
             $total = $end;
         }
 
-        return $this->receiveChunkedFile(
-            $originalName = $this->getOriginalName($contentDisposition),
-            'php://input',
-            $start,
-            $end >= $total - 1,
-            ['mimeType' => $this->getMimeType($originalName), 'headers' => ['X-Last-Known-Byte' => $end]]
-        );
+        $originalName = $this->getOriginalName($contentDisposition);
+        $mimeType = $this->getMimeType($originalName);
+        $input = 'php://input';
+        $completed = $end >= $total - 1;
+        $options = [
+            'mimeType' => $mimeType,
+            'message' => json_encode(['files' => [
+                'name' => $originalName,
+                'size' => $end,
+                'type' => $mimeType
+            ]]),
+            'headers' => [
+                'X-Last-Known-Byte' => $end
+            ],
+        ];
+
+        return $this->receiveChunks($originalName, $input, $start, $completed, $options);
     }
 }
