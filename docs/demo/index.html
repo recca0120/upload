@@ -5,15 +5,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>DEMO</title>
-</head>
-<body>
-    <script src="js/jquery-3.1.1.min.js"></script>
-    <script>
-        var FileAPI = {
-            debug: true,
-            staticPath: './js/fileapi/dist/'
-        };
-    </script>
     <style>
         html, body {
             font-size: 14px;
@@ -22,10 +13,12 @@
             margin-bottom: 1em;
         }
 
+        #fileupload .js-fileapi-wrapper,
         #fileapi .js-fileapi-wrapper {
             position: relative;
         }
 
+        #fileupload .js-fileapi-wrapper input,
         #fileapi .js-fileapi-wrapper input{
             opacity: 0;
             position: absolute;
@@ -36,108 +29,167 @@
             cursor: pointer;
         }
 
+        #fileupload a,
         #fileapi a,
         #plupload a {
             color: #0088cc;
             cursor: pointer;
         }
     </style>
+</head>
+<body>
+    <script>
+        var FileAPI = {
+            debug: true,
+            staticPath: './js/fileapi/dist/'
+        };
+    </script>
+    <script src="js/jquery-3.1.1.min.js"></script>
     <script src="js/fileapi/dist/FileAPI.html5.min.js"></script>
     <script src="js/plupload/js/plupload.full.min.js"></script>
-    <h2>FileAPI</h2>
-    <form id="fileapi">
-        <div class="filelist">
-        </div>
-        <span class="js-fileapi-wrapper">
-            <input type="file" multiple="multiple" name="file" />
-            <a>[Select files]</a>
-        </span>
-        <a class="submit">[Upload files]</a>
-    </form>
+    <script src="js/fileupload/vendor/jquery.ui.widget.js"></script>
+    <script src="js/fileupload/jquery.iframe-transport.js"></script>
+    <script src="js/fileupload/jquery.fileupload.js"></script>
 
     <script>
         function humanFileSize(size) {
             var i = Math.floor( Math.log(size) / Math.log(1024) );
             return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
         };
-
-        var files = [];
-        $(document).on('change', '#fileapi [name=file]', function(e) {
-            var f = FileAPI.getFiles($('#fileapi [name=file]'));
-            $.each(f, function(i, file) {
-                file.id = FileAPI.uid(file);
-                $('<div id="'+file.id+'">'+file.name+' ('+humanFileSize(file.size)+') <b><span>0%</span></b></div>').appendTo('#fileapi .filelist');
-            });
-            files.push(f);
-        })
-        $(document).on('click', '#fileapi .submit', function (e) {
-            $.each(files, function(i, file) {
-                FileAPI.upload({
-                    url: './upload.php?api=fileapi',
-                    files: {file: file},
-                    chunkSize: 0.5 * FileAPI.MB,
-                    chunkUploadRetry: 3,
-                    fileprogress: function(e, file) {
-                        $('#'+file.id+' b span').html(Math.ceil(e.loaded/e.total*100)+'%');
-                    },
-                    fileupload: function (e, file) {
-                        delete files[i];
-                    }
-                });
-            });
-        });
     </script>
 
-    <h2>Plupload</h2>
-    <form id="plupload">
-        <div class="filelist">
-        </div>
-        <div id="container">
-            <a id="pickfiles" href="javascript:;">[Select files]</a>
+    <section>
+        <h2>jQuery File Upload</h2>
+        <form id="fileupload">
+            <div class="filelist">
+            </div>
+            <span class="js-fileapi-wrapper">
+                <input type="file" multiple="multiple" name="file" />
+                <a>[Select files]</a>
+            </span>
             <a class="submit">[Upload files]</a>
-        </div>
-    </form>
-
-    <script type="text/javascript">
-    // Custom example logic
-     
-    var uploader = new plupload.Uploader({
-        runtimes : 'html5,flash,silverlight,html4',
-        chunk_size: '500kb',
-        browse_button : 'pickfiles', // you can pass in id...
-        container: $('#container').get(0), // ... or DOM Element itself
-         
-        url: './upload.php?api=plupload',
-         
-        // Flash settings
-        flash_swf_url : 'js/plupload/Moxie.swf',
-     
-        // Silverlight settings
-        silverlight_xap_url : 'js/plupload/Moxie.xap',
-         
-     
-        init: {
-            PostInit: function() {
-                $('#plupload .filelist').empty();
-
-                $('#plupload .submit').on('click', function(e) {
-                    e.preventDefault();
-                    uploader.start();
+        </form>
+        <script>
+            (function () {
+                var files = {};
+                $('#fileupload').fileupload({
+                    url: './upload.php?api=fileapi',
+                    dataType: 'json',
+                    autoUpload: false,
+                    multipart: false,
+                    singleFileUploads: true,
+                    maxChunkSize: 1000000,
+                }).on('fileuploadadd', function (e, data) {
+                    data.id = 'fileupload'+jQuery.guid++;
+                    $.each(data.files, function (index, file) {
+                        $('<div id="'+data.id+'">'+file.name+' ('+humanFileSize(file.size)+') <b><span>0%</span></b></div>')
+                            .data(data)
+                            .appendTo('#fileupload .filelist');
+                        files[data.id] = data;
+                    });
+                }).on('fileuploadprogress', function(e, data) {
+                    $('#'+data.id+' b span').html(Math.ceil(data.loaded/data.total*100)+'%');
+                }).on('fileuploaddone', function(e, data) {
+                    delete files[data.id];
                 });
-            },
-            FilesAdded: function(up, files) {
-                plupload.each(files, function(file) {
-                    $('<div id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ') <b><span>0%</span></b></div>').appendTo('#plupload .filelist');
-                });
-            },
-            UploadProgress: function(up, file) {
-                $('#'+file.id+' b span').html(file.percent + '%');
-            }
-        }
-    });
-     
-    uploader.init();
-     
-    </script>
+
+                $(document).on('click', '#fileupload .submit', function (e) {
+                    $.each(files, function (index, data) {
+                        data.submit();
+                    });
+                });
+            }());
+        </script>
+    </section>
+
+    <section>
+        <h2>FileAPI</h2>
+        <form id="fileapi">
+            <div class="filelist">
+            </div>
+            <span class="js-fileapi-wrapper">
+                <input type="file" multiple="multiple" name="file" />
+                <a>[Select files]</a>
+            </span>
+            <a class="submit">[Upload files]</a>
+        </form>
+
+        <script>
+            (function () {
+                var files = {};
+                $(document).on('change', '#fileapi [name=file]', function(e) {
+                    var f = FileAPI.getFiles($('#fileapi [name=file]'));
+                    $.each(f, function(i, file) {
+                        file.id = FileAPI.uid(file);
+                        $('<div id="'+file.id+'">'+file.name+' ('+humanFileSize(file.size)+') <b><span>0%</span></b></div>').appendTo('#fileapi .filelist');
+                        files[file.id] = file;
+                    });
+                });
+
+                $(document).on('click', '#fileapi .submit', function (e) {
+                    $.each(files, function(i, file) {
+                        FileAPI.upload({
+                            url: './upload.php?api=fileapi',
+                            files: {file: file},
+                            chunkSize: 0.5 * FileAPI.MB,
+                            chunkUploadRetry: 3,
+                            fileprogress: function(e, file) {
+                                $('#'+file.id+' b span').html(Math.ceil(e.loaded/e.total*100)+'%');
+                            },
+                            fileupload: function (e, file) {
+                                delete files[i];
+                            }
+                        });
+                    });
+                });
+            }());
+        </script>
+    </section>
+
+    <section>
+        <h2>Plupload</h2>
+        <form id="plupload">
+            <div class="filelist">
+            </div>
+            <div id="container">
+                <a id="pickfiles" href="javascript:;">[Select files]</a>
+                <a class="submit">[Upload files]</a>
+            </div>
+        </form>
+
+        <script type="text/javascript">
+            (function () {
+                var uploader = new plupload.Uploader({
+                    runtimes : 'html5,flash,silverlight,html4',
+                    chunk_size: '500kb',
+                    browse_button : 'pickfiles', // you can pass in id...
+                    container: $('#container').get(0), // ... or DOM Element itself
+                    url: './upload.php?api=plupload',
+                    // Flash settings
+                    flash_swf_url : 'js/plupload/Moxie.swf',
+                    // Silverlight settings
+                    silverlight_xap_url : 'js/plupload/Moxie.xap',
+                    init: {
+                        PostInit: function() {
+                            $('#plupload .filelist').empty();
+                            $('#plupload .submit').on('click', function(e) {
+                                e.preventDefault();
+                                uploader.start();
+                            });
+                        },
+                        FilesAdded: function(up, files) {
+                            plupload.each(files, function(file) {
+                                $('<div id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ') <b><span>0%</span></b></div>').appendTo('#plupload .filelist');
+                            });
+                        },
+                        UploadProgress: function(up, file) {
+                            $('#'+file.id+' b span').html(file.percent + '%');
+                        }
+                    }
+                });
+                uploader.init();
+            }());
+        </script>
+    </section>
 </body>
 </html>

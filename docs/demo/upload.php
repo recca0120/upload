@@ -1,8 +1,8 @@
 <?php
 
 use Recca0120\Upload\Receiver;
-use Recca0120\Upload\Apis\FileAPI;
-use Recca0120\Upload\Apis\Plupload;
+use Recca0120\Upload\FileAPI;
+use Recca0120\Upload\Plupload;
 
 include __DIR__.'/vendor/autoload.php';
 

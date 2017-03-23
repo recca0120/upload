@@ -110,8 +110,8 @@ Receiver::factory($config, $api)
 ```php
 
 use Recca0120\Upload\Receiver;
-use Recca0120\Upload\Apis\FileAPI;
-use Recca0120\Upload\Apis\Plupload;
+use Recca0120\Upload\FileAPI;
+use Recca0120\Upload\Plupload;
 
 require __DIR__.'/vendor/autoload.php';
 
@@ -125,7 +125,7 @@ $config = [
 $inputName = 'file';
 $storagePath = 'relative path';
 
-// if use Plupload, new Recca0120\Upload\Apis\Plupload
+// if use Plupload, new Recca0120\Upload\Plupload
 $receiver = new Receiver(new FileAPI($config));
 // save to $config['base_path'].'/'.$storagePath;
 echo $receiver->receive($inputName, function (UploadedFile $uploadedFile, $path, $domain, $api) {
