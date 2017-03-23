@@ -3,8 +3,8 @@
 namespace Recca0120\Upload\Tests;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Recca0120\Upload\Plupload;
+use PHPUnit\Framework\TestCase;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
 class PluploadTest extends TestCase

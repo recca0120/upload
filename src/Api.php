@@ -3,7 +3,6 @@
 namespace Recca0120\Upload;
 
 use Illuminate\Http\Request;
-use Recca0120\Upload\Filesystem;
 use Illuminate\Http\JsonResponse;
 use Recca0120\Upload\Contracts\Api as ApiContract;
 use Symfony\Component\HttpFoundation\File\UploadedFile;

@@ -71,10 +71,10 @@ class FileAPI extends Api
             'message' => json_encode(['files' => [
                 'name' => $originalName,
                 'size' => $end,
-                'type' => $mimeType
+                'type' => $mimeType,
             ]]),
             'headers' => [
-                'X-Last-Known-Byte' => $end
+                'X-Last-Known-Byte' => $end,
             ],
         ];
 
