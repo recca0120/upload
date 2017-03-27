@@ -53,6 +53,23 @@ class Filesystem extends IlluminateFilesystem
     }
 
     /**
+     * createUploadedFile.
+     *
+     * @param string $path
+     * @param string $originalName
+     * @param string $mimeType
+     * @param int $size
+     * @return \Illuminate\Http\UploadedFile
+     */
+    public function createUploadedFile($path, $originalName, $mimeType = null, $size = null)
+    {
+        $class = class_exists('Illuminate\Http\UploadedFile') === true ?
+            'Illuminate\Http\UploadedFile' : 'Symfony\Component\HttpFoundation\File\UploadedFile';
+
+        return new $class($path, $originalName, $mimeType, $size, UPLOAD_ERR_OK, true);
+    }
+
+    /**
      * convertToResource.
      *
      * @param string|resource $resource
@@ -72,22 +89,5 @@ class Filesystem extends IlluminateFilesystem
         }
 
         return $resource;
-    }
-
-    /**
-     * createUploadedFile.
-     *
-     * @param string $path
-     * @param string $originalName
-     * @param string $mimeType
-     * @param int $size
-     * @return \Illuminate\Http\UploadedFile
-     */
-    public function createUploadedFile($path, $originalName, $mimeType = null, $size = null)
-    {
-        $class = class_exists('Illuminate\Http\UploadedFile') === true ?
-            'Illuminate\Http\UploadedFile' : 'Symfony\Component\HttpFoundation\File\UploadedFile';
-
-        return new $class($path, $originalName, $mimeType, $size, UPLOAD_ERR_OK, true);
     }
 }

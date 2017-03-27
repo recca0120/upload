@@ -53,6 +53,23 @@ class Receiver
     }
 
     /**
+     * factory.
+     *
+     * @param array $config
+     * @param string $class
+     * @return \Recca0120\Upload\Contracts\Api
+     */
+    public static function factory($config = [], $class = FileAPI::class)
+    {
+        $class = Arr::get([
+            'fileapi' => FileAPI::class,
+            'plupload' => Plupload::class,
+        ], strtolower($class), $class);
+
+        return new static(new $class($config));
+    }
+
+    /**
      * callback.
      *
      * @return \Closure
@@ -75,22 +92,5 @@ class Receiver
         ];
 
         return new JsonResponse($response);
-    }
-
-    /**
-     * factory.
-     *
-     * @param array $config
-     * @param string $class
-     * @return \Recca0120\Upload\Contracts\Api
-     */
-    public static function factory($config = [], $class = FileAPI::class)
-    {
-        $class = Arr::get([
-            'fileapi' => FileAPI::class,
-            'plupload' => Plupload::class,
-        ], strtolower($class), $class);
-
-        return new static(new $class($config));
     }
 }

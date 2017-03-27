@@ -5,40 +5,6 @@ namespace Recca0120\Upload;
 class FileAPI extends Api
 {
     /**
-     * getOriginalName.
-     *
-     * @return string
-     */
-    protected function getOriginalName($contentDisposition)
-    {
-        $originalName = $this->request->get('name');
-        if (empty($originalName) === true) {
-            list($originalName) = sscanf(
-                $contentDisposition,
-                'attachment; filename=%s'
-            );
-        }
-
-        return preg_replace('/[\'"]/', '', $originalName);
-    }
-
-    /**
-     * getMimeType.
-     *
-     * @param string $originalName
-     * @return string
-     */
-    protected function getMimeType($originalName)
-    {
-        $mimeType = $this->request->header('content-type');
-        if (empty($mimeType) === true) {
-            $mimeType = $this->filesystem->mimeType($originalName);
-        }
-
-        return $mimeType;
-    }
-
-    /**
      * receive.
      *
      * @param string $name
@@ -79,5 +45,39 @@ class FileAPI extends Api
         ];
 
         return $this->receiveChunks($originalName, $input, $start, $completed, $options);
+    }
+
+    /**
+     * getOriginalName.
+     *
+     * @return string
+     */
+    protected function getOriginalName($contentDisposition)
+    {
+        $originalName = $this->request->get('name');
+        if (empty($originalName) === true) {
+            list($originalName) = sscanf(
+                $contentDisposition,
+                'attachment; filename=%s'
+            );
+        }
+
+        return preg_replace('/[\'"]/', '', $originalName);
+    }
+
+    /**
+     * getMimeType.
+     *
+     * @param string $originalName
+     * @return string
+     */
+    protected function getMimeType($originalName)
+    {
+        $mimeType = $this->request->header('content-type');
+        if (empty($mimeType) === true) {
+            $mimeType = $this->filesystem->mimeType($originalName);
+        }
+
+        return $mimeType;
     }
 }

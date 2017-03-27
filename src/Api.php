@@ -58,32 +58,6 @@ abstract class Api implements ApiContract
     }
 
     /**
-     * chunkFile.
-     *
-     * @param string $tmpfilename
-     * @return string
-     */
-    protected function chunkFile($tmpfilename)
-    {
-        $this->makeDirectory($this->config['chunks']);
-
-        return rtrim($this->config['chunks'], '/').'/'.$tmpfilename.static::TMPFILE_EXTENSION;
-    }
-
-    /**
-     * storageFile.
-     *
-     * @param string $tmpfilename
-     * @return string
-     */
-    protected function storageFile($tmpfilename)
-    {
-        $this->makeDirectory($this->config['storage']);
-
-        return rtrim($this->config['storage'], '/').'/'.$tmpfilename;
-    }
-
-    /**
      * domain.
      *
      * @return string
@@ -135,6 +109,70 @@ abstract class Api implements ApiContract
     }
 
     /**
+     * receive.
+     *
+     * @param string $inputName
+     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
+     *
+     * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
+     */
+    abstract public function receive($inputName);
+
+    /**
+     * deleteUploadedFile.
+     *
+     * @param \Symfony\Component\HttpFoundation\File\UploadedFile
+     * @return $this
+     */
+    public function deleteUploadedFile(UploadedFile $uploadedFile)
+    {
+        $file = $uploadedFile->getPathname();
+        if ($this->filesystem->isFile($file) === true) {
+            $this->filesystem->delete($file);
+        }
+        $this->cleanDirectory($this->config['chunks']);
+
+        return $this;
+    }
+
+    /**
+     * completedResponse.
+     *
+     * @param \Illuminate\Http\JsonResponse $response
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function completedResponse(JsonResponse $response)
+    {
+        return $response;
+    }
+
+    /**
+     * chunkFile.
+     *
+     * @param string $tmpfilename
+     * @return string
+     */
+    protected function chunkFile($tmpfilename)
+    {
+        $this->makeDirectory($this->config['chunks']);
+
+        return rtrim($this->config['chunks'], '/').'/'.$tmpfilename.static::TMPFILE_EXTENSION;
+    }
+
+    /**
+     * storageFile.
+     *
+     * @param string $tmpfilename
+     * @return string
+     */
+    protected function storageFile($tmpfilename)
+    {
+        $this->makeDirectory($this->config['storage']);
+
+        return rtrim($this->config['storage'], '/').'/'.$tmpfilename;
+    }
+
+    /**
      * receiveChunks.
      *
      * @param string $originalName
@@ -171,43 +209,5 @@ abstract class Api implements ApiContract
             empty($options['mimeType']) === false ? $options['mimeType'] : $this->filesystem->mimeType($originalName),
             $this->filesystem->size($storageFile)
         );
-    }
-
-    /**
-     * receive.
-     *
-     * @param string $inputName
-     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
-     *
-     * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
-     */
-    abstract public function receive($inputName);
-
-    /**
-     * deleteUploadedFile.
-     *
-     * @param \Symfony\Component\HttpFoundation\File\UploadedFile
-     * @return $this
-     */
-    public function deleteUploadedFile(UploadedFile $uploadedFile)
-    {
-        $file = $uploadedFile->getPathname();
-        if ($this->filesystem->isFile($file) === true) {
-            $this->filesystem->delete($file);
-        }
-        $this->cleanDirectory($this->config['chunks']);
-
-        return $this;
-    }
-
-    /**
-     * completedResponse.
-     *
-     * @param \Illuminate\Http\JsonResponse $response
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function completedResponse(JsonResponse $response)
-    {
-        return $response;
     }
 }
