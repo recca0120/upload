@@ -24,14 +24,20 @@ class Plupload extends Api
         $chunk = $this->request->get('chunk');
 
         $originalName = $this->request->get('name');
-        $input = $uploadedFile->getPathname();
         $start = $chunk * $this->request->header('content-length');
         $completed = $chunk >= $chunks - 1;
-        $options = [
-            'mimeType' => $uploadedFile->getMimeType(),
-        ];
 
-        return $this->receiveChunks($originalName, $input, $start, $completed, $options);
+        $this->chunkFile
+            ->setToken($this->request->get('token'))
+            ->setChunkPath($this->chunkPath())
+            ->setStoragePath($this->storagePath())
+            ->setName($originalName)
+            ->setMimeType($uploadedFile->getMimeType())
+            ->appendStream($uploadedFile->getPathname(), $start);
+
+        return $completed === true
+            ? $this->chunkFile->createUploadedFile()
+            : $this->chunkFile->throwException();
     }
 
     /**

@@ -118,7 +118,7 @@ class FileAPITest extends TestCase
             $request,
             $filesystem = m::mock('Recca0120\Upload\Filesystem')
         );
-        $filesystem->shouldReceive('isDirectory')->once()->andReturn(true);
+        $filesystem->shouldReceive('isDirectory')->twice()->andReturn(true);
 
         $start = 5242880;
         $end = 5767167;

@@ -30,24 +30,28 @@ class FileAPI extends Api
 
         $originalName = $this->getOriginalName($contentDisposition);
         $mimeType = $this->getMimeType($originalName);
-        $input = 'php://input';
         $completed = $end >= $total - 1;
-        $options = [
-            'mimeType' => $mimeType,
-            'message' => json_encode(['files' => [
-                'name' => $originalName,
-                'size' => $end,
-                'type' => $mimeType,
-            ]]),
-            'headers' => [
-                'X-Last-Known-Byte' => $end,
-            ],
-        ];
 
-        return $this->receiveChunks($originalName, $input, $start, $completed, $options);
+        $this->chunkFile
+            ->setToken($this->request->get('token'))
+            ->setChunkPath($this->chunkPath())
+            ->setStoragePath($this->storagePath())
+            ->setName($originalName)
+            ->setMimeType($mimeType)
+            ->appendStream('php://input', $start);
+
+        return $completed === true
+            ? $this->chunkFile->createUploadedFile()
+            : $this->chunkFile->throwException(json_encode([
+                'files' => [
+                    'name' => $originalName,
+                    'size' => $end,
+                    'type' => $mimeType,
+                ],
+            ]), ['X-Last-Known-Byte' => $end]);
     }
 
-    /**
+    /*
      * getOriginalName.
      *
      * @return string

@@ -6,30 +6,22 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Recca0120\Upload\Contracts\Api as ApiContract;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
 abstract class Api implements ApiContract
 {
-    /**
-     * TMPFILE_EXTENSION.
-     *
-     * @var string
-     */
-    const TMPFILE_EXTENSION = '.part';
-
     /**
      * $request.
      *
      * @var \Illuminate\Http\Request
      */
-    protected $request;
+    public $request;
 
     /**
      * $filesystem.
      *
      * @var \Recca0120\Upload\Filesystem
      */
-    protected $filesystem;
+    public $filesystem;
 
     /**
      * $config.
@@ -45,10 +37,11 @@ abstract class Api implements ApiContract
      * @param \Illuminate\Http\Request $request
      * @param \Recca0120\Upload\Filesystem $filesystem
      */
-    public function __construct($config = [], Request $request = null, Filesystem $filesystem = null)
+    public function __construct($config = [], Request $request = null, Filesystem $filesystem = null, ChunkFile $chunkFile = null)
     {
         $this->request = $request ?: Request::capture();
         $this->filesystem = $filesystem ?: new Filesystem();
+        $this->chunkFile = $chunkFile ?: new ChunkFile($this->filesystem);
         $this->config = array_merge([
             'chunks' => sys_get_temp_dir().'/chunks',
             'storage' => 'storage/temp',
@@ -147,67 +140,26 @@ abstract class Api implements ApiContract
     }
 
     /**
-     * chunkFile.
+     * chunkPath.
      *
-     * @param string $tmpfilename
      * @return string
      */
-    protected function chunkFile($tmpfilename)
+    protected function chunkPath()
     {
         $this->makeDirectory($this->config['chunks']);
 
-        return rtrim($this->config['chunks'], '/').'/'.$tmpfilename.static::TMPFILE_EXTENSION;
+        return rtrim($this->config['chunks'], '/').'/';
     }
 
     /**
-     * storageFile.
+     * storagePath.
      *
-     * @param string $tmpfilename
      * @return string
      */
-    protected function storageFile($tmpfilename)
+    protected function storagePath()
     {
         $this->makeDirectory($this->config['storage']);
 
-        return rtrim($this->config['storage'], '/').'/'.$tmpfilename;
-    }
-
-    /**
-     * receiveChunks.
-     *
-     * @param string $originalName
-     * @param string|resource $input
-     * @param int $start
-     * @param bool $completed
-     * @param array $options
-     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
-     *
-     * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
-     */
-    protected function receiveChunks($originalName, $input, $start, $completed = false, $options = [])
-    {
-        $tmpfilename = $this->filesystem->tmpfilename(
-            $originalName, $this->request->get('token')
-        );
-        $chunkFile = $this->chunkFile($tmpfilename);
-        $this->filesystem->appendStream($chunkFile, $input, $start);
-
-        if ($completed === false) {
-            throw new ChunkedResponseException(
-                empty($options['message']) === false ? $options['message'] : '',
-                empty($options['headers']) === false ? $options['headers'] : []
-            );
-        }
-
-        $this->filesystem->move(
-            $chunkFile, $storageFile = $this->storageFile($tmpfilename)
-        );
-
-        return $this->filesystem->createUploadedFile(
-            $storageFile,
-            $originalName,
-            empty($options['mimeType']) === false ? $options['mimeType'] : $this->filesystem->mimeType($originalName),
-            $this->filesystem->size($storageFile)
-        );
+        return rtrim($this->config['storage'], '/').'/';
     }
 }
