@@ -156,6 +156,11 @@ class ChunkFile
         return $this;
     }
 
+    /**
+     * createUploadedFile.
+     *
+     * @return \Illuminate\Http\UploadedFile
+     */
     public function createUploadedFile()
     {
         $this->filesystem->move(
@@ -165,8 +170,7 @@ class ChunkFile
         return $this->filesystem->createUploadedFile(
             $storageFile,
             $this->name,
-            $this->mimeType,
-            $this->filesystem->size($storageFile)
+            $this->mimeType
         );
     }
 

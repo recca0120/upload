@@ -58,12 +58,8 @@ class PluploadTest extends TestCase
         $filesystem->shouldReceive('appendStream')->once()->with($chunksPath.$tmpfilename.'.part', $pathname, $chunk * $contentLength);
 
         $filesystem->shouldReceive('move')->once()->with($chunksPath.$tmpfilename.'.part', $storagePath.$tmpfilename);
-        $filesystem->shouldReceive('size')->once()->with($chunksPath.$tmpfilename)->andReturn($size = 1024);
         $filesystem->shouldReceive('createUploadedFile')->once()->with(
-            $chunksPath.$tmpfilename,
-            $originalName,
-            $mimeType,
-            $size
+            $chunksPath.$tmpfilename, $originalName, $mimeType
         )->andReturn(
             $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
         );

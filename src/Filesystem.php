@@ -66,6 +66,9 @@ class Filesystem extends IlluminateFilesystem
         $class = class_exists('Illuminate\Http\UploadedFile') === true ?
             'Illuminate\Http\UploadedFile' : 'Symfony\Component\HttpFoundation\File\UploadedFile';
 
+        $mimeType = $mimeType ?: $this->mimeType($path);
+        $size = $size ?: $this->size($path);
+
         return new $class($path, $originalName, $mimeType, $size, UPLOAD_ERR_OK, true);
     }
 
