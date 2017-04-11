@@ -14,14 +14,21 @@ abstract class Api implements ApiContract
      *
      * @var \Illuminate\Http\Request
      */
-    public $request;
+    protected $request;
 
     /**
      * $filesystem.
      *
      * @var \Recca0120\Upload\Filesystem
      */
-    public $filesystem;
+    protected $filesystem;
+
+    /**
+     * $chunkFile.
+     *
+     * @var \Recca0120\Upload\ChunkFile
+     */
+    protected $chunkFile;
 
     /**
      * $config.
@@ -36,6 +43,7 @@ abstract class Api implements ApiContract
      * @param array $config
      * @param \Illuminate\Http\Request $request
      * @param \Recca0120\Upload\Filesystem $filesystem
+     * @param \Recca0120\Upload\ChunkFile $chunkFile
      */
     public function __construct($config = [], Request $request = null, Filesystem $filesystem = null, ChunkFile $chunkFile = null)
     {
