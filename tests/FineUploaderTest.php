@@ -23,13 +23,13 @@ class FineUploaderTest extends TestCase
             $filesystem = m::mock('Recca0120\Upload\Filesystem'),
             $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
-
-        $request->shouldReceive('file')->once()->with('qqfile')->andReturn(
+        $inputName = 'qqfile';
+        $request->shouldReceive('file')->once()->with($inputName)->andReturn(
             $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
         );
         $request->shouldReceive('has')->once()->with('qqtotalparts')->andReturn(false);
 
-        $this->assertSame($uploadedFile, $api->receive(''));
+        $this->assertSame($uploadedFile, $api->receive($inputName));
     }
 
     public function testReceiveChunkedFile()
@@ -43,8 +43,8 @@ class FineUploaderTest extends TestCase
             $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
         $filesystem->shouldReceive('isDirectory')->twice()->andReturn(true);
-
-        $request->shouldReceive('file')->once()->with('qqfile')->andReturn(null);
+        $inputName = 'qqfile';
+        $request->shouldReceive('file')->once()->with($inputName)->andReturn(null);
         $request->shouldReceive('has')->once()->with('qqtotalparts')->andReturn(true);
         $request->shouldReceive('get')->once()->with('qqfilename')->andReturn(
             $originalName = 'foo.php'
@@ -65,7 +65,7 @@ class FineUploaderTest extends TestCase
         $chunkFile->shouldReceive('setName')->once()->with($originalName)->andReturnSelf();
         $chunkFile->shouldReceive('createUploadedFile')->once()->with($qqtotalparts);
 
-        $api->receive($inputName = 'foo');
+        $api->receive($inputName);
     }
 
     public function testReceiveChunkedFileWithParts()
@@ -79,8 +79,8 @@ class FineUploaderTest extends TestCase
             $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
         $filesystem->shouldReceive('isDirectory')->twice()->andReturn(true);
-
-        $request->shouldReceive('file')->once()->with('qqfile')->andReturn(
+        $inputName = 'qqfile';
+        $request->shouldReceive('file')->once()->with($inputName)->andReturn(
             $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
         );
         $request->shouldReceive('has')->once()->with('qqtotalparts')->andReturn(true);
@@ -110,6 +110,6 @@ class FineUploaderTest extends TestCase
             'uuid' => $qquuid,
         ]);
 
-        $api->receive($inputName = 'foo');
+        $api->receive($inputName);
     }
 }

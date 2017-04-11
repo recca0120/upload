@@ -280,35 +280,36 @@
 
         <div id="fine-uploader"></div>
         <script>
-        // Some options to pass to the uploader are discussed on the next page
-        var uploader = new qq.FineUploader({
-            element: document.getElementById("fine-uploader"),
-            debug: true,
-            request: {
-                endpoint: "./upload.php?api=fine-uploader"
-            },
-            // deleteFile: {
-            //     enabled: true,
-            //     endpoint: "./server/endpoint.php"
-            // },
-            chunking: {
-                enabled: true,
-                concurrent: {
+            // Some options to pass to the uploader are discussed on the next page
+            var uploader = new qq.FineUploader({
+                element: document.getElementById("fine-uploader"),
+                debug: true,
+                request: {
+                    endpoint: "./upload.php?api=fine-uploader",
+                    inputName: 'file',
+                },
+                // deleteFile: {
+                //     enabled: true,
+                //     endpoint: "./server/endpoint.php"
+                // },
+                chunking: {
+                    enabled: true,
+                    concurrent: {
+                        enabled: true
+                    },
+                    success: {
+                        endpoint: "../upload/upload.php?api=fine-uploader"
+                    }
+                },
+                resume: {
                     enabled: true
                 },
-                success: {
-                    endpoint: "../upload/upload.php?api=fine-uploader"
+                retry: {
+                    enableAuto: true,
+                    showButton: true
                 }
-            },
-            resume: {
-                enabled: true
-            },
-            retry: {
-                enableAuto: true,
-                showButton: true
-            }
-        })
-    </script>
+            })
+        </script>
     </section>
 </body>
 </html>

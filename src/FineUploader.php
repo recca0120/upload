@@ -16,7 +16,7 @@ class FineUploader extends Api
      */
     public function receive($name)
     {
-        $file = $this->request->file('qqfile');
+        $file = $this->request->file($name);
         if ($this->request->has('qqtotalparts') === false) {
             return $file;
         }
