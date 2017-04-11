@@ -5,7 +5,6 @@ namespace Recca0120\Upload\Tests;
 use Mockery as m;
 use Recca0120\Upload\FileAPI;
 use PHPUnit\Framework\TestCase;
-use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
 class FileAPITest extends TestCase
 {
@@ -21,7 +20,8 @@ class FileAPITest extends TestCase
         $api = new FileAPI(
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem')
+            $filesystem = m::mock('Recca0120\Upload\Filesystem'),
+            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
         $request->shouldReceive('header')->once()->with('content-disposition')->andReturn('');
         $inputName = 'foo';
@@ -38,7 +38,8 @@ class FileAPITest extends TestCase
         $api = new FileAPI(
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem')
+            $filesystem = m::mock('Recca0120\Upload\Filesystem'),
+            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
         $filesystem->shouldReceive('isDirectory')->twice()->andReturn(true);
 
@@ -56,12 +57,13 @@ class FileAPITest extends TestCase
             $mimeType = 'foo'
         );
         $request->shouldReceive('get')->once()->with('token')->andReturn($token = 'foo');
-        $filesystem->shouldReceive('tmpfilename')->once()->with($originalName, $token)->andReturn($tmpfilename = 'foo');
-        $filesystem->shouldReceive('appendStream')->once()->with($chunksPath.$tmpfilename.'.part', 'php://input', $start);
-        $filesystem->shouldReceive('move')->once()->with($chunksPath.$tmpfilename.'.part', $storagePath.$tmpfilename);
-        $filesystem->shouldReceive('createUploadedFile')->once()->with(
-            $chunksPath.$tmpfilename, $originalName, $mimeType
-        )->andReturn(
+        $chunkFile->shouldReceive('setToken')->once()->with($token)->andReturnSelf();
+        $chunkFile->shouldReceive('setChunkPath')->once()->with($chunksPath)->andReturnSelf();
+        $chunkFile->shouldReceive('setStoragePath')->once()->with($storagePath)->andReturnSelf();
+        $chunkFile->shouldReceive('setName')->once()->with($originalName)->andReturnSelf();
+        $chunkFile->shouldReceive('setMimeType')->once()->with($mimeType)->andReturnSelf();
+        $chunkFile->shouldReceive('appendStream')->once()->with('php://input', $start)->andReturnSelf();
+        $chunkFile->shouldReceive('createUploadedFile')->once()->andReturn(
             $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
         );
 
@@ -75,7 +77,8 @@ class FileAPITest extends TestCase
         $api = new FileAPI(
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem')
+            $filesystem = m::mock('Recca0120\Upload\Filesystem'),
+            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
         $filesystem->shouldReceive('isDirectory')->twice()->andReturn(true);
 
@@ -89,12 +92,13 @@ class FileAPITest extends TestCase
             $mimeType = 'foo'
         );
         $request->shouldReceive('get')->once()->with('token')->andReturn($token = 'foo');
-        $filesystem->shouldReceive('tmpfilename')->once()->with($originalName, $token)->andReturn($tmpfilename = 'foo');
-        $filesystem->shouldReceive('appendStream')->once()->with($chunksPath.$tmpfilename.'.part', 'php://input', 0);
-        $filesystem->shouldReceive('move')->once()->with($chunksPath.$tmpfilename.'.part', $storagePath.$tmpfilename);
-        $filesystem->shouldReceive('createUploadedFile')->once()->with(
-            $chunksPath.$tmpfilename, $originalName, $mimeType
-        )->andReturn(
+        $chunkFile->shouldReceive('setToken')->once()->with($token)->andReturnSelf();
+        $chunkFile->shouldReceive('setChunkPath')->once()->with($chunksPath)->andReturnSelf();
+        $chunkFile->shouldReceive('setStoragePath')->once()->with($storagePath)->andReturnSelf();
+        $chunkFile->shouldReceive('setName')->once()->with($originalName)->andReturnSelf();
+        $chunkFile->shouldReceive('setMimeType')->once()->with($mimeType)->andReturnSelf();
+        $chunkFile->shouldReceive('appendStream')->once()->with('php://input', 0)->andReturnSelf();
+        $chunkFile->shouldReceive('createUploadedFile')->once()->andReturn(
             $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
         );
 
@@ -108,7 +112,8 @@ class FileAPITest extends TestCase
         $api = new FileAPI(
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem')
+            $filesystem = m::mock('Recca0120\Upload\Filesystem'),
+            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
         $filesystem->shouldReceive('isDirectory')->twice()->andReturn(true);
 
@@ -127,15 +132,20 @@ class FileAPITest extends TestCase
         );
 
         $request->shouldReceive('get')->once()->with('token')->andReturn($token = 'foo');
-        $filesystem->shouldReceive('tmpfilename')->once()->with($originalName, $token)->andReturn($tmpfilename = 'foo');
-        $filesystem->shouldReceive('appendStream')->once()->with($chunksPath.$tmpfilename.'.part', 'php://input', $start);
+        $chunkFile->shouldReceive('setToken')->once()->with($token)->andReturnSelf();
+        $chunkFile->shouldReceive('setChunkPath')->once()->with($chunksPath)->andReturnSelf();
+        $chunkFile->shouldReceive('setStoragePath')->once()->with($storagePath)->andReturnSelf();
+        $chunkFile->shouldReceive('setName')->once()->with($originalName)->andReturnSelf();
+        $chunkFile->shouldReceive('setMimeType')->once()->with($mimeType)->andReturnSelf();
+        $chunkFile->shouldReceive('appendStream')->once()->with('php://input', $start)->andReturnSelf();
+        $chunkFile->shouldReceive('throwException')->once()->with(json_encode([
+            'files' => [
+                'name' => $originalName,
+                'size' => $end,
+                'type' => $mimeType,
+            ],
+        ]), ['X-Last-Known-Byte' => $end]);
 
-        try {
-            $api->receive($inputName = 'foo');
-        } catch (ChunkedResponseException $e) {
-            $response = $e->getResponse();
-            $this->assertSame(201, $response->getStatusCode());
-            $this->assertSame($end, $response->headers->get('X-Last-Known-Byte'));
-        }
+        $api->receive($inputName = 'foo');
     }
 }

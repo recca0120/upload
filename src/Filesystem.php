@@ -27,7 +27,7 @@ class Filesystem extends IlluminateFilesystem
      */
     public function tmpfilename($path, $hash = null)
     {
-        return md5($path.$hash).'.'.$this->extension($path);
+        return md5($path.$hash).'.'.strtolower($this->extension($path));
     }
 
     /**

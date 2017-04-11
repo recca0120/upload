@@ -168,9 +168,7 @@ class ChunkFile
         );
 
         return $this->filesystem->createUploadedFile(
-            $storageFile,
-            $this->name,
-            $this->mimeType
+            $storageFile, $this->name, $this->mimeType
         );
     }
 

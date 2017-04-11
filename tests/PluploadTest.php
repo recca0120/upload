@@ -5,7 +5,6 @@ namespace Recca0120\Upload\Tests;
 use Mockery as m;
 use Recca0120\Upload\Plupload;
 use PHPUnit\Framework\TestCase;
-use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
 class PluploadTest extends TestCase
 {
@@ -21,7 +20,8 @@ class PluploadTest extends TestCase
         $api = new Plupload(
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem')
+            $filesystem = m::mock('Recca0120\Upload\Filesystem'),
+            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
         $inputName = 'foo';
         $request->shouldReceive('file')->once()->with($inputName)->andReturn(
@@ -38,7 +38,8 @@ class PluploadTest extends TestCase
         $api = new Plupload(
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem')
+            $filesystem = m::mock('Recca0120\Upload\Filesystem'),
+            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
         $filesystem->shouldReceive('isDirectory')->twice()->andReturn(true);
 
@@ -54,13 +55,13 @@ class PluploadTest extends TestCase
         $uploadedFile->shouldReceive('getMimeType')->once()->andReturn($mimeType = 'foo');
 
         $request->shouldReceive('get')->once()->with('token')->andReturn($token = 'foo');
-        $filesystem->shouldReceive('tmpfilename')->once()->with($originalName, $token)->andReturn($tmpfilename = 'foo');
-        $filesystem->shouldReceive('appendStream')->once()->with($chunksPath.$tmpfilename.'.part', $pathname, $chunk * $contentLength);
-
-        $filesystem->shouldReceive('move')->once()->with($chunksPath.$tmpfilename.'.part', $storagePath.$tmpfilename);
-        $filesystem->shouldReceive('createUploadedFile')->once()->with(
-            $chunksPath.$tmpfilename, $originalName, $mimeType
-        )->andReturn(
+        $chunkFile->shouldReceive('setToken')->once()->with($token)->andReturnSelf();
+        $chunkFile->shouldReceive('setChunkPath')->once()->with($chunksPath)->andReturnSelf();
+        $chunkFile->shouldReceive('setStoragePath')->once()->with($storagePath)->andReturnSelf();
+        $chunkFile->shouldReceive('setName')->once()->with($originalName)->andReturnSelf();
+        $chunkFile->shouldReceive('setMimeType')->once()->with($mimeType)->andReturnSelf();
+        $chunkFile->shouldReceive('appendStream')->once()->with($pathname, $chunk * $contentLength)->andReturnSelf();
+        $chunkFile->shouldReceive('createUploadedFile')->once()->andReturn(
             $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
         );
 
@@ -74,7 +75,8 @@ class PluploadTest extends TestCase
         $api = new Plupload(
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem')
+            $filesystem = m::mock('Recca0120\Upload\Filesystem'),
+            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
         $filesystem->shouldReceive('isDirectory')->twice()->andReturn(true);
 
@@ -90,15 +92,14 @@ class PluploadTest extends TestCase
         $uploadedFile->shouldReceive('getMimeType')->once()->andReturn($mimeType = 'foo');
 
         $request->shouldReceive('get')->once()->with('token')->andReturn($token = 'foo');
-        $filesystem->shouldReceive('tmpfilename')->once()->with($originalName, $token)->andReturn($tmpfilename = 'foo');
-        $filesystem->shouldReceive('appendStream')->once()->with($chunksPath.$tmpfilename.'.part', $pathname, $chunk * $contentLength);
-
-        try {
-            $api->receive($inputName);
-        } catch (ChunkedResponseException $e) {
-            $response = $e->getResponse();
-            $this->assertSame(201, $response->getStatusCode());
-        }
+        $chunkFile->shouldReceive('setToken')->once()->with($token)->andReturnSelf();
+        $chunkFile->shouldReceive('setChunkPath')->once()->with($chunksPath)->andReturnSelf();
+        $chunkFile->shouldReceive('setStoragePath')->once()->with($storagePath)->andReturnSelf();
+        $chunkFile->shouldReceive('setName')->once()->with($originalName)->andReturnSelf();
+        $chunkFile->shouldReceive('setMimeType')->once()->with($mimeType)->andReturnSelf();
+        $chunkFile->shouldReceive('appendStream')->once()->with($pathname, $chunk * $contentLength)->andReturnSelf();
+        $chunkFile->shouldReceive('throwException')->once();
+        $api->receive($inputName);
     }
 
     public function testCompletedResponse()
@@ -108,7 +109,8 @@ class PluploadTest extends TestCase
         $api = new Plupload(
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem')
+            $filesystem = m::mock('Recca0120\Upload\Filesystem'),
+            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
         $response = m::mock('Illuminate\Http\JsonResponse');
         $response->shouldReceive('getData')->once()->andReturn($data = []);
