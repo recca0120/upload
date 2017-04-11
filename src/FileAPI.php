@@ -51,9 +51,10 @@ class FileAPI extends Api
             ], ['X-Last-Known-Byte' => $end]);
     }
 
-    /*
+    /**
      * getOriginalName.
      *
+     * @param string $contentDisposition
      * @return string
      */
     protected function getOriginalName($contentDisposition)

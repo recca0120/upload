@@ -14,6 +14,13 @@ class ChunkFile
     const TMPFILE_EXTENSION = '.part';
 
     /**
+     * $filesystem.
+     *
+     * @var \Recca0120\Upload\Filesystem
+     */
+    protected $filesystem;
+
+    /**
      * $token.
      *
      * @var string
@@ -120,7 +127,7 @@ class ChunkFile
     /**
      * setMimeType.
      *
-     * @param string $name
+     * @param string $mimeType
      * @return $this
      */
     public function setMimeType($mimeType)
