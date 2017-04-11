@@ -17,6 +17,7 @@
 - Support Chunks [jQuery-File-Upload](https://github.com/blueimp/jQuery-File-Upload) $driver = 'fileapi';
 - Support Chunks [FileApi](http://mailru.github.io/FileAPI/) $driver = 'fileapi';
 - Support Chunks [Plupload](http://www.plupload.com/) $driver = 'plupload';
+- Support Chunks [Fine Uploader](https://fineuploader.com/) $driver = 'fine-uploader';
 
 ## Installing
 
