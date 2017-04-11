@@ -2,7 +2,6 @@
 
 namespace Recca0120\Upload;
 
-use Illuminate\Support\Arr;
 use Illuminate\Http\JsonResponse;
 
 class FineUploader extends Api
@@ -17,19 +16,19 @@ class FineUploader extends Api
      */
     public function receive($name)
     {
+        $file = $this->request->file('qqfile');
         if ($this->request->has('qqtotalparts') === false) {
-            return $this->request->file('qqfile');
+            return $file;
         }
 
+        $completed = is_null($file) === true;
         $originalName = $this->request->get('qqfilename');
         $qqtotalparts = (int) $this->request->get('qqtotalparts', 1);
         $qqpartindex = (int) $this->request->get('qqpartindex');
-        $file = $this->request->file('qqfile');
-
-        $completed = is_null($file);
+        $uuid = $this->request->get('qquuid');
 
         $this->chunkFile
-            ->setToken($this->request->get('qquuid'))
+            ->setToken($uuid)
             ->setChunkPath($this->chunkPath())
             ->setStoragePath($this->storagePath())
             ->setName($originalName);
@@ -40,10 +39,10 @@ class FineUploader extends Api
 
         return $completed === true
             ? $this->chunkFile->createUploadedFile($qqtotalparts)
-            : $this->chunkFile->throwException(json_encode([
+            : $this->chunkFile->throwException([
                 'success' => true,
-                'uuid' => $this->request->get('qquuid'),
-            ]));
+                'uuid' => $uuid,
+            ]);
     }
 
     /**

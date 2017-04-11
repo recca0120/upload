@@ -138,13 +138,13 @@ class FileAPITest extends TestCase
         $chunkFile->shouldReceive('setName')->once()->with($originalName)->andReturnSelf();
         $chunkFile->shouldReceive('setMimeType')->once()->with($mimeType)->andReturnSelf();
         $chunkFile->shouldReceive('appendStream')->once()->with('php://input', $start)->andReturnSelf();
-        $chunkFile->shouldReceive('throwException')->once()->with(json_encode([
+        $chunkFile->shouldReceive('throwException')->once()->with([
             'files' => [
                 'name' => $originalName,
                 'size' => $end,
                 'type' => $mimeType,
             ],
-        ]), ['X-Last-Known-Byte' => $end]);
+        ], ['X-Last-Known-Byte' => $end]);
 
         $api->receive($inputName = 'foo');
     }

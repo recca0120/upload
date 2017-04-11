@@ -24,13 +24,16 @@ class ChunkedResponseException extends RuntimeException
     /**
      * __construct.
      *
+     * @param mixed $message
      * @param array $headers
      * @param int $code
      */
     public function __construct($message = '', $headers = [], $code = Response::HTTP_CREATED)
     {
-        parent::__construct('', $code);
-        $this->message = $message;
+        parent::__construct(
+            is_string($message) === true ? $message : json_encode($message), $code
+        );
+
         $this->headers = $headers;
     }
 
@@ -41,6 +44,6 @@ class ChunkedResponseException extends RuntimeException
      */
     public function getResponse()
     {
-        return new Response($this->message, $this->getCode(), $this->headers);
+        return new Response($this->getMessage(), $this->getCode(), $this->headers);
     }
 }

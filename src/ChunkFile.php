@@ -133,7 +133,7 @@ class ChunkFile
     /**
      * throwException.
      *
-     * @param string $message
+     * @param mixed $message
      * @param array $headers
      * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
      */
@@ -152,7 +152,7 @@ class ChunkFile
     public function appendStream($source, $offset = 0, $index = null)
     {
         $chunkFile = $this->chunkFile();
-        $chunkFile = is_null($index) === false ? $chunkFile.='.'.$index : $chunkFile;
+        $chunkFile = is_null($index) === false ? $chunkFile .= '.'.$index : $chunkFile;
 
         $this->filesystem->appendStream($chunkFile, $source, (int) $offset);
 

@@ -69,11 +69,11 @@ class ChunkFileTest extends TestCase
         );
 
         try {
-            $chunkFile->throwException('foo', ['foo' => 'bar']);
+            $chunkFile->throwException(['foo' => 'bar'], ['foo' => 'bar']);
         } catch (ChunkedResponseException $e) {
             $response = $e->getResponse();
             $this->assertSame(201, $response->getStatusCode());
-            $this->assertSame('foo', $e->getMessage());
+            $this->assertSame(json_encode(['foo' => 'bar']), $e->getMessage());
             $this->assertSame('bar', $response->headers->get('foo'));
         }
     }

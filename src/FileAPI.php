@@ -42,13 +42,13 @@ class FileAPI extends Api
 
         return $completed === true
             ? $this->chunkFile->createUploadedFile()
-            : $this->chunkFile->throwException(json_encode([
+            : $this->chunkFile->throwException([
                 'files' => [
                     'name' => $originalName,
                     'size' => $end,
                     'type' => $mimeType,
                 ],
-            ]), ['X-Last-Known-Byte' => $end]);
+            ], ['X-Last-Known-Byte' => $end]);
     }
 
     /*
