@@ -14,7 +14,7 @@ class FileAPI extends Api
      */
     public function receive($name)
     {
-        $contentDisposition = $this->request->header('content-disposition');
+        $contentDisposition = (string) $this->request->header('content-disposition');
         if (empty($contentDisposition) === true) {
             return $this->request->file($name);
         }
