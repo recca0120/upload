@@ -42,4 +42,19 @@ class UploadManagerTest extends TestCase
         $request->shouldReceive('root')->andReturn($root = 'foo');
         $this->assertInstanceOf('Recca0120\Upload\Receiver', $uploadManager->driver('plupload'));
     }
+
+    public function testCreateFineUploaderDriver()
+    {
+        $uploadManager = new UploadManager(
+            [
+                'config' => [
+                    'upload' => [],
+                ],
+            ],
+            $request = m::mock('Illuminate\Http\Request'),
+            $filesystem = m::mock('Recca0120\Upload\Filesystem')
+        );
+        $request->shouldReceive('root')->andReturn($root = 'foo');
+        $this->assertInstanceOf('Recca0120\Upload\Receiver', $uploadManager->driver('fine-uploader'));
+    }
 }

@@ -149,9 +149,12 @@ class ChunkFile
      * @param int $offset
      * @return $this
      */
-    public function appendStream($source, $offset = 0)
+    public function appendStream($source, $offset = 0, $index = null)
     {
-        $this->filesystem->appendStream($this->chunkFile(), $source, (int) $offset);
+        $chunkFile = $this->chunkFile();
+        $chunkFile = is_null($index) === false ? $chunkFile.='.'.$index : $chunkFile;
+
+        $this->filesystem->appendStream($chunkFile, $source, (int) $offset);
 
         return $this;
     }
@@ -161,11 +164,23 @@ class ChunkFile
      *
      * @return \Illuminate\Http\UploadedFile
      */
-    public function createUploadedFile()
+    public function createUploadedFile($chunks = null)
     {
-        $this->filesystem->move(
-            $this->chunkFile(), $storageFile = $this->storageFile()
-        );
+        $chunkFile = $this->chunkFile();
+        $storageFile = $this->storageFile();
+
+        if (is_null($chunks) === false) {
+            for ($i = 0; $i < $chunks; $i++) {
+                $chunk = $chunkFile.'.'.$i;
+                $this->filesystem->append(
+                    $storageFile,
+                    $this->filesystem->get($chunk)
+                );
+                $this->filesystem->delete($chunk);
+            }
+        } else {
+            $this->filesystem->move($chunkFile, $storageFile);
+        }
 
         return $this->filesystem->createUploadedFile(
             $storageFile, $this->name, $this->mimeType

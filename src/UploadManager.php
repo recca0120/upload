@@ -56,12 +56,22 @@ class UploadManager extends Manager
     }
 
     /**
-     * create fileapi driver.
+     * create plupload driver.
      *
      * @return Receiver
      */
     protected function createPluploadDriver()
     {
         return new Receiver(new Plupload($this->app['config']['upload'], $this->request, $this->filesystem));
+    }
+
+    /**
+     * create fine uploader driver.
+     *
+     * @return Receiver
+     */
+    protected function createFineUploaderDriver()
+    {
+        return new Receiver(new FineUploader($this->app['config']['upload'], $this->request, $this->filesystem));
     }
 }
