@@ -55,6 +55,6 @@ class UploadManagerTest extends TestCase
             $filesystem = m::mock('Recca0120\Upload\Filesystem')
         );
         $request->shouldReceive('root')->andReturn($root = 'foo');
-        $this->assertInstanceOf('Recca0120\Upload\Receiver', $uploadManager->driver('fine-uploader'));
+        $this->assertInstanceOf('Recca0120\Upload\Receiver', $uploadManager->driver('fineuploader'));
     }
 }
