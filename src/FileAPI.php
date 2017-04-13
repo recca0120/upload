@@ -19,15 +19,7 @@ class FileAPI extends Api
             return $this->request->file($name);
         }
 
-        $contentRange = $this->request->header('content-range');
-        if (empty($contentRange) === false) {
-            list($start, $end, $total) = sscanf($contentRange, 'bytes %d-%d/%d');
-        } else {
-            $start = 0;
-            $end = (int) $this->request->header('content-length');
-            $total = $end;
-        }
-
+        list($start, $end, $total) = $this->parseContentRange();
         $originalName = $this->getOriginalName($contentDisposition);
         $mimeType = $this->getMimeType($originalName);
         $completed = $end >= $total - 1;
@@ -84,5 +76,22 @@ class FileAPI extends Api
         }
 
         return $mimeType;
+    }
+
+    /**
+     * parseContentRange.
+     *
+     * @return array
+     */
+    protected function parseContentRange()
+    {
+        $contentRange = $this->request->header('content-range');
+        if (empty($contentRange) === false) {
+            return sscanf($contentRange, 'bytes %d-%d/%d');
+        }
+
+        $total = $end = (int) $this->request->header('content-length');
+
+        return [0, $end, $total];
     }
 }
