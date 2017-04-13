@@ -24,7 +24,7 @@ class FileAPI extends Api
             list($start, $end, $total) = sscanf($contentRange, 'bytes %d-%d/%d');
         } else {
             $start = 0;
-            $end = $this->request->header('content-length');
+            $end = (int) $this->request->header('content-length');
             $total = $end;
         }
 
