@@ -59,7 +59,7 @@ class FileAPI extends Api
      */
     protected function getOriginalName($contentDisposition)
     {
-        $originalName = $this->request->get('name');
+        $originalName = (string) $this->request->get('name');
         if (empty($originalName) === true) {
             list($originalName) = sscanf(
                 $contentDisposition,
@@ -78,7 +78,7 @@ class FileAPI extends Api
      */
     protected function getMimeType($originalName)
     {
-        $mimeType = $this->request->header('content-type');
+        $mimeType = (string) $this->request->header('content-type');
         if (empty($mimeType) === true) {
             $mimeType = $this->filesystem->mimeType($originalName);
         }
