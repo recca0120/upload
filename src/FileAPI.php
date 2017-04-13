@@ -72,7 +72,7 @@ class FileAPI extends Api
     {
         $mimeType = (string) $this->request->header('content-type');
         if (empty($mimeType) === true) {
-            $mimeType = $this->filesystem->mimeType($originalName);
+            $mimeType = $this->files->mimeType($originalName);
         }
 
         return $mimeType;

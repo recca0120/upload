@@ -14,11 +14,11 @@ class ChunkFile
     const TMPFILE_EXTENSION = '.part';
 
     /**
-     * $filesystem.
+     * $files.
      *
      * @var \Recca0120\Upload\Filesystem
      */
-    protected $filesystem;
+    protected $files;
 
     /**
      * $token.
@@ -65,11 +65,11 @@ class ChunkFile
     /**
      * __construct.
      *
-     * @param \Recca0120\Upload\Filesystem $filesystem
+     * @param \Recca0120\Upload\Filesystem $files
      */
-    public function __construct(Filesystem $filesystem = null)
+    public function __construct(Filesystem $files = null)
     {
-        $this->filesystem = $filesystem ?: new Filesystem();
+        $this->files = $files ?: new Filesystem();
     }
 
     /**
@@ -160,8 +160,7 @@ class ChunkFile
     {
         $chunkFile = $this->chunkFile();
         $chunkFile = is_null($index) === false ? $chunkFile .= '.'.$index : $chunkFile;
-
-        $this->filesystem->appendStream($chunkFile, $source, (int) $offset);
+        $this->files->appendStream($chunkFile, $source, (int) $offset);
 
         return $this;
     }
@@ -171,25 +170,25 @@ class ChunkFile
      *
      * @return \Illuminate\Http\UploadedFile
      */
-    public function createUploadedFile($chunks = null)
+    public function createUploadedFile($chunks = null, $storageFile = null)
     {
         $chunkFile = $this->chunkFile();
-        $storageFile = $this->storageFile();
+        $storageFile = $storageFile ?: $this->storageFile();
 
         if (is_null($chunks) === false) {
             for ($i = 0; $i < $chunks; $i++) {
                 $chunk = $chunkFile.'.'.$i;
-                $this->filesystem->append(
+                $this->files->append(
                     $storageFile,
-                    $this->filesystem->get($chunk)
+                    $this->files->get($chunk)
                 );
-                $this->filesystem->delete($chunk);
+                $this->files->delete($chunk);
             }
         } else {
-            $this->filesystem->move($chunkFile, $storageFile);
+            $this->files->move($chunkFile, $storageFile);
         }
 
-        return $this->filesystem->createUploadedFile(
+        return $this->files->createUploadedFile(
             $storageFile, $this->name, $this->mimeType
         );
     }
@@ -202,7 +201,7 @@ class ChunkFile
     protected function tmpfilename()
     {
         if (is_null($this->tmpfilename) === true) {
-            $this->tmpfilename = $this->filesystem->tmpfilename($this->name, $this->token);
+            $this->tmpfilename = $this->files->tmpfilename($this->name, $this->token);
         }
 
         return $this->tmpfilename;

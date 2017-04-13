@@ -17,21 +17,21 @@ class FilesystemTest extends TestCase
 
     public function testBaseName()
     {
-        $filesystem = new Filesystem();
+        $files = new Filesystem();
         $this->assertSame(
             basename(__FILE__, PATHINFO_BASENAME),
-            $filesystem->basename($path = __FILE__)
+            $files->basename($path = __FILE__)
         );
     }
 
     public function testTmpfilename()
     {
-        $filesystem = new Filesystem();
+        $files = new Filesystem();
         $path = __FILE__;
         $hash = uniqid();
         $this->assertSame(
             md5($path.$hash).'.php',
-            $filesystem->tmpfilename($path, $hash)
+            $files->tmpfilename($path, $hash)
         );
     }
 
@@ -43,11 +43,11 @@ class FilesystemTest extends TestCase
             ->at($root);
         $output = vfsStream::newFile('output.txt')
             ->at($root);
-        $filesystem = new Filesystem();
+        $files = new Filesystem();
         $offset = 0;
         $appendContent = '';
         for ($i = 0; $i < 5; $i++) {
-            $filesystem->appendStream($output->url(), $input->url(), $offset);
+            $files->appendStream($output->url(), $input->url(), $offset);
             $appendContent .= $input->getContent();
             $offset += $input->size();
             $this->assertSame($offset, $output->size());
@@ -66,9 +66,9 @@ class FilesystemTest extends TestCase
         $input = vfsStream::newFile('input.txt')
             ->withContent(LargeFileContent::withKilobytes(10))
             ->at($root);
-        $filesystem = new Filesystem();
+        $files = new Filesystem();
         $offset = 0;
-        $filesystem->appendStream(null, $input->url(), $offset);
+        $files->appendStream(null, $input->url(), $offset);
     }
 
     /**
@@ -81,9 +81,9 @@ class FilesystemTest extends TestCase
         $root = vfsStream::setup();
         $output = vfsStream::newFile('output.txt')
             ->at($root);
-        $filesystem = new Filesystem();
+        $files = new Filesystem();
         $offset = 0;
-        $filesystem->appendStream($output->url(), null, $offset);
+        $files->appendStream($output->url(), null, $offset);
     }
 
     public function testCreateUploadedFile()
@@ -91,7 +91,7 @@ class FilesystemTest extends TestCase
         $root = vfsStream::setup();
         $file = vfsStream::newFile('file.txt')
             ->at($root);
-        $filesystem = new Filesystem();
-        $filesystem->createUploadedFile($file->url(), basename($file->url()));
+        $files = new Filesystem();
+        $files->createUploadedFile($file->url(), basename($file->url()));
     }
 }

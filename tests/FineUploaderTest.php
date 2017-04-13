@@ -20,7 +20,7 @@ class FineUploaderTest extends TestCase
         $api = new FineUploader(
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem'),
+            $files = m::mock('Recca0120\Upload\Filesystem'),
             $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
         $inputName = 'qqfile';
@@ -39,10 +39,10 @@ class FineUploaderTest extends TestCase
         $api = new FineUploader(
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem'),
+            $files = m::mock('Recca0120\Upload\Filesystem'),
             $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
-        $filesystem->shouldReceive('isDirectory')->twice()->andReturn(true);
+        $files->shouldReceive('isDirectory')->twice()->andReturn(true);
         $inputName = 'qqfile';
         $request->shouldReceive('file')->once()->with($inputName)->andReturn(null);
         $request->shouldReceive('has')->once()->with('qqtotalparts')->andReturn(true);
@@ -75,10 +75,10 @@ class FineUploaderTest extends TestCase
         $api = new FineUploader(
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem'),
+            $files = m::mock('Recca0120\Upload\Filesystem'),
             $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
-        $filesystem->shouldReceive('isDirectory')->twice()->andReturn(true);
+        $files->shouldReceive('isDirectory')->twice()->andReturn(true);
         $inputName = 'qqfile';
         $request->shouldReceive('file')->once()->with($inputName)->andReturn(
             $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')

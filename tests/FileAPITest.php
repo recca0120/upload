@@ -20,7 +20,7 @@ class FileAPITest extends TestCase
         $api = new FileAPI(
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem'),
+            $files = m::mock('Recca0120\Upload\Filesystem'),
             $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
         $request->shouldReceive('header')->once()->with('content-disposition')->andReturn('');
@@ -38,10 +38,10 @@ class FileAPITest extends TestCase
         $api = new FileAPI(
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem'),
+            $files = m::mock('Recca0120\Upload\Filesystem'),
             $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
-        $filesystem->shouldReceive('isDirectory')->twice()->andReturn(true);
+        $files->shouldReceive('isDirectory')->twice()->andReturn(true);
 
         $start = 5242880;
         $end = 7845180;
@@ -77,10 +77,10 @@ class FileAPITest extends TestCase
         $api = new FileAPI(
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem'),
+            $files = m::mock('Recca0120\Upload\Filesystem'),
             $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
-        $filesystem->shouldReceive('isDirectory')->twice()->andReturn(true);
+        $files->shouldReceive('isDirectory')->twice()->andReturn(true);
 
         $request->shouldReceive('header')->once()->with('content-range')->andReturn(null);
         $request->shouldReceive('header')->once()->with('content-length')->andReturn($total = 7845180);
@@ -112,10 +112,10 @@ class FileAPITest extends TestCase
         $api = new FileAPI(
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem'),
+            $files = m::mock('Recca0120\Upload\Filesystem'),
             $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
-        $filesystem->shouldReceive('isDirectory')->twice()->andReturn(true);
+        $files->shouldReceive('isDirectory')->twice()->andReturn(true);
 
         $start = 5242880;
         $end = 5767167;

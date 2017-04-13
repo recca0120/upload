@@ -17,11 +17,11 @@ abstract class Api implements ApiContract
     protected $request;
 
     /**
-     * $filesystem.
+     * $files.
      *
      * @var \Recca0120\Upload\Filesystem
      */
-    protected $filesystem;
+    protected $files;
 
     /**
      * $chunkFile.
@@ -42,14 +42,14 @@ abstract class Api implements ApiContract
      *
      * @param array $config
      * @param \Illuminate\Http\Request $request
-     * @param \Recca0120\Upload\Filesystem $filesystem
+     * @param \Recca0120\Upload\Filesystem $files
      * @param \Recca0120\Upload\ChunkFile $chunkFile
      */
-    public function __construct($config = [], Request $request = null, Filesystem $filesystem = null, ChunkFile $chunkFile = null)
+    public function __construct($config = [], Request $request = null, Filesystem $files = null, ChunkFile $chunkFile = null)
     {
         $this->request = $request ?: Request::capture();
-        $this->filesystem = $filesystem ?: new Filesystem();
-        $this->chunkFile = $chunkFile ?: new ChunkFile($this->filesystem);
+        $this->files = $files ?: new Filesystem();
+        $this->chunkFile = $chunkFile ?: new ChunkFile($this->files);
         $this->config = array_merge([
             'chunks' => sys_get_temp_dir().'/chunks',
             'storage' => 'storage/temp',
@@ -85,8 +85,8 @@ abstract class Api implements ApiContract
      */
     public function makeDirectory($path)
     {
-        if ($this->filesystem->isDirectory($path) === false) {
-            $this->filesystem->makeDirectory($path, 0777, true, true);
+        if ($this->files->isDirectory($path) === false) {
+            $this->files->makeDirectory($path, 0777, true, true);
         }
 
         return $this;
@@ -99,12 +99,12 @@ abstract class Api implements ApiContract
     {
         $time = time();
         $maxFileAge = 3600;
-        $files = (array) $this->filesystem->files($path);
+        $files = (array) $this->files->files($path);
         foreach ($files as $file) {
-            if ($this->filesystem->isFile($file) === true &&
-                $this->filesystem->lastModified($file) < ($time - $maxFileAge)
+            if ($this->files->isFile($file) === true &&
+                $this->files->lastModified($file) < ($time - $maxFileAge)
             ) {
-                $this->filesystem->delete($file);
+                $this->files->delete($file);
             }
         }
     }
@@ -128,8 +128,8 @@ abstract class Api implements ApiContract
     public function deleteUploadedFile(UploadedFile $uploadedFile)
     {
         $file = $uploadedFile->getPathname();
-        if ($this->filesystem->isFile($file) === true) {
-            $this->filesystem->delete($file);
+        if ($this->files->isFile($file) === true) {
+            $this->files->delete($file);
         }
         $this->cleanDirectory($this->config['chunks']);
 

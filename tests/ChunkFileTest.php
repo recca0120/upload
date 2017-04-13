@@ -17,7 +17,7 @@ class ChunkFileTest extends TestCase
     public function testAppendStream()
     {
         $chunkFile = new ChunkFile(
-            $filesystem = m::mock('Recca0120\Upload\Filesystem')
+            $files = m::mock('Recca0120\Upload\Filesystem')
         );
 
         $chunkFile
@@ -27,10 +27,10 @@ class ChunkFileTest extends TestCase
 
         $source = 'php://input';
         $offset = 0;
-        $filesystem->shouldReceive('tmpfilename')->once()->with($name, $token)->andReturn(
+        $files->shouldReceive('tmpfilename')->once()->with($name, $token)->andReturn(
             $tmpfilename = 'foo.php'
         );
-        $filesystem->shouldReceive('appendStream')->once()->with($chunkPath.$tmpfilename.'.part', $source, $offset);
+        $files->shouldReceive('appendStream')->once()->with($chunkPath.$tmpfilename.'.part', $source, $offset);
 
         $chunkFile->appendStream($source, $offset);
     }
@@ -38,7 +38,7 @@ class ChunkFileTest extends TestCase
     public function testCreateUploadedFile()
     {
         $chunkFile = new ChunkFile(
-            $filesystem = m::mock('Recca0120\Upload\Filesystem')
+            $files = m::mock('Recca0120\Upload\Filesystem')
         );
 
         $chunkFile
@@ -51,11 +51,11 @@ class ChunkFileTest extends TestCase
         $source = 'php://input';
         $offset = 0;
 
-        $filesystem->shouldReceive('tmpfilename')->once()->with($name, $token)->andReturn(
+        $files->shouldReceive('tmpfilename')->once()->with($name, $token)->andReturn(
             $tmpfilename = 'foo.php'
         );
-        $filesystem->shouldReceive('move')->once()->with($chunkPath.$tmpfilename.'.part', $storagePath.$tmpfilename);
-        $filesystem->shouldReceive('createUploadedFile')->once()->with(
+        $files->shouldReceive('move')->once()->with($chunkPath.$tmpfilename.'.part', $storagePath.$tmpfilename);
+        $files->shouldReceive('createUploadedFile')->once()->with(
             $storagePath.$tmpfilename, $name, $mimeType
         );
 
@@ -65,7 +65,7 @@ class ChunkFileTest extends TestCase
     public function testThrowException()
     {
         $chunkFile = new ChunkFile(
-            $filesystem = m::mock('Recca0120\Upload\Filesystem')
+            $files = m::mock('Recca0120\Upload\Filesystem')
         );
 
         try {

@@ -20,7 +20,7 @@ class PluploadTest extends TestCase
         $api = new Plupload(
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem'),
+            $files = m::mock('Recca0120\Upload\Filesystem'),
             $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
         $inputName = 'foo';
@@ -38,10 +38,10 @@ class PluploadTest extends TestCase
         $api = new Plupload(
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem'),
+            $files = m::mock('Recca0120\Upload\Filesystem'),
             $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
-        $filesystem->shouldReceive('isDirectory')->twice()->andReturn(true);
+        $files->shouldReceive('isDirectory')->twice()->andReturn(true);
 
         $inputName = 'foo';
         $request->shouldReceive('file')->once()->with($inputName)->andReturn(
@@ -75,10 +75,10 @@ class PluploadTest extends TestCase
         $api = new Plupload(
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem'),
+            $files = m::mock('Recca0120\Upload\Filesystem'),
             $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
-        $filesystem->shouldReceive('isDirectory')->twice()->andReturn(true);
+        $files->shouldReceive('isDirectory')->twice()->andReturn(true);
 
         $inputName = 'foo';
         $request->shouldReceive('file')->once()->with($inputName)->andReturn(
@@ -109,7 +109,7 @@ class PluploadTest extends TestCase
         $api = new Plupload(
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem'),
+            $files = m::mock('Recca0120\Upload\Filesystem'),
             $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
         $response = m::mock('Illuminate\Http\JsonResponse');

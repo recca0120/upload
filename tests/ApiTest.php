@@ -20,7 +20,7 @@ class ApiTest extends TestCase
         $api = new Api(
             $config = ['domain' => $domain = 'foo/'],
             $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem')
+            $files = m::mock('Recca0120\Upload\Filesystem')
         );
         $this->assertSame($domain, $api->domain());
     }
@@ -32,7 +32,7 @@ class ApiTest extends TestCase
         $api = new Api(
             $config = ['path' => $path = 'foo/'],
             $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem')
+            $files = m::mock('Recca0120\Upload\Filesystem')
         );
         $this->assertSame($path, $api->path());
     }
@@ -44,11 +44,11 @@ class ApiTest extends TestCase
         $api = new Api(
             $config = ['chunks' => $chunksPath = 'foo/'],
             $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem')
+            $files = m::mock('Recca0120\Upload\Filesystem')
         );
         $path = __DIR__;
-        $filesystem->shouldReceive('isDirectory')->once()->with($path)->andReturn(false);
-        $filesystem->shouldReceive('makeDirectory')->once()->with($path, 0777, true, true)->andReturn(false);
+        $files->shouldReceive('isDirectory')->once()->with($path)->andReturn(false);
+        $files->shouldReceive('makeDirectory')->once()->with($path, 0777, true, true)->andReturn(false);
         $api->makeDirectory($path);
     }
 
@@ -59,13 +59,13 @@ class ApiTest extends TestCase
         $api = new Api(
             $config = ['chunks' => $chunksPath = 'foo/'],
             $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem')
+            $files = m::mock('Recca0120\Upload\Filesystem')
         );
         $path = __DIR__;
-        $filesystem->shouldReceive('files')->once()->with($path)->andReturn([$file = __FILE__]);
-        $filesystem->shouldReceive('isFile')->once()->with($file)->andReturn(true);
-        $filesystem->shouldReceive('lastModified')->once()->with($file)->andReturn(time() - 86400);
-        $filesystem->shouldReceive('delete')->once()->with($file);
+        $files->shouldReceive('files')->once()->with($path)->andReturn([$file = __FILE__]);
+        $files->shouldReceive('isFile')->once()->with($file)->andReturn(true);
+        $files->shouldReceive('lastModified')->once()->with($file)->andReturn(time() - 86400);
+        $files->shouldReceive('delete')->once()->with($file);
         $api->cleanDirectory($path);
     }
 
@@ -76,13 +76,13 @@ class ApiTest extends TestCase
         $api = new Api(
             $config = ['chunks' => $chunksPath = 'foo/'],
             $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem')
+            $files = m::mock('Recca0120\Upload\Filesystem')
         );
         $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile');
         $uploadedFile->shouldReceive('getPathname')->once()->andReturn($file = __FILE__);
-        $filesystem->shouldReceive('isFile')->once()->with($file)->andReturn(true);
-        $filesystem->shouldReceive('delete')->once()->with($file);
-        $filesystem->shouldReceive('files')->once()->andReturn([]);
+        $files->shouldReceive('isFile')->once()->with($file)->andReturn(true);
+        $files->shouldReceive('delete')->once()->with($file);
+        $files->shouldReceive('files')->once()->andReturn([]);
         $api->deleteUploadedFile($uploadedFile);
     }
 
@@ -93,7 +93,7 @@ class ApiTest extends TestCase
         $api = new Api(
             $config = ['chunks' => $chunksPath = 'foo/'],
             $request,
-            $filesystem = m::mock('Recca0120\Upload\Filesystem')
+            $files = m::mock('Recca0120\Upload\Filesystem')
         );
         $api->completedResponse(
             $respomse = m::mock('Illuminate\Http\JsonResponse')

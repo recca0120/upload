@@ -10,29 +10,29 @@ class UploadManager extends Manager
     /**
      * $request.
      *
-     * @var [type]
+     * @var \Illuminate\Http\Request
      */
     protected $request;
 
     /**
-     * $filesystem.
+     * $files.
      *
-     * @var [type]
+     * @var \Recca0120\Upload\Filesystem
      */
-    protected $filesystem;
+    protected $files;
 
     /**
      * __construct.
      *
      * @param \Illuminate\Contracts\Foundation\Application $app
      * @param \Illuminate\Http\Request $request
-     * @param Filesystem $filesystem
+     * @param \Recca0120\Upload\Filesystem $files
      */
-    public function __construct($app, Request $request = null, Filesystem $filesystem = null)
+    public function __construct($app, Request $request = null, Filesystem $files = null)
     {
         parent::__construct($app);
         $this->request = $request ?: Request::capture();
-        $this->filesystem = $filesystem ?: new Filesystem();
+        $this->files = $files ?: new Filesystem();
     }
 
     /**
@@ -52,7 +52,7 @@ class UploadManager extends Manager
      */
     protected function createFileapiDriver()
     {
-        return new Receiver(new FileAPI($this->app['config']['upload'], $this->request, $this->filesystem));
+        return new Receiver(new FileAPI($this->app['config']['upload'], $this->request, $this->files));
     }
 
     /**
@@ -62,7 +62,7 @@ class UploadManager extends Manager
      */
     protected function createPluploadDriver()
     {
-        return new Receiver(new Plupload($this->app['config']['upload'], $this->request, $this->filesystem));
+        return new Receiver(new Plupload($this->app['config']['upload'], $this->request, $this->files));
     }
 
     /**
@@ -72,6 +72,6 @@ class UploadManager extends Manager
      */
     protected function createFineUploaderDriver()
     {
-        return new Receiver(new FineUploader($this->app['config']['upload'], $this->request, $this->filesystem));
+        return new Receiver(new FineUploader($this->app['config']['upload'], $this->request, $this->files));
     }
 }
