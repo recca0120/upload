@@ -4,12 +4,25 @@ namespace Recca0120\Upload\Tests;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Container\Container;
 use Recca0120\Upload\UploadServiceProvider;
 
 class UploadServiceProviderTest extends TestCase
 {
+    protected function setUp()
+    {
+        parent::setUp();
+        if (class_exists(Container::class)) {
+            $container = Container::getInstance();
+            $container->instance('path.storage', __DIR__);
+            $container->instance('path.public', __DIR__);
+            $container->instance('path.config', __DIR__);
+        }
+    }
+
     protected function tearDown()
     {
+        parent::tearDown();
         m::close();
     }
 
@@ -37,7 +50,7 @@ class UploadServiceProviderTest extends TestCase
                 )->andReturn(
                     m::mock('Recca0120\Upload\Filesystem')
                 );
-                $closure($app);
+                $this->assertInstanceOf('Recca0120\Upload\UploadManager', $closure($app));
 
                 return true;
             })
@@ -51,7 +64,7 @@ class UploadServiceProviderTest extends TestCase
             $app = m::mock('Illuminate\Contracts\Foundation\Application, ArrayAccess')
         );
         $app->shouldReceive('runningInConsole')->once()->andReturn(true);
-        $app->shouldReceive('configPath')->once();
         $serviceProvider->boot();
+        $this->assertAttributeNotEmpty('publishes', $serviceProvider);
     }
 }

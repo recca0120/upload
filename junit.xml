@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Package Test Suite" tests="35" assertions="37" errors="16" failures="0" skipped="0" time="0.190206">
+    <testsuite name="Recca0120\Upload\Tests\ApiTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\ApiTest.php" tests="6" assertions="2" errors="4" failures="0" skipped="0" time="0.109538">
+      <testcase name="testDomain" class="Recca0120\Upload\Tests\ApiTest" classname="Recca0120.Upload.Tests.ApiTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\ApiTest.php" line="16" assertions="1" time="0.087304"/>
+      <testcase name="testPath" class="Recca0120\Upload\Tests\ApiTest" classname="Recca0120.Upload.Tests.ApiTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\ApiTest.php" line="28" assertions="1" time="0.000310"/>
+      <testcase name="testMakeDirectory" class="Recca0120\Upload\Tests\ApiTest" classname="Recca0120.Upload.Tests.ApiTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\ApiTest.php" line="40" assertions="0" time="0.000615">
+        <error type="PHPUnit\Framework\RiskyTestError">Risky Test
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:209
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:140
+</error>
+      </testcase>
+      <testcase name="testCleanDirectory" class="Recca0120\Upload\Tests\ApiTest" classname="Recca0120.Upload.Tests.ApiTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\ApiTest.php" line="55" assertions="0" time="0.000552">
+        <error type="PHPUnit\Framework\RiskyTestError">Risky Test
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:209
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:140
+</error>
+      </testcase>
+      <testcase name="testDeleteUploadedFile" class="Recca0120\Upload\Tests\ApiTest" classname="Recca0120.Upload.Tests.ApiTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\ApiTest.php" line="72" assertions="0" time="0.006349">
+        <error type="PHPUnit\Framework\RiskyTestError">Risky Test
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:209
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:140
+</error>
+      </testcase>
+      <testcase name="testCompletedResponse" class="Recca0120\Upload\Tests\ApiTest" classname="Recca0120.Upload.Tests.ApiTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\ApiTest.php" line="89" assertions="0" time="0.014408">
+        <error type="PHPUnit\Framework\RiskyTestError">Risky Test
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:209
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:140
+</error>
+      </testcase>
+    </testsuite>
+    <testsuite name="Recca0120\Upload\Tests\ChunkFileTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\ChunkFileTest.php" tests="3" assertions="3" errors="2" failures="0" skipped="0" time="0.004348">
+      <testcase name="testAppendStream" class="Recca0120\Upload\Tests\ChunkFileTest" classname="Recca0120.Upload.Tests.ChunkFileTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\ChunkFileTest.php" line="17" assertions="0" time="0.000453">
+        <error type="PHPUnit\Framework\RiskyTestError">Risky Test
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:209
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:140
+</error>
+      </testcase>
+      <testcase name="testCreateUploadedFile" class="Recca0120\Upload\Tests\ChunkFileTest" classname="Recca0120.Upload.Tests.ChunkFileTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\ChunkFileTest.php" line="38" assertions="0" time="0.000535">
+        <error type="PHPUnit\Framework\RiskyTestError">Risky Test
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:209
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:140
+</error>
+      </testcase>
+      <testcase name="testThrowException" class="Recca0120\Upload\Tests\ChunkFileTest" classname="Recca0120.Upload.Tests.ChunkFileTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\ChunkFileTest.php" line="65" assertions="3" time="0.003360"/>
+    </testsuite>
+    <testsuite name="Recca0120\Upload\Tests\FileAPITest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\FileAPITest.php" tests="4" assertions="1" errors="3" failures="0" skipped="0" time="0.011025">
+      <testcase name="testReceiveSingleFile" class="Recca0120\Upload\Tests\FileAPITest" classname="Recca0120.Upload.Tests.FileAPITest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\FileAPITest.php" line="16" assertions="1" time="0.004617"/>
+      <testcase name="testReceiveChunkedFile" class="Recca0120\Upload\Tests\FileAPITest" classname="Recca0120.Upload.Tests.FileAPITest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\FileAPITest.php" line="34" assertions="0" time="0.002244">
+        <error type="PHPUnit\Framework\RiskyTestError">Risky Test
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:209
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:140
+</error>
+      </testcase>
+      <testcase name="testReceiveChunkedFileWithoutContentRange" class="Recca0120\Upload\Tests\FileAPITest" classname="Recca0120.Upload.Tests.FileAPITest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\FileAPITest.php" line="73" assertions="0" time="0.002189">
+        <error type="PHPUnit\Framework\RiskyTestError">Risky Test
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:209
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:140
+</error>
+      </testcase>
+      <testcase name="testReceiveChunkedFileAndThrowChunkedResponseException" class="Recca0120\Upload\Tests\FileAPITest" classname="Recca0120.Upload.Tests.FileAPITest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\FileAPITest.php" line="108" assertions="0" time="0.001975">
+        <error type="PHPUnit\Framework\RiskyTestError">Risky Test
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:209
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:140
+</error>
+      </testcase>
+    </testsuite>
+    <testsuite name="Recca0120\Upload\Tests\FilesystemTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\FilesystemTest.php" tests="6" assertions="18" errors="1" failures="0" skipped="0" time="0.034627">
+      <testcase name="testBaseName" class="Recca0120\Upload\Tests\FilesystemTest" classname="Recca0120.Upload.Tests.FilesystemTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\FilesystemTest.php" line="18" assertions="1" time="0.000155"/>
+      <testcase name="testTmpfilename" class="Recca0120\Upload\Tests\FilesystemTest" classname="Recca0120.Upload.Tests.FilesystemTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\FilesystemTest.php" line="27" assertions="1" time="0.000092"/>
+      <testcase name="testAppendStream" class="Recca0120\Upload\Tests\FilesystemTest" classname="Recca0120.Upload.Tests.FilesystemTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\FilesystemTest.php" line="38" assertions="10" time="0.030514"/>
+      <testcase name="testOutputIsNotResource" class="Recca0120\Upload\Tests\FilesystemTest" classname="Recca0120.Upload.Tests.FilesystemTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\FilesystemTest.php" line="63" assertions="3" time="0.001808"/>
+      <testcase name="testInputIsNotResource" class="Recca0120\Upload\Tests\FilesystemTest" classname="Recca0120.Upload.Tests.FilesystemTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\FilesystemTest.php" line="79" assertions="3" time="0.000282"/>
+      <testcase name="testCreateUploadedFile" class="Recca0120\Upload\Tests\FilesystemTest" classname="Recca0120.Upload.Tests.FilesystemTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\FilesystemTest.php" line="89" assertions="0" time="0.001776">
+        <error type="PHPUnit\Framework\RiskyTestError">Risky Test
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:209
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:140
+</error>
+      </testcase>
+    </testsuite>
+    <testsuite name="Recca0120\Upload\Tests\FineUploaderTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\FineUploaderTest.php" tests="3" assertions="1" errors="2" failures="0" skipped="0" time="0.004695">
+      <testcase name="testReceiveSingleFile" class="Recca0120\Upload\Tests\FineUploaderTest" classname="Recca0120.Upload.Tests.FineUploaderTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\FineUploaderTest.php" line="16" assertions="1" time="0.001521"/>
+      <testcase name="testReceiveChunkedFile" class="Recca0120\Upload\Tests\FineUploaderTest" classname="Recca0120.Upload.Tests.FineUploaderTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\FineUploaderTest.php" line="35" assertions="0" time="0.001743">
+        <error type="PHPUnit\Framework\RiskyTestError">Risky Test
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:209
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:140
+</error>
+      </testcase>
+      <testcase name="testReceiveChunkedFileWithParts" class="Recca0120\Upload\Tests\FineUploaderTest" classname="Recca0120.Upload.Tests.FineUploaderTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\FineUploaderTest.php" line="71" assertions="0" time="0.001431">
+        <error type="PHPUnit\Framework\RiskyTestError">Risky Test
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:209
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:140
+</error>
+      </testcase>
+    </testsuite>
+    <testsuite name="Recca0120\Upload\Tests\PluploadTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\PluploadTest.php" tests="4" assertions="2" errors="2" failures="0" skipped="0" time="0.006254">
+      <testcase name="testReceiveUploadSingleFile" class="Recca0120\Upload\Tests\PluploadTest" classname="Recca0120.Upload.Tests.PluploadTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\PluploadTest.php" line="16" assertions="1" time="0.001257"/>
+      <testcase name="testReceiveChunkedFile" class="Recca0120\Upload\Tests\PluploadTest" classname="Recca0120.Upload.Tests.PluploadTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\PluploadTest.php" line="34" assertions="0" time="0.001333">
+        <error type="PHPUnit\Framework\RiskyTestError">Risky Test
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:209
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:140
+</error>
+      </testcase>
+      <testcase name="testReceiveChunkedFileAndThrowChunkedResponseException" class="Recca0120\Upload\Tests\PluploadTest" classname="Recca0120.Upload.Tests.PluploadTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\PluploadTest.php" line="71" assertions="0" time="0.002411">
+        <error type="PHPUnit\Framework\RiskyTestError">Risky Test
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:209
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:140
+</error>
+      </testcase>
+      <testcase name="testCompletedResponse" class="Recca0120\Upload\Tests\PluploadTest" classname="Recca0120.Upload.Tests.PluploadTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\PluploadTest.php" line="105" assertions="1" time="0.001253"/>
+    </testsuite>
+    <testsuite name="Recca0120\Upload\Tests\ReceiverTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\ReceiverTest.php" tests="4" assertions="7" errors="0" failures="0" skipped="0" time="0.016349">
+      <testcase name="testReceive" class="Recca0120\Upload\Tests\ReceiverTest" classname="Recca0120.Upload.Tests.ReceiverTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\ReceiverTest.php" line="18" assertions="1" time="0.007920"/>
+      <testcase name="testReceiveCustomCallback" class="Recca0120\Upload\Tests\ReceiverTest" classname="Recca0120.Upload.Tests.ReceiverTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\ReceiverTest.php" line="64" assertions="1" time="0.000715"/>
+      <testcase name="testReceiveAndThroChunkedResponseException" class="Recca0120\Upload\Tests\ReceiverTest" classname="Recca0120.Upload.Tests.ReceiverTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\ReceiverTest.php" line="87" assertions="1" time="0.001053"/>
+      <testcase name="testFactory" class="Recca0120\Upload\Tests\ReceiverTest" classname="Recca0120.Upload.Tests.ReceiverTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\ReceiverTest.php" line="104" assertions="4" time="0.006661"/>
+    </testsuite>
+    <testsuite name="Recca0120\Upload\Tests\UploadManagerTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\UploadManagerTest.php" tests="3" assertions="3" errors="0" failures="0" skipped="0" time="0.002496">
+      <testcase name="testCreateDefaultDriver" class="Recca0120\Upload\Tests\UploadManagerTest" classname="Recca0120.Upload.Tests.UploadManagerTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\UploadManagerTest.php" line="16" assertions="1" time="0.001855"/>
+      <testcase name="testCreatePluploadDriver" class="Recca0120\Upload\Tests\UploadManagerTest" classname="Recca0120.Upload.Tests.UploadManagerTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\UploadManagerTest.php" line="31" assertions="1" time="0.000267"/>
+      <testcase name="testCreateFineUploaderDriver" class="Recca0120\Upload\Tests\UploadManagerTest" classname="Recca0120.Upload.Tests.UploadManagerTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\UploadManagerTest.php" line="46" assertions="1" time="0.000374"/>
+    </testsuite>
+    <testsuite name="Recca0120\Upload\Tests\UploadServiceProviderTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\UploadServiceProviderTest.php" tests="2" assertions="0" errors="2" failures="0" skipped="0" time="0.000874">
+      <testcase name="testRegister" class="Recca0120\Upload\Tests\UploadServiceProviderTest" classname="Recca0120.Upload.Tests.UploadServiceProviderTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\UploadServiceProviderTest.php" line="27" assertions="0" time="0.000718">
+        <error type="Error">Recca0120\Upload\Tests\UploadServiceProviderTest::testRegister
+Error: Class 'Illuminate\Container\Container' not found
+
+C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\UploadServiceProviderTest.php:15
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:209
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:140
+</error>
+      </testcase>
+      <testcase name="testBoot" class="Recca0120\Upload\Tests\UploadServiceProviderTest" classname="Recca0120.Upload.Tests.UploadServiceProviderTest" file="C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\UploadServiceProviderTest.php" line="59" assertions="0" time="0.000156">
+        <error type="Error">Recca0120\Upload\Tests\UploadServiceProviderTest::testBoot
+Error: Class 'Illuminate\Container\Container' not found
+
+C:\Users\recca\UniServerZ\www\enie\laravel\vendor\recca0120\upload\tests\UploadServiceProviderTest.php:15
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:209
+C:\ProgramData\ComposerSetup\vendor\phpunit\phpunit\src\TextUI\Command.php:140
+</error>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

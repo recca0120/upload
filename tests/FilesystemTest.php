@@ -12,6 +12,7 @@ class FilesystemTest extends TestCase
 {
     protected function tearDown()
     {
+        parent::tearDown();
         m::close();
     }
 
@@ -92,6 +93,9 @@ class FilesystemTest extends TestCase
         $file = vfsStream::newFile('file.txt')
             ->at($root);
         $files = new Filesystem();
-        $files->createUploadedFile($file->url(), basename($file->url()));
+        $this->assertInstanceOf(
+            'Symfony\Component\HttpFoundation\File\UploadedFile',
+            $files->createUploadedFile($file->url(), basename($file->url()))
+        );
     }
 }

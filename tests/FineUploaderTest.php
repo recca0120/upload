@@ -10,6 +10,7 @@ class FineUploaderTest extends TestCase
 {
     protected function tearDown()
     {
+        parent::tearDown();
         m::close();
     }
 
@@ -63,9 +64,11 @@ class FineUploaderTest extends TestCase
         $chunkFile->shouldReceive('setChunkPath')->once()->with($chunksPath)->andReturnSelf();
         $chunkFile->shouldReceive('setStoragePath')->once()->with($storagePath)->andReturnSelf();
         $chunkFile->shouldReceive('setName')->once()->with($originalName)->andReturnSelf();
-        $chunkFile->shouldReceive('createUploadedFile')->once()->with($qqtotalparts);
+        $chunkFile->shouldReceive('createUploadedFile')->once()->with($qqtotalparts)->andReturn(
+            $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
+        );
 
-        $api->receive($inputName);
+        $this->assertSame($uploadedFile, $api->receive($inputName));
     }
 
     public function testReceiveChunkedFileWithParts()
@@ -108,8 +111,10 @@ class FineUploaderTest extends TestCase
         $chunkFile->shouldReceive('throwException')->once()->with([
             'success' => true,
             'uuid' => $qquuid,
-        ]);
+        ])->andReturn(
+            $exception = m::mock('stdClass')
+        );
 
-        $api->receive($inputName);
+        $this->assertSame($exception, $api->receive($inputName));
     }
 }

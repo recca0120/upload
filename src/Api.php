@@ -94,6 +94,9 @@ abstract class Api implements ApiContract
 
     /**
      * cleanDirectory.
+     *
+     * @param string $path
+     * @return $this
      */
     public function cleanDirectory($path)
     {
@@ -107,6 +110,8 @@ abstract class Api implements ApiContract
                 $this->files->delete($file);
             }
         }
+
+        return $this;
     }
 
     /**

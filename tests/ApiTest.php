@@ -10,6 +10,7 @@ class ApiTest extends TestCase
 {
     protected function tearDown()
     {
+        parent::tearDown();
         m::close();
     }
 
@@ -49,7 +50,7 @@ class ApiTest extends TestCase
         $path = __DIR__;
         $files->shouldReceive('isDirectory')->once()->with($path)->andReturn(false);
         $files->shouldReceive('makeDirectory')->once()->with($path, 0777, true, true)->andReturn(false);
-        $api->makeDirectory($path);
+        $this->assertSame($api, $api->makeDirectory($path));
     }
 
     public function testCleanDirectory()
@@ -66,7 +67,7 @@ class ApiTest extends TestCase
         $files->shouldReceive('isFile')->once()->with($file)->andReturn(true);
         $files->shouldReceive('lastModified')->once()->with($file)->andReturn(time() - 86400);
         $files->shouldReceive('delete')->once()->with($file);
-        $api->cleanDirectory($path);
+        $this->assertSame($api, $api->cleanDirectory($path));
     }
 
     public function testDeleteUploadedFile()
@@ -83,7 +84,7 @@ class ApiTest extends TestCase
         $files->shouldReceive('isFile')->once()->with($file)->andReturn(true);
         $files->shouldReceive('delete')->once()->with($file);
         $files->shouldReceive('files')->once()->andReturn([]);
-        $api->deleteUploadedFile($uploadedFile);
+        $this->assertSame($api, $api->deleteUploadedFile($uploadedFile));
     }
 
     public function testCompletedResponse()
@@ -95,9 +96,10 @@ class ApiTest extends TestCase
             $request,
             $files = m::mock('Recca0120\Upload\Filesystem')
         );
-        $api->completedResponse(
-            $respomse = m::mock('Illuminate\Http\JsonResponse')
-        );
+
+        $response = m::mock('Illuminate\Http\JsonResponse');
+
+        $this->assertSame($response, $api->completedResponse($response));
     }
 }
 

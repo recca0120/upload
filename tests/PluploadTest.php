@@ -10,6 +10,7 @@ class PluploadTest extends TestCase
 {
     protected function tearDown()
     {
+        parent::tearDown();
         m::close();
     }
 
@@ -65,7 +66,7 @@ class PluploadTest extends TestCase
             $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
         );
 
-        $api->receive($inputName);
+        $this->assertSame($uploadedFile, $api->receive($inputName));
     }
 
     public function testReceiveChunkedFileAndThrowChunkedResponseException()
@@ -98,8 +99,11 @@ class PluploadTest extends TestCase
         $chunkFile->shouldReceive('setName')->once()->with($originalName)->andReturnSelf();
         $chunkFile->shouldReceive('setMimeType')->once()->with($mimeType)->andReturnSelf();
         $chunkFile->shouldReceive('appendStream')->once()->with($pathname, $chunk * $contentLength)->andReturnSelf();
-        $chunkFile->shouldReceive('throwException')->once();
-        $api->receive($inputName);
+        $chunkFile->shouldReceive('throwException')->once()->andReturn(
+            $exception = m::mock('stdClass')
+        );
+
+        $this->assertSame($exception, $api->receive($inputName));
     }
 
     public function testCompletedResponse()

@@ -10,6 +10,7 @@ class FileAPITest extends TestCase
 {
     protected function tearDown()
     {
+        parent::tearDown();
         m::close();
     }
 
@@ -67,7 +68,7 @@ class FileAPITest extends TestCase
             $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
         );
 
-        $api->receive($inputName = 'foo');
+        $this->assertSame($uploadedFile, $api->receive($inputName = 'foo'));
     }
 
     public function testReceiveChunkedFileWithoutContentRange()
@@ -102,7 +103,7 @@ class FileAPITest extends TestCase
             $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
         );
 
-        $api->receive($inputName = 'foo');
+        $this->assertSame($uploadedFile, $api->receive($inputName = 'foo'));
     }
 
     public function testReceiveChunkedFileAndThrowChunkedResponseException()
@@ -144,8 +145,10 @@ class FileAPITest extends TestCase
                 'size' => $end,
                 'type' => $mimeType,
             ],
-        ], ['X-Last-Known-Byte' => $end]);
+        ], ['X-Last-Known-Byte' => $end])->andReturn(
+            $exception = m::mock('stdClass')
+        );
 
-        $api->receive($inputName = 'foo');
+        $this->assertSame($exception, $api->receive($inputName = 'foo'));
     }
 }

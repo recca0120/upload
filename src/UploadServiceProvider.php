@@ -35,7 +35,7 @@ class UploadServiceProvider extends ServiceProvider
     protected function handlePublishes()
     {
         $this->publishes([
-            __DIR__.'/../config/upload.php' => $this->app->configPath().'/upload.php',
+            __DIR__.'/../config/upload.php' => config_path('upload.php'),
         ], 'config');
     }
 }

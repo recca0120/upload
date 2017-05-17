@@ -2,6 +2,7 @@
 
 namespace Recca0120\Upload\Tests;
 
+use Exception;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Recca0120\Upload\ChunkFile;
@@ -11,6 +12,7 @@ class ChunkFileTest extends TestCase
 {
     protected function tearDown()
     {
+        parent::tearDown();
         m::close();
     }
 
@@ -20,8 +22,7 @@ class ChunkFileTest extends TestCase
             $files = m::mock('Recca0120\Upload\Filesystem')
         );
 
-        $chunkFile
-            ->setToken($token = uniqid())
+        $chunkFile->setToken($token = uniqid())
             ->setName($name = __FILE__)
             ->setChunkPath($chunkPath = 'chunk/');
 
@@ -32,7 +33,11 @@ class ChunkFileTest extends TestCase
         );
         $files->shouldReceive('appendStream')->once()->with($chunkPath.$tmpfilename.'.part', $source, $offset);
 
-        $chunkFile->appendStream($source, $offset);
+        try {
+            $chunkFile->appendStream($source, $offset)->throwException();
+        } catch (Exception $e) {
+            $this->assertInstanceOf('Recca0120\Upload\Exceptions\ChunkedResponseException', $e);
+        }
     }
 
     public function testCreateUploadedFile()
@@ -57,9 +62,11 @@ class ChunkFileTest extends TestCase
         $files->shouldReceive('move')->once()->with($chunkPath.$tmpfilename.'.part', $storagePath.$tmpfilename);
         $files->shouldReceive('createUploadedFile')->once()->with(
             $storagePath.$tmpfilename, $name, $mimeType
+        )->andReturn(
+            $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
         );
 
-        $chunkFile->createUploadedFile();
+        $this->assertSame($uploadedFile, $chunkFile->createUploadedFile());
     }
 
     public function testThrowException()
