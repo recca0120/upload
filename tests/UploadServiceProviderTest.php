@@ -13,10 +13,11 @@ class UploadServiceProviderTest extends TestCase
     {
         parent::setUp();
         if (class_exists(Container::class)) {
-            $container = Container::getInstance();
+            $container = new Container;
             $container->instance('path.storage', __DIR__);
             $container->instance('path.public', __DIR__);
             $container->instance('path.config', __DIR__);
+            Container::setInstance($container);
         }
     }
 
