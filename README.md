@@ -73,7 +73,7 @@ class UploadController extends Controller
 
         return $manager
             ->driver($driver)
-            ->receive($inputName, function (UploadedFile $uploadedFile, $path, $root, $url, $api) {
+            ->receive($inputName, function (UploadedFile $uploadedFile, $path, $domain, $api) {
                 // do something
 
             });
