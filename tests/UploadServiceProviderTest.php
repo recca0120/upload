@@ -66,6 +66,10 @@ class UploadServiceProviderTest extends TestCase
         );
         $app->shouldReceive('runningInConsole')->once()->andReturn(true);
         $serviceProvider->boot();
-        $this->assertAttributeNotEmpty('publishes', $serviceProvider);
+        if (method_exists('Recca0120\Upload\UploadServiceProvider', 'publishableProviders') === true) {
+            $this->assertNotEmpty(UploadServiceProvider::publishableProviders());
+        } else {
+            $this->assertAttributeNotEmpty('publishes', $serviceProvider);
+        }
     }
 }
