@@ -60,6 +60,7 @@ artisan vendor:publish --provider="Recca0120\Upload\UploadServiceProvider"
 Controller
 ```php
 
+use Illuminate\Http\JsonResponse;
 use Recca0120\Upload\UploadManager;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -69,12 +70,28 @@ class UploadController extends Controller
     {
         $driver = 'plupload'; // or 'fileapi'
         $inputName = 'file'; // $_FILES index;
-        $storagePath = 'storage/temp';
 
+        return $manager->driver($driver)->receive($inputName);
+        // or
         return $manager
             ->driver($driver)
             ->receive($inputName, function (UploadedFile $uploadedFile, $path, $domain, $api) {
-                // do something
+                $clientOriginalName = $uploadedFile->getClientOriginalName();
+                $clientOriginalExtension = strtolower($uploadedFile->getClientOriginalExtension());
+                $basename = pathinfo($uploadedFile->getBasename(), PATHINFO_FILENAME);
+                $filename = md5($basename).'.'.$clientOriginalExtension;
+                $mimeType = $uploadedFile->getMimeType();
+                $size = $uploadedFile->getSize();
+                $uploadedFile->move($path, $filename);
+                $response = [
+                    'name' => pathinfo($clientOriginalName, PATHINFO_FILENAME).'.'.$clientOriginalExtension,
+                    'tmp_name' => $path.$filename,
+                    'type' => $mimeType,
+                    'size' => $size,
+                    'url' => $domain.$path.$filename,
+                ];
+
+                return new JsonResponse($response);
 
             });
     }
@@ -85,6 +102,7 @@ class UploadController extends Controller
 
 ```php
 use Recca0120\Upload\Receiver;
+use Illuminate\Http\JsonResponse;
 
 require __DIR__.'/vendor/autoload.php';
 
@@ -101,8 +119,22 @@ $api = 'fileapi'; // or plupload
 
 Receiver::factory($config, $api)
     ->receive($inputName, function (UploadedFile $uploadedFile, $path, $domain, $api) {
-        // do something
+        $clientOriginalName = $uploadedFile->getClientOriginalName();
+        $clientOriginalExtension = strtolower($uploadedFile->getClientOriginalExtension());
+        $basename = pathinfo($uploadedFile->getBasename(), PATHINFO_FILENAME);
+        $filename = md5($basename).'.'.$clientOriginalExtension;
+        $mimeType = $uploadedFile->getMimeType();
+        $size = $uploadedFile->getSize();
+        $uploadedFile->move($path, $filename);
+        $response = [
+            'name' => pathinfo($clientOriginalName, PATHINFO_FILENAME).'.'.$clientOriginalExtension,
+            'tmp_name' => $path.$filename,
+            'type' => $mimeType,
+            'size' => $size,
+            'url' => $domain.$path.$filename,
+        ];
 
+        return new JsonResponse($response);
     });
 ```
 
@@ -113,6 +145,7 @@ Receiver::factory($config, $api)
 use Recca0120\Upload\Receiver;
 use Recca0120\Upload\FileAPI;
 use Recca0120\Upload\Plupload;
+use Illuminate\Http\JsonResponse;
 
 require __DIR__.'/vendor/autoload.php';
 
@@ -130,7 +163,21 @@ $storagePath = 'relative path';
 $receiver = new Receiver(new FileAPI($config));
 // save to $config['base_path'].'/'.$storagePath;
 echo $receiver->receive($inputName, function (UploadedFile $uploadedFile, $path, $domain, $api) {
-    // do something
-
+    $clientOriginalName = $uploadedFile->getClientOriginalName();
+    $clientOriginalExtension = strtolower($uploadedFile->getClientOriginalExtension());
+    $basename = pathinfo($uploadedFile->getBasename(), PATHINFO_FILENAME);
+    $filename = md5($basename).'.'.$clientOriginalExtension;
+    $mimeType = $uploadedFile->getMimeType();
+    $size = $uploadedFile->getSize();
+    $uploadedFile->move($path, $filename);
+    $response = [
+        'name' => pathinfo($clientOriginalName, PATHINFO_FILENAME).'.'.$clientOriginalExtension,
+        'tmp_name' => $path.$filename,
+        'type' => $mimeType,
+        'size' => $size,
+        'url' => $domain.$path.$filename,
+    ];
+    
+    return new JsonResponse($response);
 });
 ```
