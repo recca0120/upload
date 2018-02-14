@@ -4,9 +4,9 @@ namespace Recca0120\Upload;
 
 use Illuminate\Http\JsonResponse;
 
-class FineUploader extends Api
+class Dropzone extends FineUploader
 {
-    /**
+        /**
      * receive.
      *
      * @param string $name
@@ -17,21 +17,22 @@ class FineUploader extends Api
     public function receive($name)
     {
         $file = $this->request->file($name);
-        if ($this->request->has('qqtotalparts') === false) {
+        if ($this->request->has('dztotalchunkcount') === false) {
             return $file;
         }
 
-        $originalName = $this->request->get('qqfilename');
-        $totalparts = (int) $this->request->get('qqtotalparts', 1);
-        $partindex = (int) $this->request->get('qqpartindex');
-        $uuid = $this->request->get('qquuid');
+        $originalName = $file->getClientOriginalName();
+        $totalparts = (int) $this->request->get('dztotalchunkcount', 1);
+        $partindex = (int) $this->request->get('dzchunkindex');
+        $uuid = $this->request->get('dzuuid');
 
         $this->chunkFile
             ->setToken($uuid)
             ->setChunkPath($this->chunkPath())
             ->setStoragePath($this->storagePath())
-            ->setName($originalName)
-            ->appendStream($file->getRealPath(), 0, $partindex);
+            ->setName($originalName);
+
+        $this->chunkFile->appendStream($file->getRealPath(), 0, $partindex);
 
         $completed = $totalparts - 1 === $partindex;
 
@@ -53,7 +54,7 @@ class FineUploader extends Api
     {
         $data = $response->getData();
         $data->success = true;
-        $data->uuid = $this->request->get('qquuid');
+        $data->uuid = $this->request->get('dzuuid');
         $response->setData($data);
 
         return $response;

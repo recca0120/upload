@@ -3,6 +3,7 @@
 namespace Recca0120\Upload;
 
 use Illuminate\Http\Request;
+use Recca0120\Upload\Dropzone;
 use Illuminate\Support\Manager;
 
 class UploadManager extends Manager
@@ -46,6 +47,16 @@ class UploadManager extends Manager
     }
 
     /**
+     * create fine uploader driver.
+     *
+     * @return Receiver
+     */
+    protected function createDropzoneDriver()
+    {
+        return new Receiver(new Dropzone($this->app['config']['upload'], $this->request, $this->files));
+    }
+
+    /**
      * create fileapi driver.
      *
      * @return Receiver
@@ -56,16 +67,6 @@ class UploadManager extends Manager
     }
 
     /**
-     * create plupload driver.
-     *
-     * @return Receiver
-     */
-    protected function createPluploadDriver()
-    {
-        return new Receiver(new Plupload($this->app['config']['upload'], $this->request, $this->files));
-    }
-
-    /**
      * create fine uploader driver.
      *
      * @return Receiver
@@ -73,5 +74,15 @@ class UploadManager extends Manager
     protected function createFineUploaderDriver()
     {
         return new Receiver(new FineUploader($this->app['config']['upload'], $this->request, $this->files));
+    }
+
+    /**
+     * create plupload driver.
+     *
+     * @return Receiver
+     */
+    protected function createPluploadDriver()
+    {
+        return new Receiver(new Plupload($this->app['config']['upload'], $this->request, $this->files));
     }
 }

@@ -81,6 +81,7 @@ class ApiTest extends TestCase
         );
         $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile');
         $uploadedFile->shouldReceive('getPathname')->once()->andReturn($file = __FILE__);
+        $files->shouldReceive('isDirectory')->once()->andReturn(true);
         $files->shouldReceive('isFile')->once()->with($file)->andReturn(true);
         $files->shouldReceive('delete')->once()->with($file);
         $files->shouldReceive('files')->once()->andReturn([]);

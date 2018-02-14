@@ -61,9 +61,10 @@ class Receiver
     public static function factory($config = [], $class = FileAPI::class)
     {
         $class = Arr::get([
+            'dropzone' => Dropzone::class,
             'fileapi' => FileAPI::class,
-            'plupload' => Plupload::class,
             'fineuploader' => FineUploader::class,
+            'plupload' => Plupload::class,
         ], strtolower($class), $class);
 
         return new static(new $class($config));
@@ -72,7 +73,7 @@ class Receiver
     /**
      * callback.
      *
-     * @return \callable
+     * @return \Illuminate\Http\JsonResponse
      */
     protected function callback(UploadedFile $uploadedFile, $path, $domain)
     {
