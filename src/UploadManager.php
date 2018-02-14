@@ -3,7 +3,6 @@
 namespace Recca0120\Upload;
 
 use Illuminate\Http\Request;
-use Recca0120\Upload\Dropzone;
 use Illuminate\Support\Manager;
 
 class UploadManager extends Manager

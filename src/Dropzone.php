@@ -6,7 +6,7 @@ use Illuminate\Http\JsonResponse;
 
 class Dropzone extends FineUploader
 {
-        /**
+    /**
      * receive.
      *
      * @param string $name
