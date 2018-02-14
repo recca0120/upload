@@ -36,4 +36,4 @@ switch ($api) {
         break;
 }
 
-return $receiver->receive($inputName)->send();
+$receiver->receive($inputName)->send();

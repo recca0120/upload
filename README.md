@@ -73,6 +73,7 @@ class UploadController extends Controller
         $inputName = 'file'; // $_FILES index;
 
         return $manager->driver($driver)->receive($inputName);
+
         // or
         return $manager
             ->driver($driver)
@@ -118,25 +119,7 @@ $inputName = 'file';
 $storagePath = 'relative path';
 $api = 'fileapi'; // or plupload
 
-Receiver::factory($config, $api)
-    ->receive($inputName, function (UploadedFile $uploadedFile, $path, $domain, $api) {
-        $clientOriginalName = $uploadedFile->getClientOriginalName();
-        $clientOriginalExtension = strtolower($uploadedFile->getClientOriginalExtension());
-        $basename = pathinfo($uploadedFile->getBasename(), PATHINFO_FILENAME);
-        $filename = md5($basename).'.'.$clientOriginalExtension;
-        $mimeType = $uploadedFile->getMimeType();
-        $size = $uploadedFile->getSize();
-        $uploadedFile->move($path, $filename);
-        $response = [
-            'name' => pathinfo($clientOriginalName, PATHINFO_FILENAME).'.'.$clientOriginalExtension,
-            'tmp_name' => $path.$filename,
-            'type' => $mimeType,
-            'size' => $size,
-            'url' => $domain.$path.$filename,
-        ];
-
-        return new JsonResponse($response);
-    });
+Receiver::factory($config, $api)->receive($inputName)->send();
 ```
 
 ## Standalone
@@ -163,22 +146,5 @@ $storagePath = 'relative path';
 // if use Plupload, new Recca0120\Upload\Plupload
 $receiver = new Receiver(new FileAPI($config));
 // save to $config['base_path'].'/'.$storagePath;
-echo $receiver->receive($inputName, function (UploadedFile $uploadedFile, $path, $domain, $api) {
-    $clientOriginalName = $uploadedFile->getClientOriginalName();
-    $clientOriginalExtension = strtolower($uploadedFile->getClientOriginalExtension());
-    $basename = pathinfo($uploadedFile->getBasename(), PATHINFO_FILENAME);
-    $filename = md5($basename).'.'.$clientOriginalExtension;
-    $mimeType = $uploadedFile->getMimeType();
-    $size = $uploadedFile->getSize();
-    $uploadedFile->move($path, $filename);
-    $response = [
-        'name' => pathinfo($clientOriginalName, PATHINFO_FILENAME).'.'.$clientOriginalExtension,
-        'tmp_name' => $path.$filename,
-        'type' => $mimeType,
-        'size' => $size,
-        'url' => $domain.$path.$filename,
-    ];
-
-    return new JsonResponse($response);
-});
+$receiver->receive($inputName)->send();
 ```
