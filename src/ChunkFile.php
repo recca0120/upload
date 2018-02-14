@@ -168,10 +168,10 @@ class ChunkFile
      * appendFile.
      *
      * @param mixed $source
-     * @param int $offset
+     * @param int $index
      * @return $this
      */
-    public function appendFile($source, $index = null)
+    public function appendFile($source, $index = 0)
     {
         $chunkFile = $this->chunkFile().'.'.$index;
         $this->files->appendStream($chunkFile, $source, 0);
