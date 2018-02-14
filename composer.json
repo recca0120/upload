@@ -1,7 +1,7 @@
 {
     "name": "recca0120/upload",
     "description": "Ajax Upload Large File Support jQuery-File-Upload, FileApi, Plupload, Support framework Laravel 5",
-    "keywords": ["laravel", "chunk", "ajax", "upload", "jQuery-File-Upload", "jquery-fileapi", "plupload", "fileapi"],
+    "keywords": ["laravel", "chunk", "ajax", "upload", "jQuery-File-Upload", "jquery-fileapi", "plupload", "fileapi", "dropzone"],
     "license": "MIT",
     "authors": [
         {
