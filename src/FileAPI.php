@@ -71,8 +71,13 @@ class FileAPI extends Api
     protected function getMimeType($originalName)
     {
         $mimeType = (string) $this->request->header('content-type');
+
         if (empty($mimeType) === true) {
             $mimeType = $this->files->mimeType($originalName);
+
+            if ($mimeType === false) {
+                return '';
+            }
         }
 
         return $mimeType;
