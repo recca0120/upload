@@ -31,7 +31,7 @@ class FineUploader extends Api
             ->setChunkPath($this->chunkPath())
             ->setStoragePath($this->storagePath())
             ->setName($originalName)
-            ->appendStream($file->getRealPath(), 0, $partindex);
+            ->appendFile($file->getRealPath(), $partindex);
 
         $completed = $totalparts - 1 === $partindex;
 

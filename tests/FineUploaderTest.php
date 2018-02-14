@@ -69,7 +69,7 @@ class FineUploaderTest extends TestCase
         $chunkFile->shouldReceive('setChunkPath')->once()->with($chunksPath)->andReturnSelf();
         $chunkFile->shouldReceive('setStoragePath')->once()->with($storagePath)->andReturnSelf();
         $chunkFile->shouldReceive('setName')->once()->with($originalName)->andReturnSelf();
-        $chunkFile->shouldReceive('appendStream')->once()->with($realPath, 0, $qqpartindex);
+        $chunkFile->shouldReceive('appendFile')->once()->with($realPath, $qqpartindex);
         $chunkFile->shouldReceive('createUploadedFile')->once()->with($qqtotalparts)->andReturn(
             $uploadedFile
         );
@@ -113,7 +113,7 @@ class FineUploaderTest extends TestCase
         $chunkFile->shouldReceive('setChunkPath')->once()->with($chunksPath)->andReturnSelf();
         $chunkFile->shouldReceive('setStoragePath')->once()->with($storagePath)->andReturnSelf();
         $chunkFile->shouldReceive('setName')->once()->with($originalName)->andReturnSelf();
-        $chunkFile->shouldReceive('appendStream')->once()->with($realPath, 0, (int) $qqpartindex)->andReturnSelf();
+        $chunkFile->shouldReceive('appendFile')->once()->with($realPath, (int) $qqpartindex)->andReturnSelf();
         $chunkFile->shouldReceive('throwException')->once()->with([
             'success' => true,
             'uuid' => $qquuid,
