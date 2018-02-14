@@ -21,6 +21,7 @@ class FineUploader extends Api
             return $file;
         }
 
+        $completed = is_null($file) === true;
         $originalName = $this->request->get('qqfilename');
         $totalparts = (int) $this->request->get('qqtotalparts', 1);
         $partindex = (int) $this->request->get('qqpartindex');
@@ -30,10 +31,11 @@ class FineUploader extends Api
             ->setToken($uuid)
             ->setChunkPath($this->chunkPath())
             ->setStoragePath($this->storagePath())
-            ->setName($originalName)
-            ->appendFile($file->getRealPath(), $partindex);
+            ->setName($originalName);
 
-        $completed = $totalparts - 1 === $partindex;
+        if ($completed === false) {
+            $this->chunkFile->appendFile($file->getRealPath(), $partindex);
+        }
 
         return $completed === true
             ? $this->chunkFile->createUploadedFile($totalparts)

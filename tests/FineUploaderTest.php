@@ -45,9 +45,7 @@ class FineUploaderTest extends TestCase
         );
         $files->shouldReceive('isDirectory')->twice()->andReturn(true);
         $inputName = 'qqfile';
-        $request->shouldReceive('file')->once()->with($inputName)->andReturn(
-            $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
-        );
+        $request->shouldReceive('file')->once()->with($inputName)->andReturn(null);
         $request->shouldReceive('has')->once()->with('qqtotalparts')->andReturn(true);
         $request->shouldReceive('get')->once()->with('qqfilename')->andReturn(
             $originalName = 'foo.php'
@@ -61,17 +59,13 @@ class FineUploaderTest extends TestCase
         $request->shouldReceive('get')->once()->with('qquuid')->andReturn(
             $qquuid = 'foo.qquuid'
         );
-        $uploadedFile->shouldReceive('getRealPath')->once()->andReturn(
-            $realPath = 'foo.realpath'
-        );
 
         $chunkFile->shouldReceive('setToken')->once()->with($qquuid)->andReturnSelf();
         $chunkFile->shouldReceive('setChunkPath')->once()->with($chunksPath)->andReturnSelf();
         $chunkFile->shouldReceive('setStoragePath')->once()->with($storagePath)->andReturnSelf();
         $chunkFile->shouldReceive('setName')->once()->with($originalName)->andReturnSelf();
-        $chunkFile->shouldReceive('appendFile')->once()->with($realPath, $qqpartindex);
         $chunkFile->shouldReceive('createUploadedFile')->once()->with($qqtotalparts)->andReturn(
-            $uploadedFile
+            $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
         );
 
         $this->assertSame($uploadedFile, $api->receive($inputName));
@@ -100,7 +94,7 @@ class FineUploaderTest extends TestCase
             $qqtotalparts = '4'
         );
         $request->shouldReceive('get')->once()->with('qqpartindex')->andReturn(
-            $qqpartindex = '2'
+            $qqpartindex = '3'
         );
         $request->shouldReceive('get')->once()->with('qquuid')->andReturn(
             $qquuid = 'foo.qquuid'
