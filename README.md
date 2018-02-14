@@ -15,9 +15,10 @@
 
 ## Features
 - Support Chunks [jQuery-File-Upload](https://github.com/blueimp/jQuery-File-Upload) $driver = 'fileapi';
+- Support Chunks [Dropzone](https://fineuploader.com/) $driver = 'dropzone';
 - Support Chunks [FileApi](http://mailru.github.io/FileAPI/) $driver = 'fileapi';
-- Support Chunks [Plupload](http://www.plupload.com/) $driver = 'plupload';
 - Support Chunks [Fine Uploader](https://fineuploader.com/) $driver = 'fine-uploader';
+- Support Chunks [Plupload](http://www.plupload.com/) $driver = 'plupload';
 
 ## Installing
 
@@ -32,7 +33,7 @@ Instead, you may of course manually update your require block and run `composer 
 ```json
 {
     "require": {
-        "recca0120/upload": "^1.5.3"
+        "recca0120/upload": "^1.7"
     }
 }
 ```
@@ -177,7 +178,7 @@ echo $receiver->receive($inputName, function (UploadedFile $uploadedFile, $path,
         'size' => $size,
         'url' => $domain.$path.$filename,
     ];
-    
+
     return new JsonResponse($response);
 });
 ```
