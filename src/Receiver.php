@@ -2,7 +2,6 @@
 
 namespace Recca0120\Upload;
 
-use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Http\JsonResponse;
 use Recca0120\Upload\Contracts\Api as ApiContract;
@@ -32,10 +31,10 @@ class Receiver
      * receive.
      *
      * @param string $inputName
-     * @param \Closure $callback
+     * @param callable $callback
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function receive($inputName = 'file', Closure $callback = null)
+    public function receive($inputName = 'file', callable $callback = null)
     {
         try {
             $callback = $callback ?: [$this, 'callback'];
@@ -64,6 +63,7 @@ class Receiver
         $class = Arr::get([
             'fileapi' => FileAPI::class,
             'plupload' => Plupload::class,
+            'fineuploader' => FineUploader::class,
         ], strtolower($class), $class);
 
         return new static(new $class($config));
@@ -72,7 +72,7 @@ class Receiver
     /**
      * callback.
      *
-     * @return \Closure
+     * @return \callable
      */
     protected function callback(UploadedFile $uploadedFile, $path, $domain)
     {

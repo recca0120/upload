@@ -136,7 +136,7 @@ abstract class Api implements ApiContract
         if ($this->files->isFile($file) === true) {
             $this->files->delete($file);
         }
-        $this->cleanDirectory($this->config['chunks']);
+        $this->cleanDirectory($this->chunkPath());
 
         return $this;
     }
