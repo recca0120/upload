@@ -30,9 +30,8 @@ class Dropzone extends FineUploader
             ->setToken($uuid)
             ->setChunkPath($this->chunkPath())
             ->setStoragePath($this->storagePath())
-            ->setName($originalName);
-
-        $this->chunkFile->appendStream($file->getRealPath(), 0, $partindex);
+            ->setName($originalName)
+            ->appendFile($file->getRealPath(), $partindex);
 
         $completed = $totalparts - 1 === $partindex;
 
