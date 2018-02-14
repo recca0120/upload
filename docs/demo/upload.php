@@ -1,6 +1,7 @@
 <?php
 
 use Recca0120\Upload\FileAPI;
+use Recca0120\Upload\Dropzone;
 use Recca0120\Upload\Plupload;
 use Recca0120\Upload\Receiver;
 use Recca0120\Upload\FineUploader;
@@ -15,15 +16,21 @@ $config = [
 ];
 
 $inputName = 'file';
-$api = $_GET['api'];
+$api = isset($_GET['api']) ? $_GET['api'] : null;
 
 switch ($api) {
     case 'plupload':
         $receiver = new Receiver(new Plupload($config));
         break;
+
     case 'fine-uploader':
         $receiver = new Receiver(new FineUploader($config));
         break;
+
+    case 'dropzone':
+        $receiver = new Receiver(new Dropzone($config));
+        break;
+
     default:
         $receiver = new Receiver(new FileAPI($config));
         break;

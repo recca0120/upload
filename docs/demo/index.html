@@ -6,6 +6,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>DEMO</title>
     <link href="js/fine-uploader/fine-uploader-gallery.min.css" rel="stylesheet" />
+    <link href="js/dropzone/basic.min.css" rel="stylesheet" />
+    <link href="js/dropzone/dropzone.min.css" rel="stylesheet" />
     <style>
         html, body {
             font-size: 14px;
@@ -57,6 +59,7 @@
     <script src="js/fileupload/jquery.iframe-transport.js"></script>
     <script src="js/fileupload/jquery.fileupload.js"></script>
     <script src="js/fine-uploader/fine-uploader.min.js"></script>
+    <script src="js/dropzone/dropzone.min.js"></script>
 
     <script>
         function humanFileSize(size) {
@@ -309,6 +312,23 @@
                     showButton: true
                 }
             })
+        </script>
+    </section>
+
+    <section>
+        <h2>Dropzone</h2>
+        <form action="upload.php?api=dropzone" class="dropzone">
+            <div class="fallback">
+                <input name="file" type="file" multiple />
+            </div>
+        </form>
+        <script>
+            Dropzone.autoDiscover = false;
+
+            new Dropzone(".dropzone", {
+                chunking: true,
+                chunkSize: 1024000,
+            });
         </script>
     </section>
 </body>
