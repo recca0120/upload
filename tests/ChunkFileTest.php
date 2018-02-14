@@ -40,6 +40,30 @@ class ChunkFileTest extends TestCase
         }
     }
 
+    public function testAppendFile()
+    {
+        $chunkFile = new ChunkFile(
+            $files = m::mock('Recca0120\Upload\Filesystem')
+        );
+
+        $chunkFile->setToken($token = uniqid())
+            ->setName($name = __FILE__)
+            ->setChunkPath($chunkPath = 'chunk/');
+
+        $source = 'php://input';
+        $index = 0;
+        $files->shouldReceive('tmpfilename')->once()->with($name, $token)->andReturn(
+            $tmpfilename = 'foo.php'
+        );
+        $files->shouldReceive('appendStream')->once()->with($chunkPath.$tmpfilename.'.part.'.$index, $source, 0);
+
+        try {
+            $chunkFile->appendFile($source, $index)->throwException();
+        } catch (Exception $e) {
+            $this->assertInstanceOf('Recca0120\Upload\Exceptions\ChunkedResponseException', $e);
+        }
+    }
+
     public function testCreateUploadedFile()
     {
         $chunkFile = new ChunkFile(
