@@ -43,7 +43,7 @@ abstract class Api implements ApiContract
      * @param array $config
      * @param \Illuminate\Http\Request $request
      * @param \Recca0120\Upload\Filesystem $files
-     * @param \Recca0120\Upload\ChunkFile $chunkFile
+     * @param \Recca0120\Upload\ChunkFileFactory $chunkFileFactory
      */
     public function __construct($config = [], Request $request = null, Filesystem $files = null, ChunkFileFactory $chunkFileFactory = null)
     {
@@ -176,6 +176,13 @@ abstract class Api implements ApiContract
         return rtrim($this->config['storage'], '/').'/';
     }
 
+    /**
+     * createChunkFile.
+     *
+     * @param string $name
+     * @param string $uuid
+     * @return \Recca0120\Upload\ChunkFile
+     */
     protected function createChunkFile($name, $uuid = null)
     {
         return $this->chunkFileFactory->create(
