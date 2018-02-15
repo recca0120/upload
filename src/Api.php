@@ -26,9 +26,9 @@ abstract class Api implements ApiContract
     /**
      * $chunkFile.
      *
-     * @var \Recca0120\Upload\ChunkFile
+     * @var \Recca0120\Upload\ChunkFileFactory
      */
-    protected $chunkFile;
+    protected $ChunkFileFactory;
 
     /**
      * $config.
@@ -45,11 +45,11 @@ abstract class Api implements ApiContract
      * @param \Recca0120\Upload\Filesystem $files
      * @param \Recca0120\Upload\ChunkFile $chunkFile
      */
-    public function __construct($config = [], Request $request = null, Filesystem $files = null, ChunkFile $chunkFile = null)
+    public function __construct($config = [], Request $request = null, Filesystem $files = null, ChunkFileFactory $chunkFileFactory = null)
     {
         $this->request = $request ?: Request::capture();
         $this->files = $files ?: new Filesystem();
-        $this->chunkFile = $chunkFile ?: new ChunkFile($this->files);
+        $this->chunkFileFactory = $chunkFileFactory ?: new ChunkFileFactory($this->files);
         $this->config = array_merge([
             'chunks' => sys_get_temp_dir().'/chunks',
             'storage' => 'storage/temp',
@@ -174,5 +174,12 @@ abstract class Api implements ApiContract
         $this->makeDirectory($this->config['storage']);
 
         return rtrim($this->config['storage'], '/').'/';
+    }
+
+    protected function createChunkFile($name, $uuid = null)
+    {
+        return $this->chunkFileFactory->create(
+            $name, $this->chunkPath(), $this->storagePath(), $uuid
+        );
     }
 }

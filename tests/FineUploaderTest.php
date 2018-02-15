@@ -22,7 +22,7 @@ class FineUploaderTest extends TestCase
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
             $files = m::mock('Recca0120\Upload\Filesystem'),
-            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
+            $chunkFileFactory = m::mock('Recca0120\Upload\ChunkFileFactory')
         );
         $inputName = 'qqfile';
         $request->shouldReceive('file')->once()->with($inputName)->andReturn(
@@ -41,7 +41,7 @@ class FineUploaderTest extends TestCase
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
             $files = m::mock('Recca0120\Upload\Filesystem'),
-            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
+            $chunkFileFactory = m::mock('Recca0120\Upload\ChunkFileFactory')
         );
         $files->shouldReceive('isDirectory')->twice()->andReturn(true);
         $inputName = 'qqfile';
@@ -51,20 +51,20 @@ class FineUploaderTest extends TestCase
             $originalName = 'foo.php'
         );
         $request->shouldReceive('get')->once()->with('qqtotalparts', 1)->andReturn(
-            $qqtotalparts = '4'
+            $totalparts = '4'
         );
         $request->shouldReceive('get')->once()->with('qqpartindex')->andReturn(
-            $qqpartindex = '3'
+            $partindex = '3'
         );
         $request->shouldReceive('get')->once()->with('qquuid')->andReturn(
-            $qquuid = 'foo.qquuid'
+            $uuid = 'foo.qquuid'
         );
 
-        $chunkFile->shouldReceive('setToken')->once()->with($qquuid)->andReturnSelf();
-        $chunkFile->shouldReceive('setChunkPath')->once()->with($chunksPath)->andReturnSelf();
-        $chunkFile->shouldReceive('setStoragePath')->once()->with($storagePath)->andReturnSelf();
-        $chunkFile->shouldReceive('setName')->once()->with($originalName)->andReturnSelf();
-        $chunkFile->shouldReceive('createUploadedFile')->once()->with($qqtotalparts)->andReturn(
+        $chunkFileFactory->shouldReceive('create')->once()->with($originalName, $chunksPath, $storagePath, $uuid)->andReturn(
+            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
+        );
+
+        $chunkFile->shouldReceive('createUploadedFile')->once()->with($totalparts)->andReturn(
             $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
         );
 
@@ -79,7 +79,7 @@ class FineUploaderTest extends TestCase
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
             $files = m::mock('Recca0120\Upload\Filesystem'),
-            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
+            $chunkFileFactory = m::mock('Recca0120\Upload\ChunkFileFactory')
         );
         $files->shouldReceive('isDirectory')->twice()->andReturn(true);
         $inputName = 'qqfile';
@@ -91,26 +91,27 @@ class FineUploaderTest extends TestCase
             $originalName = 'foo.php'
         );
         $request->shouldReceive('get')->once()->with('qqtotalparts', 1)->andReturn(
-            $qqtotalparts = '4'
+            $totalparts = '4'
         );
         $request->shouldReceive('get')->once()->with('qqpartindex')->andReturn(
-            $qqpartindex = '3'
+            $partindex = '3'
         );
         $request->shouldReceive('get')->once()->with('qquuid')->andReturn(
-            $qquuid = 'foo.qquuid'
+            $uuid = 'foo.qquuid'
         );
         $uploadedFile->shouldReceive('getRealPath')->once()->andReturn(
             $realPath = 'foo.realpath'
         );
 
-        $chunkFile->shouldReceive('setToken')->once()->with($qquuid)->andReturnSelf();
-        $chunkFile->shouldReceive('setChunkPath')->once()->with($chunksPath)->andReturnSelf();
-        $chunkFile->shouldReceive('setStoragePath')->once()->with($storagePath)->andReturnSelf();
-        $chunkFile->shouldReceive('setName')->once()->with($originalName)->andReturnSelf();
-        $chunkFile->shouldReceive('appendFile')->once()->with($realPath, (int) $qqpartindex)->andReturnSelf();
+        $chunkFileFactory->shouldReceive('create')->once()->with($originalName, $chunksPath, $storagePath, $uuid)->andReturn(
+            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
+        );
+
+        $chunkFile->shouldReceive('appendFile')->once()->with($realPath, (int) $partindex)->andReturnSelf();
+
         $chunkFile->shouldReceive('throwException')->once()->with([
             'success' => true,
-            'uuid' => $qquuid,
+            'uuid' => $uuid,
         ])->andReturn(
             $exception = m::mock('stdClass')
         );

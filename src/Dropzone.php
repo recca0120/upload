@@ -26,18 +26,14 @@ class Dropzone extends FineUploader
         $partindex = (int) $this->request->get('dzchunkindex');
         $uuid = $this->request->get('dzuuid');
 
-        $this->chunkFile
-            ->setToken($uuid)
-            ->setChunkPath($this->chunkPath())
-            ->setStoragePath($this->storagePath())
-            ->setName($originalName)
-            ->appendFile($file->getRealPath(), $partindex);
+        $chunkFile = $this->createChunkFile($originalName, $uuid);
+        $chunkFile->appendFile($file->getRealPath(), $partindex);
 
         $completed = $totalparts - 1 === $partindex;
 
         return $completed === true
-            ? $this->chunkFile->createUploadedFile($totalparts)
-            : $this->chunkFile->throwException([
+            ? $chunkFile->createUploadedFile($totalparts)
+            : $chunkFile->throwException([
                 'success' => true,
                 'uuid' => $uuid,
             ]);

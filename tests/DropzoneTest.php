@@ -22,7 +22,7 @@ class DropzoneTest extends TestCase
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
             $files = m::mock('Recca0120\Upload\Filesystem'),
-            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
+            $chunkFileFactory = m::mock('Recca0120\Upload\ChunkFileFactory')
         );
         $inputName = 'dzfile';
         $request->shouldReceive('file')->once()->with($inputName)->andReturn(
@@ -41,7 +41,7 @@ class DropzoneTest extends TestCase
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
             $files = m::mock('Recca0120\Upload\Filesystem'),
-            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
+            $chunkFileFactory = m::mock('Recca0120\Upload\ChunkFileFactory')
         );
         $files->shouldReceive('isDirectory')->twice()->andReturn(true);
         $inputName = 'dzfile';
@@ -65,11 +65,11 @@ class DropzoneTest extends TestCase
             $realPath = 'foo.realpath'
         );
 
-        $chunkFile->shouldReceive('setToken')->once()->with($uuid)->andReturnSelf();
-        $chunkFile->shouldReceive('setChunkPath')->once()->with($chunksPath)->andReturnSelf();
-        $chunkFile->shouldReceive('setStoragePath')->once()->with($storagePath)->andReturnSelf();
-        $chunkFile->shouldReceive('setName')->once()->with($originalName)->andReturnSelf();
-        $chunkFile->shouldReceive('appendFile')->once()->with($realPath, $partindex);
+        $chunkFileFactory->shouldReceive('create')->once()->with($originalName, $chunksPath, $storagePath, $uuid)->andReturn(
+            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
+        );
+
+        $chunkFile->shouldReceive('appendFile')->once()->with($realPath, (int) $partindex)->andReturnSelf();
         $chunkFile->shouldReceive('createUploadedFile')->once()->with($totalparts)->andReturn(
             $uploadedFile
         );
@@ -85,7 +85,7 @@ class DropzoneTest extends TestCase
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
             $files = m::mock('Recca0120\Upload\Filesystem'),
-            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
+            $chunkFileFactory = m::mock('Recca0120\Upload\ChunkFileFactory')
         );
         $files->shouldReceive('isDirectory')->twice()->andReturn(true);
         $inputName = 'qqfile';
@@ -109,11 +109,12 @@ class DropzoneTest extends TestCase
             $realPath = 'foo.realpath'
         );
 
-        $chunkFile->shouldReceive('setToken')->once()->with($uuid)->andReturnSelf();
-        $chunkFile->shouldReceive('setChunkPath')->once()->with($chunksPath)->andReturnSelf();
-        $chunkFile->shouldReceive('setStoragePath')->once()->with($storagePath)->andReturnSelf();
-        $chunkFile->shouldReceive('setName')->once()->with($originalName)->andReturnSelf();
+        $chunkFileFactory->shouldReceive('create')->once()->with($originalName, $chunksPath, $storagePath, $uuid)->andReturn(
+            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
+        );
+
         $chunkFile->shouldReceive('appendFile')->once()->with($realPath, (int) $partindex)->andReturnSelf();
+
         $chunkFile->shouldReceive('throwException')->once()->with([
             'success' => true,
             'uuid' => $uuid,

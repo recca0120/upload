@@ -27,19 +27,15 @@ class FineUploader extends Api
         $partindex = (int) $this->request->get('qqpartindex');
         $uuid = $this->request->get('qquuid');
 
-        $this->chunkFile
-            ->setToken($uuid)
-            ->setChunkPath($this->chunkPath())
-            ->setStoragePath($this->storagePath())
-            ->setName($originalName);
+        $chunkFile = $this->createChunkFile($originalName, $uuid);
 
         if ($completed === false) {
-            $this->chunkFile->appendFile($file->getRealPath(), $partindex);
+            $chunkFile->appendFile($file->getRealPath(), $partindex);
         }
 
         return $completed === true
-            ? $this->chunkFile->createUploadedFile($totalparts)
-            : $this->chunkFile->throwException([
+            ? $chunkFile->createUploadedFile($totalparts)
+            : $chunkFile->throwException([
                 'success' => true,
                 'uuid' => $uuid,
             ]);

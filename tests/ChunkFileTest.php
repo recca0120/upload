@@ -18,13 +18,18 @@ class ChunkFileTest extends TestCase
 
     public function testAppendStream()
     {
-        $chunkFile = new ChunkFile(
-            $files = m::mock('Recca0120\Upload\Filesystem')
+        $files = m::mock('Recca0120\Upload\Filesystem');
+        $files->shouldReceive('mimeType')->once()->andReturn(
+            $mimeType = 'text/plain'
         );
 
-        $chunkFile->setToken($token = uniqid())
-            ->setName($name = __FILE__)
-            ->setChunkPath($chunkPath = 'chunk/');
+        $chunkFile = new ChunkFile(
+            $name = __FILE__,
+            $chunkPath = 'storage/chunk/',
+            $storagePath = 'storage/',
+            $token = uniqid(),
+            $files
+        );
 
         $source = 'php://input';
         $offset = 0;
@@ -42,13 +47,18 @@ class ChunkFileTest extends TestCase
 
     public function testAppendFile()
     {
-        $chunkFile = new ChunkFile(
-            $files = m::mock('Recca0120\Upload\Filesystem')
+        $files = m::mock('Recca0120\Upload\Filesystem');
+        $files->shouldReceive('mimeType')->once()->andReturn(
+            $mimeType = 'text/plain'
         );
 
-        $chunkFile->setToken($token = uniqid())
-            ->setName($name = __FILE__)
-            ->setChunkPath($chunkPath = 'chunk/');
+        $chunkFile = new ChunkFile(
+            $name = __FILE__,
+            $chunkPath = 'storage/chunk/',
+            $storagePath = 'storage/',
+            $token = uniqid(),
+            $files
+        );
 
         $source = 'php://input';
         $index = 0;
@@ -66,8 +76,17 @@ class ChunkFileTest extends TestCase
 
     public function testCreateUploadedFile()
     {
+        $files = m::mock('Recca0120\Upload\Filesystem');
+        $files->shouldReceive('mimeType')->once()->andReturn(
+            $mimeType = 'text/plain'
+        );
+
         $chunkFile = new ChunkFile(
-            $files = m::mock('Recca0120\Upload\Filesystem')
+            $name = __FILE__,
+            $chunkPath = 'storage/chunk/',
+            $storagePath = 'storage/',
+            $token = uniqid(),
+            $files
         );
 
         $chunkFile
@@ -95,8 +114,17 @@ class ChunkFileTest extends TestCase
 
     public function testThrowException()
     {
+        $files = m::mock('Recca0120\Upload\Filesystem');
+        $files->shouldReceive('mimeType')->once()->andReturn(
+            $mimeType = 'text/plain'
+        );
+
         $chunkFile = new ChunkFile(
-            $files = m::mock('Recca0120\Upload\Filesystem')
+            $name = __FILE__,
+            $chunkPath = 'storage/chunk/',
+            $storagePath = 'storage/',
+            $token = uniqid(),
+            $files
         );
 
         try {

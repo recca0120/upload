@@ -22,7 +22,7 @@ class FileAPITest extends TestCase
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
             $files = m::mock('Recca0120\Upload\Filesystem'),
-            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
+            $chunkFileFactory = m::mock('Recca0120\Upload\ChunkFileFactory')
         );
         $request->shouldReceive('header')->once()->with('content-disposition')->andReturn('');
         $inputName = 'foo';
@@ -40,7 +40,7 @@ class FileAPITest extends TestCase
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
             $files = m::mock('Recca0120\Upload\Filesystem'),
-            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
+            $chunkFileFactory = m::mock('Recca0120\Upload\ChunkFileFactory')
         );
         $files->shouldReceive('isDirectory')->twice()->andReturn(true);
 
@@ -54,15 +54,13 @@ class FileAPITest extends TestCase
         $request->shouldReceive('header')->once()->with('content-range')->andReturn(
             $contentRange = 'bytes '.$start.'-'.$end.'/'.$total
         );
-        $request->shouldReceive('header')->once()->with('content-type')->andReturn(
-            $mimeType = 'foo'
-        );
+
         $request->shouldReceive('get')->once()->with('token')->andReturn($token = 'foo');
-        $chunkFile->shouldReceive('setToken')->once()->with($token)->andReturnSelf();
-        $chunkFile->shouldReceive('setChunkPath')->once()->with($chunksPath)->andReturnSelf();
-        $chunkFile->shouldReceive('setStoragePath')->once()->with($storagePath)->andReturnSelf();
-        $chunkFile->shouldReceive('setName')->once()->with($originalName)->andReturnSelf();
-        $chunkFile->shouldReceive('setMimeType')->once()->with($mimeType)->andReturnSelf();
+
+        $chunkFileFactory->shouldReceive('create')->once()->with($originalName, $chunksPath, $storagePath, $token)->andReturn(
+            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
+        );
+
         $chunkFile->shouldReceive('appendStream')->once()->with('php://input', $start)->andReturnSelf();
         $chunkFile->shouldReceive('createUploadedFile')->once()->andReturn(
             $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
@@ -79,7 +77,7 @@ class FileAPITest extends TestCase
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
             $files = m::mock('Recca0120\Upload\Filesystem'),
-            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
+            $chunkFileFactory = m::mock('Recca0120\Upload\ChunkFileFactory')
         );
         $files->shouldReceive('isDirectory')->twice()->andReturn(true);
 
@@ -89,15 +87,13 @@ class FileAPITest extends TestCase
         $request->shouldReceive('header')->once()->with('content-disposition')->andReturn(
             'attachment; filename="'.($originalName = 'foo.php').'"'
         );
-        $request->shouldReceive('header')->once()->with('content-type')->andReturn(
-            $mimeType = 'foo'
-        );
+
         $request->shouldReceive('get')->once()->with('token')->andReturn($token = 'foo');
-        $chunkFile->shouldReceive('setToken')->once()->with($token)->andReturnSelf();
-        $chunkFile->shouldReceive('setChunkPath')->once()->with($chunksPath)->andReturnSelf();
-        $chunkFile->shouldReceive('setStoragePath')->once()->with($storagePath)->andReturnSelf();
-        $chunkFile->shouldReceive('setName')->once()->with($originalName)->andReturnSelf();
-        $chunkFile->shouldReceive('setMimeType')->once()->with($mimeType)->andReturnSelf();
+
+        $chunkFileFactory->shouldReceive('create')->once()->with($originalName, $chunksPath, $storagePath, $token)->andReturn(
+            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
+        );
+
         $chunkFile->shouldReceive('appendStream')->once()->with('php://input', 0)->andReturnSelf();
         $chunkFile->shouldReceive('createUploadedFile')->once()->andReturn(
             $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
@@ -114,7 +110,7 @@ class FileAPITest extends TestCase
             $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
             $files = m::mock('Recca0120\Upload\Filesystem'),
-            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
+            $chunkFileFactory = m::mock('Recca0120\Upload\ChunkFileFactory')
         );
         $files->shouldReceive('isDirectory')->twice()->andReturn(true);
 
@@ -128,17 +124,15 @@ class FileAPITest extends TestCase
         $request->shouldReceive('header')->once()->with('content-disposition')->andReturn(
             'attachment; filename='.($originalName = 'foo.php')
         );
-        $request->shouldReceive('header')->once()->with('content-type')->andReturn(
-            $mimeType = 'foo'
+        $request->shouldReceive('get')->once()->with('token')->andReturn($token = 'foo');
+
+        $chunkFileFactory->shouldReceive('create')->once()->with($originalName, $chunksPath, $storagePath, $token)->andReturn(
+            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
 
-        $request->shouldReceive('get')->once()->with('token')->andReturn($token = 'foo');
-        $chunkFile->shouldReceive('setToken')->once()->with($token)->andReturnSelf();
-        $chunkFile->shouldReceive('setChunkPath')->once()->with($chunksPath)->andReturnSelf();
-        $chunkFile->shouldReceive('setStoragePath')->once()->with($storagePath)->andReturnSelf();
-        $chunkFile->shouldReceive('setName')->once()->with($originalName)->andReturnSelf();
-        $chunkFile->shouldReceive('setMimeType')->once()->with($mimeType)->andReturnSelf();
         $chunkFile->shouldReceive('appendStream')->once()->with('php://input', $start)->andReturnSelf();
+        $chunkFile->shouldReceive('getMimeType')->andReturn($mimeType = 'foo.mimeType');
+
         $chunkFile->shouldReceive('throwException')->once()->with([
             'files' => [
                 'name' => $originalName,

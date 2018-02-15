@@ -65,76 +65,30 @@ class ChunkFile
     /**
      * __construct.
      *
+     * @param string $name
+     * @param string $chunkPath
+     * @param string $storagePath
+     * @param string $token
      * @param \Recca0120\Upload\Filesystem $files
      */
-    public function __construct(Filesystem $files = null)
+    public function __construct($name, $chunkPath, $storagePath, $token = null, Filesystem $files = null)
     {
         $this->files = $files ?: new Filesystem();
-    }
-
-    /**
-     * setToken.
-     *
-     * @param string $token
-     * @return $this
-     */
-    public function setToken($token)
-    {
-        $this->token = $token;
-
-        return $this;
-    }
-
-    /**
-     * setChunkPath.
-     *
-     * @param string $chunkPath
-     * @return $this
-     */
-    public function setChunkPath($chunkPath)
-    {
-        $this->chunkPath = $chunkPath;
-
-        return $this;
-    }
-
-    /**
-     * setStoragePath.
-     *
-     * @param string $storagePath
-     * @return $this
-     */
-    public function setStoragePath($storagePath)
-    {
-        $this->storagePath = $storagePath;
-
-        return $this;
-    }
-
-    /**
-     * setName.
-     *
-     * @param string $name
-     * @return $this
-     */
-    public function setName($name)
-    {
         $this->name = $name;
-
-        return $this;
+        $this->chunkPath = $chunkPath;
+        $this->storagePath = $storagePath;
+        $this->token = $token;
+        $this->mimeType = $this->files->mimeType($this->name);
     }
 
     /**
-     * setMimeType.
+     * getMimeType.
      *
-     * @param string $mimeType
-     * @return $this
+     * @return string
      */
-    public function setMimeType($mimeType)
+    public function getMimeType()
     {
-        $this->mimeType = $mimeType;
-
-        return $this;
+        return $this->mimeType;
     }
 
     /**

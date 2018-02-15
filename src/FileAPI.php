@@ -21,24 +21,19 @@ class FileAPI extends Api
 
         list($start, $end, $total) = $this->parseContentRange();
         $originalName = $this->getOriginalName($contentDisposition);
-        $mimeType = $this->getMimeType($originalName);
+        $uuid = $this->request->get('token');
         $completed = $end >= $total - 1;
 
-        $this->chunkFile
-            ->setToken($this->request->get('token'))
-            ->setChunkPath($this->chunkPath())
-            ->setStoragePath($this->storagePath())
-            ->setName($originalName)
-            ->setMimeType($mimeType)
-            ->appendStream('php://input', $start);
+        $chunkFile = $this->createChunkFile($originalName, $uuid);
+        $chunkFile->appendStream('php://input', $start);
 
         return $completed === true
-            ? $this->chunkFile->createUploadedFile()
-            : $this->chunkFile->throwException([
+            ? $chunkFile->createUploadedFile()
+            : $chunkFile->throwException([
                 'files' => [
                     'name' => $originalName,
                     'size' => $end,
-                    'type' => $mimeType,
+                    'type' => $chunkFile->getMimeType(),
                 ],
             ], ['X-Last-Known-Byte' => $end]);
     }
@@ -60,27 +55,6 @@ class FileAPI extends Api
         }
 
         return preg_replace('/[\'"]/', '', $originalName);
-    }
-
-    /**
-     * getMimeType.
-     *
-     * @param string $originalName
-     * @return string
-     */
-    protected function getMimeType($originalName)
-    {
-        $mimeType = (string) $this->request->header('content-type');
-
-        if (empty($mimeType) === true) {
-            $mimeType = $this->files->mimeType($originalName);
-
-            if ($mimeType === false) {
-                return '';
-            }
-        }
-
-        return $mimeType;
     }
 
     /**
