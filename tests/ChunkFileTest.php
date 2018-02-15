@@ -89,13 +89,6 @@ class ChunkFileTest extends TestCase
             $files
         );
 
-        $chunkFile
-            ->setToken($token = uniqid())
-            ->setName($name = __FILE__)
-            ->setMimeType($mimeType = 'foo')
-            ->setChunkPath($chunkPath = 'chunk/')
-            ->setStoragePath($storagePath = 'chunk/');
-
         $source = 'php://input';
         $offset = 0;
 
