@@ -183,10 +183,10 @@ abstract class Api implements ApiContract
      * @param string $uuid
      * @return \Recca0120\Upload\ChunkFile
      */
-    protected function createChunkFile($name, $uuid = null)
+    protected function createChunkFile($name, $uuid = null, $mimeType = null)
     {
         return $this->chunkFileFactory->create(
-            $name, $this->chunkPath(), $this->storagePath(), $uuid
+            $name, $this->chunkPath(), $this->storagePath(), $uuid, $mimeType
         );
     }
 }

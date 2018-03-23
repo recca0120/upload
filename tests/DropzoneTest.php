@@ -65,7 +65,7 @@ class DropzoneTest extends TestCase
             $realPath = 'foo.realpath'
         );
 
-        $chunkFileFactory->shouldReceive('create')->once()->with($originalName, $chunksPath, $storagePath, $uuid)->andReturn(
+        $chunkFileFactory->shouldReceive('create')->once()->with($originalName, $chunksPath, $storagePath, $uuid, null)->andReturn(
             $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
 
@@ -109,7 +109,7 @@ class DropzoneTest extends TestCase
             $realPath = 'foo.realpath'
         );
 
-        $chunkFileFactory->shouldReceive('create')->once()->with($originalName, $chunksPath, $storagePath, $uuid)->andReturn(
+        $chunkFileFactory->shouldReceive('create')->once()->with($originalName, $chunksPath, $storagePath, $uuid, null)->andReturn(
             $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
 

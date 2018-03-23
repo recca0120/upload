@@ -56,7 +56,7 @@ class PluploadTest extends TestCase
 
         $request->shouldReceive('get')->once()->with('token')->andReturn($token = 'foo');
 
-        $chunkFileFactory->shouldReceive('create')->once()->with($originalName, $chunksPath, $storagePath, $token)->andReturn(
+        $chunkFileFactory->shouldReceive('create')->once()->with($originalName, $chunksPath, $storagePath, $token, null)->andReturn(
             $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
 
@@ -92,7 +92,7 @@ class PluploadTest extends TestCase
 
         $request->shouldReceive('get')->once()->with('token')->andReturn($token = 'foo');
 
-        $chunkFileFactory->shouldReceive('create')->once()->with($originalName, $chunksPath, $storagePath, $token)->andReturn(
+        $chunkFileFactory->shouldReceive('create')->once()->with($originalName, $chunksPath, $storagePath, $token, null)->andReturn(
             $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
 

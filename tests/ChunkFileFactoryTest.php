@@ -20,8 +20,13 @@ class ChunkFileFactoryTest extends TestCase
             $files = m::mock('Recca0120\Upload\Filesystem')
         );
 
-        $files->shouldReceive('mimeType')->once()->andReturn('text/plain');
-
-        $this->assertInstanceOf('Recca0120\Upload\ChunkFile', $chunkFileFactory->create('foo.php', 'foo.chunksPath', 'foo.storagePath', 'foo.token'));
+        $chunkFile = $chunkFileFactory->create(
+            $name = 'foo.php',
+            $cunksPath = 'foo.chunksPath',
+            $storagePath = 'foo.storagePath',
+            $token = 'foo.token'.
+            $mimeType = 'foo.mimeType'
+        );
+        $this->assertInstanceOf('Recca0120\Upload\ChunkFile', $chunkFile);
     }
 }

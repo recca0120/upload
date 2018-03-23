@@ -54,10 +54,13 @@ class FileAPITest extends TestCase
         $request->shouldReceive('header')->once()->with('content-range')->andReturn(
             $contentRange = 'bytes '.$start.'-'.$end.'/'.$total
         );
+        $request->shouldReceive('header')->once()->with('content-type')->andReturn(
+            $mimeType = 'foo'
+        );
 
         $request->shouldReceive('get')->once()->with('token')->andReturn($token = 'foo');
 
-        $chunkFileFactory->shouldReceive('create')->once()->with($originalName, $chunksPath, $storagePath, $token)->andReturn(
+        $chunkFileFactory->shouldReceive('create')->once()->with($originalName, $chunksPath, $storagePath, $mimeType, $token)->andReturn(
             $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
 
@@ -87,10 +90,13 @@ class FileAPITest extends TestCase
         $request->shouldReceive('header')->once()->with('content-disposition')->andReturn(
             'attachment; filename="'.($originalName = 'foo.php').'"'
         );
+        $request->shouldReceive('header')->once()->with('content-type')->andReturn(
+            $mimeType = 'foo'
+        );
 
         $request->shouldReceive('get')->once()->with('token')->andReturn($token = 'foo');
 
-        $chunkFileFactory->shouldReceive('create')->once()->with($originalName, $chunksPath, $storagePath, $token)->andReturn(
+        $chunkFileFactory->shouldReceive('create')->once()->with($originalName, $chunksPath, $storagePath, $mimeType, $token)->andReturn(
             $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
 
@@ -124,9 +130,13 @@ class FileAPITest extends TestCase
         $request->shouldReceive('header')->once()->with('content-disposition')->andReturn(
             'attachment; filename='.($originalName = 'foo.php')
         );
+        $request->shouldReceive('header')->once()->with('content-type')->andReturn(
+            $mimeType = 'foo'
+        );
+
         $request->shouldReceive('get')->once()->with('token')->andReturn($token = 'foo');
 
-        $chunkFileFactory->shouldReceive('create')->once()->with($originalName, $chunksPath, $storagePath, $token)->andReturn(
+        $chunkFileFactory->shouldReceive('create')->once()->with($originalName, $chunksPath, $storagePath, $mimeType, $token)->andReturn(
             $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
         );
 

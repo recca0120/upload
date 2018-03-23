@@ -19,8 +19,8 @@ class ChunkFileFactory
      *
      * @return \Recca0120\Upload\ChunkFile
      */
-    public function create($name, $chunksPath, $storagePath, $token = null)
+    public function create($name, $chunksPath, $storagePath, $token = null, $mimeType = null)
     {
-        return new ChunkFile($name, $chunksPath, $storagePath, $token, $this->files);
+        return new ChunkFile($name, $chunksPath, $storagePath, $token, $mimeType, $this->files);
     }
 }

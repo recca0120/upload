@@ -2,6 +2,7 @@
 
 namespace Recca0120\Upload;
 
+use ErrorException;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
 class ChunkFile
@@ -68,17 +69,18 @@ class ChunkFile
      * @param string $name
      * @param string $chunkPath
      * @param string $storagePath
+     * @param string $mimeType
      * @param string $token
      * @param \Recca0120\Upload\Filesystem $files
      */
-    public function __construct($name, $chunkPath, $storagePath, $token = null, Filesystem $files = null)
+    public function __construct($name, $chunkPath, $storagePath, $token = null, $mimeType = null, Filesystem $files = null)
     {
         $this->files = $files ?: new Filesystem();
         $this->name = $name;
         $this->chunkPath = $chunkPath;
         $this->storagePath = $storagePath;
         $this->token = $token;
-        $this->mimeType = $this->files->mimeType($this->name);
+        $this->mimeType = $mimeType;
     }
 
     /**
@@ -88,7 +90,11 @@ class ChunkFile
      */
     public function getMimeType()
     {
-        return $this->mimeType;
+        try {
+            return $this->mimeType ?: $this->files->mimeType($this->name);
+        } catch (ErrorException $e) {
+            return;
+        }
     }
 
     /**
@@ -157,7 +163,7 @@ class ChunkFile
         }
 
         return $this->files->createUploadedFile(
-            $storageFile, $this->name, $this->mimeType
+            $storageFile, $this->name, $this->getMimeType()
         );
     }
 

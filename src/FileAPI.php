@@ -21,10 +21,11 @@ class FileAPI extends Api
 
         list($start, $end, $total) = $this->parseContentRange();
         $originalName = $this->getOriginalName($contentDisposition);
+        $mimeType = $this->getMimeType($originalName);
         $uuid = $this->request->get('token');
         $completed = $end >= $total - 1;
 
-        $chunkFile = $this->createChunkFile($originalName, $uuid);
+        $chunkFile = $this->createChunkFile($originalName, $mimeType, $uuid);
         $chunkFile->appendStream('php://input', $start);
 
         return $completed === true
@@ -55,6 +56,22 @@ class FileAPI extends Api
         }
 
         return preg_replace('/[\'"]/', '', $originalName);
+    }
+
+    /**
+     * getMimeType.
+     *
+     * @param string $originalName
+     * @return string
+     */
+    protected function getMimeType($originalName)
+    {
+        $mimeType = (string) $this->request->header('content-type');
+        if (empty($mimeType) === true) {
+            $mimeType = $this->files->mimeType($originalName);
+        }
+
+        return $mimeType;
     }
 
     /**
