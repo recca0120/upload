@@ -30,9 +30,7 @@ class ReceiverTest extends TestCase
         $uploadedFile->shouldReceive('getClientOriginalName')->once()->andReturn(
             $clientOriginalName = 'foo.PHP'
         );
-        $uploadedFile->shouldReceive('getClientOriginalExtension')->once()->andReturn(
-            $clientOriginalExtension = 'PHP'
-        );
+        $clientOriginalExtension = 'PHP';
 
         $uploadedFile->shouldReceive('getBasename')->once()->andReturn(
             $basename = 'foo'

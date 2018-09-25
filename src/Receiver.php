@@ -77,15 +77,14 @@ class Receiver
      */
     protected function callback(UploadedFile $uploadedFile, $path, $domain)
     {
-        $clientOriginalName = $uploadedFile->getClientOriginalName();
-        $clientOriginalExtension = strtolower($uploadedFile->getClientOriginalExtension());
-        $basename = pathinfo($uploadedFile->getBasename(), PATHINFO_FILENAME);
-        $filename = md5($basename).'.'.$clientOriginalExtension;
+        $clientPathInfo = $this->pathInfo($uploadedFile->getClientOriginalName());
+        $basePathInfo = $this->pathInfo($uploadedFile->getBasename());
+        $filename = md5($basePathInfo['basename']).'.'.$clientPathInfo['extension'];
         $mimeType = $uploadedFile->getMimeType();
         $size = $uploadedFile->getSize();
         $uploadedFile->move($path, $filename);
         $response = [
-            'name' => pathinfo($clientOriginalName, PATHINFO_FILENAME).'.'.$clientOriginalExtension,
+            'name' => $clientPathInfo['filename'].'.'.$clientPathInfo['extension'],
             'tmp_name' => $path.$filename,
             'type' => $mimeType,
             'size' => $size,
@@ -93,5 +92,16 @@ class Receiver
         ];
 
         return new JsonResponse($response);
+    }
+
+    private function pathInfo($path)
+    {
+        $parts = [];
+        $parts['dirname'] = rtrim(substr($path, 0, strrpos($path, '/')), '/').'/';
+        $parts['basename'] = ltrim(substr($path, strrpos($path, '/')), '/');
+        $parts['extension'] = strtolower(substr(strrchr($path, '.'), 1));
+        $parts['filename'] = ltrim(substr($parts['basename'], 0, strrpos($parts ['basename'], '.')), '/');
+
+        return $parts;
     }
 }
