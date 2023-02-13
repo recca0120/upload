@@ -1,4 +1,4 @@
- [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YNNLC9V28YDPN)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YNNLC9V28YDPN)
 
 ## Pure Ajax Upload And for Laravel 5 (Support jQuery-File-Upload, FileApi, Plupload)
 
@@ -14,11 +14,12 @@
 [![Code Coverage](https://scrutinizer-ci.com/g/recca0120/upload/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/recca0120/upload/?branch=master)
 
 ## Features
-- Support Chunks [jQuery-File-Upload](https://github.com/blueimp/jQuery-File-Upload) $driver = 'fileapi';
-- Support Chunks [Dropzone](https://fineuploader.com/) $driver = 'dropzone';
-- Support Chunks [FileApi](http://mailru.github.io/FileAPI/) $driver = 'fileapi';
-- Support Chunks [Fine Uploader](https://fineuploader.com/) $driver = 'fine-uploader';
-- Support Chunks [Plupload](http://www.plupload.com/) $driver = 'plupload';
+
+-   Support Chunks [jQuery-File-Upload](https://github.com/blueimp/jQuery-File-Upload) $driver = 'fileapi';
+-   Support Chunks [Dropzone](https://fineuploader.com/) $driver = 'dropzone';
+-   Support Chunks [FileApi](http://mailru.github.io/FileAPI/) $driver = 'fileapi';
+-   Support Chunks [Fine Uploader](https://fineuploader.com/) $driver = 'fine-uploader';
+-   Support Chunks [Plupload](http://www.plupload.com/) $driver = 'plupload';
 
 ## Installing
 
@@ -28,27 +29,7 @@ To get the latest version of Laravel Exceptions, simply require the project usin
 composer require recca0120/upload
 ```
 
-Instead, you may of course manually update your require block and run `composer update` if you so choose:
-
-```json
-{
-    "require": {
-        "recca0120/upload": "^1.7"
-    }
-}
-```
-
-## Laravel 5
-
-Include the service provider within `config/app.php`. The service povider is needed for the generator artisan command.
-
-```php
-'providers' => [
-    ...
-    Recca0120\Upload\UploadServiceProvider::class,
-    ...
-];
-```
+## Laravel
 
 publish
 
@@ -59,6 +40,7 @@ artisan vendor:publish --provider="Recca0120\Upload\UploadServiceProvider"
 ## How to use
 
 Controller
+
 ```php
 
 use Illuminate\Http\JsonResponse;
@@ -85,16 +67,14 @@ class UploadController extends Controller
                 $mimeType = $uploadedFile->getMimeType();
                 $size = $uploadedFile->getSize();
                 $uploadedFile->move($path, $filename);
-                $response = [
+
+                return new JsonResponse([
                     'name' => pathinfo($clientOriginalName, PATHINFO_FILENAME).'.'.$clientOriginalExtension,
                     'tmp_name' => $path.$filename,
                     'type' => $mimeType,
                     'size' => $size,
                     'url' => $domain.$path.$filename,
-                ];
-
-                return new JsonResponse($response);
-
+                ]);
             });
     }
 }
