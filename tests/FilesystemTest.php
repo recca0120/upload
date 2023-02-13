@@ -2,48 +2,43 @@
 
 namespace Recca0120\Upload\Tests;
 
-use Mockery as m;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use org\bovigo\vfs\content\LargeFileContent;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
+use Recca0120\Upload\Exceptions\ResourceOpenException;
 use Recca0120\Upload\Filesystem;
-use org\bovigo\vfs\content\LargeFileContent;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FilesystemTest extends TestCase
 {
-    protected function tearDown()
-    {
-        parent::tearDown();
-        m::close();
-    }
+    use MockeryPHPUnitIntegration;
 
-    public function testBaseName()
+    public function testBaseName(): void
     {
         $files = new Filesystem();
-        $this->assertSame(
-            basename(__FILE__, PATHINFO_BASENAME),
-            $files->basename($path = __FILE__)
-        );
+
+        $this->assertSame(basename(__FILE__, PATHINFO_BASENAME), $files->basename(__FILE__));
     }
 
-    public function testTmpfilename()
+    public function testTmpfilename(): void
     {
         $files = new Filesystem();
         $path = __FILE__;
-        $hash = uniqid();
-        $this->assertSame(
-            md5($path.$hash).'.php',
-            $files->tmpfilename($path, $hash)
-        );
+        $hash = uniqid('', true);
+
+        $this->assertSame(md5($path.$hash).'.php', $files->tmpfilename($path, $hash));
     }
 
-    public function testAppendStream()
+    /**
+     * @throws ResourceOpenException
+     */
+    public function testAppendStream(): void
     {
         $root = vfsStream::setup();
-        $input = vfsStream::newFile('input.txt')
-            ->withContent(LargeFileContent::withKilobytes(10))
-            ->at($root);
-        $output = vfsStream::newFile('output.txt')
-            ->at($root);
+        $input = vfsStream::newFile('input.txt')->withContent(LargeFileContent::withKilobytes(10))->at($root);
+        $output = vfsStream::newFile('output.txt')->at($root);
+
         $files = new Filesystem();
         $offset = 0;
         $appendContent = '';
@@ -56,45 +51,40 @@ class FilesystemTest extends TestCase
         }
     }
 
-    /**
-     * @expectedException Recca0120\Upload\Exceptions\ResourceOpenException
-     * @expectedExceptionMessage Failed to open output stream.
-     * @expectedExceptionCode 102
-     */
-    public function testOutputIsNotResource()
+    public function testOutputIsNotResource(): void
     {
+        $this->expectExceptionCode(102);
+        $this->expectExceptionMessage('Failed to open output stream.');
+        $this->expectException(ResourceOpenException::class);
+
         $root = vfsStream::setup();
-        $input = vfsStream::newFile('input.txt')
-            ->withContent(LargeFileContent::withKilobytes(10))
-            ->at($root);
+        $input = vfsStream::newFile('input.txt')->withContent(LargeFileContent::withKilobytes(10))->at($root);
         $files = new Filesystem();
         $offset = 0;
         $files->appendStream(null, $input->url(), $offset);
     }
 
-    /**
-     * @expectedException Recca0120\Upload\Exceptions\ResourceOpenException
-     * @expectedExceptionMessage Failed to open input stream.
-     * @expectedExceptionCode 101
-     */
-    public function testInputIsNotResource()
+    public function testInputIsNotResource(): void
     {
+        $this->expectExceptionCode(101);
+        $this->expectExceptionMessage('Failed to open input stream.');
+        $this->expectException(ResourceOpenException::class);
+
         $root = vfsStream::setup();
-        $output = vfsStream::newFile('output.txt')
-            ->at($root);
+        $output = vfsStream::newFile('output.txt')->at($root);
         $files = new Filesystem();
         $offset = 0;
         $files->appendStream($output->url(), null, $offset);
     }
 
-    public function testCreateUploadedFile()
+    public function testCreateUploadedFile(): void
     {
         $root = vfsStream::setup();
-        $file = vfsStream::newFile('file.txt')
-            ->at($root);
+        $file = vfsStream::newFile('file.txt')->at($root);
         $files = new Filesystem();
+
         $this->assertInstanceOf(
-            'Symfony\Component\HttpFoundation\File\UploadedFile',
+            UploadedFile::class,
             $files->createUploadedFile($file->url(), basename($file->url()))
         );
     }

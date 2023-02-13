@@ -2,24 +2,23 @@
 
 namespace Recca0120\Upload;
 
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Recca0120\Upload\Exceptions\ResourceOpenException;
+
 class FileAPI extends Api
 {
     /**
-     * receive.
-     *
-     * @param string $name
-     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
-     *
-     * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
+     * @throws ResourceOpenException
+     * @throws FileNotFoundException
      */
-    public function receive($name)
+    public function receive(string $name)
     {
         $contentDisposition = (string) $this->request->header('content-disposition');
         if (empty($contentDisposition) === true) {
             return $this->request->file($name);
         }
 
-        list($start, $end, $total) = $this->parseContentRange();
+        [$start, $end, $total] = $this->parseContentRange();
         $originalName = $this->getOriginalName($contentDisposition);
         $mimeType = $this->getMimeType($originalName);
         $uuid = $this->request->get('token');
@@ -31,25 +30,15 @@ class FileAPI extends Api
         return $completed === true
             ? $chunkFile->createUploadedFile()
             : $chunkFile->throwException([
-                'files' => [
-                    'name' => $originalName,
-                    'size' => $end,
-                    'type' => $chunkFile->getMimeType(),
-                ],
+                'files' => ['name' => $originalName, 'size' => $end, 'type' => $chunkFile->getMimeType()],
             ], ['X-Last-Known-Byte' => $end]);
     }
 
-    /**
-     * getOriginalName.
-     *
-     * @param string $contentDisposition
-     * @return string
-     */
-    protected function getOriginalName($contentDisposition)
+    protected function getOriginalName(string $contentDisposition): string
     {
         $originalName = (string) $this->request->get('name');
         if (empty($originalName) === true) {
-            list($originalName) = sscanf(
+            [$originalName] = sscanf(
                 $contentDisposition,
                 'attachment; filename=%s'
             );
@@ -58,13 +47,7 @@ class FileAPI extends Api
         return preg_replace('/[\'"]/', '', $originalName);
     }
 
-    /**
-     * getMimeType.
-     *
-     * @param string $originalName
-     * @return string
-     */
-    protected function getMimeType($originalName)
+    protected function getMimeType(string $originalName): string
     {
         $mimeType = (string) $this->request->header('content-type');
         if (empty($mimeType) === true) {
@@ -74,12 +57,7 @@ class FileAPI extends Api
         return $mimeType;
     }
 
-    /**
-     * parseContentRange.
-     *
-     * @return array
-     */
-    protected function parseContentRange()
+    protected function parseContentRange(): array
     {
         $contentRange = $this->request->header('content-range');
         if (empty($contentRange) === false) {

@@ -2,116 +2,100 @@
 
 namespace Recca0120\Upload\Tests;
 
-use Exception;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Recca0120\Upload\ChunkFile;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
+use Recca0120\Upload\Filesystem;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ChunkFileTest extends TestCase
 {
-    protected function tearDown()
-    {
-        parent::tearDown();
-        m::close();
-    }
+    use MockeryPHPUnitIntegration;
 
-    public function testAppendStream()
+    public function testAppendStream(): void
     {
-        $files = m::mock('Recca0120\Upload\Filesystem');
+        $this->expectException(ChunkedResponseException::class);
+
+        $files = m::mock(Filesystem::class);
 
         $chunkFile = new ChunkFile(
             $name = __FILE__,
             $chunkPath = 'storage/chunk/',
-            $storagePath = 'storage/',
-            $token = uniqid(),
-            $mimeType = 'text/plain',
+            'storage/',
+            $token = uniqid('', true),
+            'text/plain',
             $files
         );
 
         $source = 'php://input';
         $offset = 0;
-        $files->shouldReceive('tmpfilename')->once()->with($name, $token)->andReturn(
-            $tmpfilename = 'foo.php'
-        );
-        $files->shouldReceive('appendStream')->once()->with($chunkPath.$tmpfilename.'.part', $source, $offset);
+        $files->allows('tmpfilename')->once()->with($name, $token)->andReturn($tmpfilename = 'foo.php');
+        $files->allows('appendStream')->once()->with($chunkPath.$tmpfilename.'.part', $source, $offset);
 
-        try {
-            $chunkFile->appendStream($source, $offset)->throwException();
-        } catch (Exception $e) {
-            $this->assertInstanceOf('Recca0120\Upload\Exceptions\ChunkedResponseException', $e);
-        }
+        $chunkFile->appendStream($source, $offset)->throwException();
     }
 
-    public function testAppendFile()
+    public function testAppendFile(): void
     {
-        $files = m::mock('Recca0120\Upload\Filesystem');
+        $this->expectException(ChunkedResponseException::class);
+
+        $files = m::mock(Filesystem::class);
 
         $chunkFile = new ChunkFile(
             $name = __FILE__,
             $chunkPath = 'storage/chunk/',
-            $storagePath = 'storage/',
-            $token = uniqid(),
-            $mimeType = 'text/plain',
+            'storage/',
+            $token = uniqid('', true),
+            'text/plain',
             $files
         );
 
         $source = 'php://input';
         $index = 0;
-        $files->shouldReceive('tmpfilename')->once()->with($name, $token)->andReturn(
-            $tmpfilename = 'foo.php'
-        );
-        $files->shouldReceive('appendStream')->once()->with($chunkPath.$tmpfilename.'.part.'.$index, $source, 0);
+        $files->allows('tmpfilename')->once()->with($name, $token)->andReturn($tmpfilename = 'foo.php');
+        $files->allows('appendStream')->once()->with($chunkPath.$tmpfilename.'.part.'.$index, $source, 0);
 
-        try {
-            $chunkFile->appendFile($source, $index)->throwException();
-        } catch (Exception $e) {
-            $this->assertInstanceOf('Recca0120\Upload\Exceptions\ChunkedResponseException', $e);
-        }
+        $chunkFile->appendFile($source, $index)->throwException();
     }
 
-    public function testCreateUploadedFile()
+    /**
+     * @throws FileNotFoundException
+     */
+    public function testCreateUploadedFile(): void
     {
-        $files = m::mock('Recca0120\Upload\Filesystem');
-        $files->shouldReceive('mimeType')->once()->andReturn(
-            $mimeType = 'text/plain'
-        );
+        $files = m::mock(Filesystem::class);
+        $files->allows('mimeType')->once()->andReturn($mimeType = 'text/plain');
 
         $chunkFile = new ChunkFile(
             $name = __FILE__,
             $chunkPath = 'storage/chunk/',
             $storagePath = 'storage/',
-            $token = uniqid(),
+            $token = uniqid('', true),
             null,
             $files
         );
 
-        $source = 'php://input';
-        $offset = 0;
-
-        $files->shouldReceive('tmpfilename')->once()->with($name, $token)->andReturn(
-            $tmpfilename = 'foo.php'
-        );
-        $files->shouldReceive('move')->once()->with($chunkPath.$tmpfilename.'.part', $storagePath.$tmpfilename);
-        $files->shouldReceive('createUploadedFile')->once()->with(
-            $storagePath.$tmpfilename, $name, $mimeType
-        )->andReturn(
-            $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
-        );
+        $files->allows('tmpfilename')->once()->with($name, $token)->andReturn($tmpfilename = 'foo.php');
+        $files->allows('move')->once()->with($chunkPath.$tmpfilename.'.part', $storagePath.$tmpfilename);
+        $files->allows('createUploadedFile')->once()->with($storagePath.$tmpfilename, $name, $mimeType)
+            ->andReturn($uploadedFile = m::mock(UploadedFile::class));
 
         $this->assertSame($uploadedFile, $chunkFile->createUploadedFile());
     }
 
-    public function testThrowException()
+    public function testThrowException(): void
     {
-        $files = m::mock('Recca0120\Upload\Filesystem');
+        $files = m::mock(Filesystem::class);
 
         $chunkFile = new ChunkFile(
-            $name = __FILE__,
-            $chunkPath = 'storage/chunk/',
-            $storagePath = 'storage/',
-            $token = uniqid(),
-            $mimeType = 'text/plain',
+            __FILE__,
+            'storage/chunk/',
+            'storage/',
+            uniqid('', true),
+            'text/plain',
             $files
         );
 

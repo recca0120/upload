@@ -3,62 +3,39 @@
 namespace Recca0120\Upload\Contracts;
 
 use Illuminate\Http\JsonResponse;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Illuminate\Http\UploadedFile;
+use Recca0120\Upload\Exceptions\ChunkedResponseException;
+use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 interface Api
 {
-    /**
-     * domain.
-     *
-     * @return string
-     */
-    public function domain();
+    public function domain(): string;
+
+    public function path(): string;
 
     /**
-     * path.
-     *
-     * @return string
+     * @param  string  $path
+     * @return self
      */
-    public function path();
+    public function makeDirectory(string $path);
 
     /**
-     * makeDirectory.
-     *
-     * @param string $path
-     * @return static
+     * @return self
      */
-    public function makeDirectory($path);
+    public function cleanDirectory(string $path);
 
     /**
-     * cleanDirectory.
+     * @return UploadedFile|SymfonyUploadedFile
      *
-     * @param string $path
+     * @throws ChunkedResponseException
      */
-    public function cleanDirectory($path);
+    public function receive(string $name);
 
     /**
-     * receive.
-     *
-     * @param string $name
-     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
-     *
-     * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
+     * @param  UploadedFile|SymfonyUploadedFile  $uploadedFile
+     * @return self
      */
-    public function receive($name);
+    public function deleteUploadedFile($uploadedFile);
 
-    /**
-     * deleteUploadedFile.
-     *
-     * @param \Symfony\Component\HttpFoundation\File\UploadedFile
-     */
-    public function deleteUploadedFile(UploadedFile $uploadedFile);
-
-    /**
-     * completedResponse.
-     *
-     * @method completedResponse
-     * @param \Illuminate\Http\JsonResponse $response
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function completedResponse(JsonResponse $response);
+    public function completedResponse(JsonResponse $response): JsonResponse;
 }

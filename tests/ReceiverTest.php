@@ -2,51 +2,40 @@
 
 namespace Recca0120\Upload\Tests;
 
+use Illuminate\Http\JsonResponse;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
-use Recca0120\Upload\Receiver;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Recca0120\Upload\Contracts\Api;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
+use Recca0120\Upload\FileAPI;
+use Recca0120\Upload\Plupload;
+use Recca0120\Upload\Receiver;
+use ReflectionClass;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Response;
 
 class ReceiverTest extends TestCase
 {
-    protected function tearDown()
-    {
-        parent::tearDown();
-        m::close();
-    }
+    use MockeryPHPUnitIntegration;
 
-    public function testReceive()
+    public function testReceive(): void
     {
-        $receiver = new Receiver(
-            $api = m::mock('Recca0120\Upload\Contracts\Api')
-        );
+        $receiver = new Receiver($api = m::mock(Api::class));
         $inputName = 'foo';
-        $api->shouldReceive('receive')->once()->with($inputName)->andReturn(
-            $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
-        );
-        $api->shouldReceive('domain')->once()->andReturn($domain = 'foo/');
-        $api->shouldReceive('path')->once()->andReturn($path = 'foo/');
-        $uploadedFile->shouldReceive('getClientOriginalName')->once()->andReturn(
-            $clientOriginalName = 'foo.PHP'
-        );
+        $api->allows('receive')->once()->with($inputName)->andReturn($uploadedFile = m::mock(UploadedFile::class));
+        $api->allows('domain')->once()->andReturn($domain = 'foo/');
+        $api->allows('path')->once()->andReturn($path = 'foo/');
+        $uploadedFile->allows('getClientOriginalName')->once()->andReturn($clientOriginalName = 'foo.PHP');
         $clientOriginalExtension = 'PHP';
 
-        $uploadedFile->shouldReceive('getBasename')->once()->andReturn(
-            $basename = 'foo'
-        );
-        $uploadedFile->shouldReceive('getMimeType')->once()->andReturn(
-            $mimeType = 'foo'
-        );
-        $uploadedFile->shouldReceive('getSize')->once()->andReturn(
-            $size = 1000
-        );
-        $uploadedFile->shouldReceive('move')->once()->with(
-            $path, $filename = md5($basename).'.'.strtolower($clientOriginalExtension)
-        );
+        $uploadedFile->allows('getBasename')->once()->andReturn($basename = 'foo');
+        $uploadedFile->allows('getMimeType')->once()->andReturn($mimeType = 'foo');
+        $uploadedFile->allows('getSize')->once()->andReturn($size = 1000);
+        $uploadedFile->allows('move')->once()->with($path, $filename = md5($basename).'.'.strtolower($clientOriginalExtension));
 
-        $api->shouldReceive('deleteUploadedFile')->once()->with($uploadedFile)->andReturnSelf();
-        $api->shouldReceive('completedResponse')->once()->with(m::type('Illuminate\Http\JsonResponse'))->andReturnUsing(function ($response) {
+        $api->allows('deleteUploadedFile')->once()->with($uploadedFile)->andReturnSelf();
+        $api->allows('completedResponse')->once()->with(m::type(JsonResponse::class))->andReturnUsing(function ($response) {
             return $response;
         });
 
@@ -60,67 +49,54 @@ class ReceiverTest extends TestCase
         ], (array) $response->getData());
     }
 
-    public function testReceiveCustomCallback()
+    public function testReceiveCustomCallback(): void
     {
-        $receiver = new Receiver(
-            $api = m::mock('Recca0120\Upload\Contracts\Api')
-        );
+        $receiver = new Receiver($api = m::mock(Api::class));
         $inputName = 'foo';
-        $api->shouldReceive('receive')->once()->with($inputName)->andReturn(
-            $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
-        );
-        $api->shouldReceive('domain')->once()->andReturn($domain = 'foo/');
-        $api->shouldReceive('path')->once()->andReturn($path = 'foo/');
-        $response = m::mock('Illuminate\Http\JsonResponse');
-        $api->shouldReceive('deleteUploadedFile')->once()->with($uploadedFile)->andReturnSelf();
-        $api->shouldReceive('completedResponse')->once()->with($response)->andReturn($response);
+        $api->allows('receive')->once()->with($inputName)->andReturn($uploadedFile = m::mock(UploadedFile::class));
+        $api->allows('domain')->once()->andReturn($domain = 'foo/');
+        $api->allows('path')->once()->andReturn($path = 'foo/');
+        $response = m::mock(JsonResponse::class);
+        $api->allows('deleteUploadedFile')->once()->with($uploadedFile)->andReturnSelf();
+        $api->allows('completedResponse')->once()->with($response)->andReturn($response);
 
         $this->assertSame(
             $response,
-            $receiver->receive($inputName, function (UploadedFile $uploadedFile, $path, $domain, $api) use ($response) {
+            $receiver->receive($inputName, function () use ($response) {
                 return $response;
             })
         );
     }
 
-    public function testReceiveAndThroChunkedResponseException()
+    public function testReceiveAndThrowChunkedResponseException(): void
     {
-        $receiver = new Receiver(
-            $api = m::mock('Recca0120\Upload\Contracts\Api')
-        );
+        $receiver = new Receiver($api = m::mock(Api::class));
         $inputName = 'foo';
-        $api->shouldReceive('receive')->once()->with($inputName)->andThrow(
-            $chunkedResponseException = new ChunkedResponseException()
-        );
+        $api->allows('receive')->once()->with($inputName)->andThrow(new ChunkedResponseException());
+
         $this->assertInstanceOf(
-            'Symfony\Component\HttpFoundation\Response',
-            $receiver->receive($inputName, function (UploadedFile $uploadedFile, $path, $domain, $url, $api) {
-                return $response;
+            Response::class,
+            $receiver->receive($inputName, function () {
             })
         );
     }
 
-    public function testFactory()
+    public function testFactory(): void
     {
-        $this->assertAttributeInstanceOf(
-            'Recca0120\Upload\FileAPI',
-            'api',
-            Receiver::factory([], 'Recca0120\Upload\FileAPI')
-        );
-        $this->assertAttributeInstanceOf(
-            'Recca0120\Upload\FileAPI',
-            'api',
-            Receiver::factory([], 'FILEAPI')
-        );
-        $this->assertAttributeInstanceOf(
-            'Recca0120\Upload\Plupload',
-            'api',
-            Receiver::factory([], 'Recca0120\Upload\Plupload')
-        );
-        $this->assertAttributeInstanceOf(
-            'Recca0120\Upload\Plupload',
-            'api',
-            Receiver::factory([], 'PLUPLOAD')
-        );
+        $class = new ReflectionClass(Receiver::class);
+        $property = $class->getProperty('api');
+        $property->setAccessible(true);
+
+        $receiver = Receiver::factory();
+        self::assertInstanceOf(FileAPI::class, $property->getValue($receiver));
+
+        $receiver = Receiver::factory([], 'FILEAPI');
+        self::assertInstanceOf(FileAPI::class, $property->getValue($receiver));
+
+        $receiver = Receiver::factory([], Plupload::class);
+        self::assertInstanceOf(Plupload::class, $property->getValue($receiver));
+
+        $receiver = Receiver::factory([], 'PLUPLOAD');
+        self::assertInstanceOf(Plupload::class, $property->getValue($receiver));
     }
 }

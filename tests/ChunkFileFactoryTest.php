@@ -2,31 +2,28 @@
 
 namespace Recca0120\Upload\Tests;
 
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Recca0120\Upload\ChunkFile;
 use Recca0120\Upload\ChunkFileFactory;
+use Recca0120\Upload\Filesystem;
 
 class ChunkFileFactoryTest extends TestCase
 {
-    protected function tearDown()
-    {
-        parent::tearDown();
-        m::close();
-    }
+    use MockeryPHPUnitIntegration;
 
-    public function testCreate()
+    public function testCreate(): void
     {
-        $chunkFileFactory = new ChunkFileFactory(
-            $files = m::mock('Recca0120\Upload\Filesystem')
-        );
+        $chunkFileFactory = new ChunkFileFactory(m::mock(Filesystem::class));
 
         $chunkFile = $chunkFileFactory->create(
-            $name = 'foo.php',
-            $cunksPath = 'foo.chunksPath',
-            $storagePath = 'foo.storagePath',
-            $token = 'foo.token'.
-            $mimeType = 'foo.mimeType'
+            'foo.php',
+            'foo.chunksPath',
+            'foo.storagePath',
+            'foo.token'.'foo.mimeType'
         );
-        $this->assertInstanceOf('Recca0120\Upload\ChunkFile', $chunkFile);
+
+        $this->assertInstanceOf(ChunkFile::class, $chunkFile);
     }
 }

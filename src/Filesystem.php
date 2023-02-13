@@ -2,46 +2,33 @@
 
 namespace Recca0120\Upload;
 
-use Recca0120\Upload\Exceptions\ResourceOpenException;
 use Illuminate\Filesystem\Filesystem as IlluminateFilesystem;
+use Illuminate\Http\UploadedFile;
+use Recca0120\Upload\Exceptions\ResourceOpenException;
+use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
+use TypeError;
+use ValueError;
 
 class Filesystem extends IlluminateFilesystem
 {
-    /**
-     * Extract the trailing name component from a file path.
-     *
-     * @param string $path
-     * @return string
-     */
-    public function basename($path)
+    public function basename($path): string
     {
         return pathinfo($path, PATHINFO_BASENAME);
     }
 
-    /**
-     * tmpfilename.
-     *
-     * @param string $path
-     * @param string $hash
-     * @return string
-     */
-    public function tmpfilename($path, $hash = null)
+    public function tmpfilename(string $path, string $hash = null): string
     {
         return md5($path.$hash).'.'.strtolower($this->extension($path));
     }
 
     /**
-     * appendStream.
-     *
-     * @param string $output
-     * @param string|resource $input
-     * @param int $offset
+     * @throws ResourceOpenException
      */
-    public function appendStream($output, $input, $offset = 0)
+    public function appendStream($output, $input, int $offset = 0): void
     {
         $mode = ($offset === 0) ? 'wb' : 'ab';
         $output = $this->convertToResource($output, $mode, 'output');
-        $input = $this->convertToResource($input, 'rb', 'input');
+        $input = $this->convertToResource($input, 'rb');
 
         fseek($output, $offset);
         while ($buffer = fread($input, 4096)) {
@@ -52,19 +39,9 @@ class Filesystem extends IlluminateFilesystem
         fclose($input);
     }
 
-    /**
-     * createUploadedFile.
-     *
-     * @param string $path
-     * @param string $originalName
-     * @param string $mimeType
-     * @param int $size
-     * @return \Illuminate\Http\UploadedFile
-     */
-    public function createUploadedFile($path, $originalName, $mimeType = null, $size = null)
+    public function createUploadedFile(string $path, string $originalName, string $mimeType = null, int $size = null)
     {
-        $class = class_exists('Illuminate\Http\UploadedFile') === true ?
-            'Illuminate\Http\UploadedFile' : 'Symfony\Component\HttpFoundation\File\UploadedFile';
+        $class = class_exists(UploadedFile::class) === true ? UploadedFile::class : SymfonyUploadedFile::class;
 
         $mimeType = $mimeType ?: $this->mimeType($path);
         $size = $size ?: $this->size($path);
@@ -75,15 +52,19 @@ class Filesystem extends IlluminateFilesystem
     /**
      * convertToResource.
      *
-     * @param string|resource $resource
-     * @param string $mode
-     * @param string $type
+     * @param  mixed  $resource
+     * @param  string  $mode
+     * @param  string  $type
      * @return resource
+     *
+     * @throws ResourceOpenException
      */
-    protected function convertToResource($resource, $mode = 'wb', $type = 'input')
+    protected function convertToResource($resource, string $mode = 'wb', string $type = 'input')
     {
-        $resource = is_resource($resource) === true ?
-            $resource : @fopen($resource, $mode);
+        try {
+            $resource = is_resource($resource) === true ? $resource : @fopen($resource, $mode);
+        } catch (TypeError|ValueError $error) {
+        }
 
         if (is_resource($resource) === false) {
             $code = $type === 'input' ? 101 : 102;

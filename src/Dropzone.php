@@ -2,19 +2,17 @@
 
 namespace Recca0120\Upload;
 
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Recca0120\Upload\Exceptions\ResourceOpenException;
 
 class Dropzone extends FineUploader
 {
     /**
-     * receive.
-     *
-     * @param string $name
-     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
-     *
-     * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
+     * @throws ResourceOpenException
+     * @throws FileNotFoundException
      */
-    public function receive($name)
+    public function receive(string $name)
     {
         $file = $this->request->file($name);
         if ($this->request->has('dztotalchunkcount') === false) {
@@ -33,19 +31,10 @@ class Dropzone extends FineUploader
 
         return $completed === true
             ? $chunkFile->createUploadedFile($totalparts)
-            : $chunkFile->throwException([
-                'success' => true,
-                'uuid' => $uuid,
-            ]);
+            : $chunkFile->throwException(['success' => true, 'uuid' => $uuid]);
     }
 
-    /**
-     * completedResponse.
-     *
-     * @param \Illuminate\Http\JsonResponse $response
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function completedResponse(JsonResponse $response)
+    public function completedResponse(JsonResponse $response): JsonResponse
     {
         $data = $response->getData();
         $data->success = true;

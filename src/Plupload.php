@@ -2,19 +2,17 @@
 
 namespace Recca0120\Upload;
 
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Recca0120\Upload\Exceptions\ResourceOpenException;
 
 class Plupload extends Api
 {
     /**
-     * receive.
-     *
-     * @param string $name
-     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
-     *
-     * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
+     * @throws FileNotFoundException
+     * @throws ResourceOpenException
      */
-    public function receive($name)
+    public function receive(string $name)
     {
         $uploadedFile = $this->request->file($name);
         $chunks = $this->request->get('chunks');
@@ -31,24 +29,13 @@ class Plupload extends Api
         $chunkFile = $this->createChunkFile($originalName, $uuid);
         $chunkFile->appendStream($uploadedFile->getPathname(), $start);
 
-        return $completed === true
-            ? $chunkFile->createUploadedFile()
-            : $chunkFile->throwException();
+        return $completed === true ? $chunkFile->createUploadedFile() : $chunkFile->throwException();
     }
 
-    /**
-     * completedResponse.
-     *
-     * @param \Illuminate\Http\JsonResponse $response
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function completedResponse(JsonResponse $response)
+    public function completedResponse(JsonResponse $response): JsonResponse
     {
         $data = $response->getData();
-        $response->setData([
-            'jsonrpc' => '2.0',
-            'result' => $data,
-        ]);
+        $response->setData(['jsonrpc' => '2.0', 'result' => $data]);
 
         return $response;
     }

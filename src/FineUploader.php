@@ -6,15 +6,7 @@ use Illuminate\Http\JsonResponse;
 
 class FineUploader extends Api
 {
-    /**
-     * receive.
-     *
-     * @param string $name
-     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
-     *
-     * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
-     */
-    public function receive($name)
+    public function receive(string $name)
     {
         $file = $this->request->file($name);
         if ($this->request->has('qqtotalparts') === false) {
@@ -35,19 +27,10 @@ class FineUploader extends Api
 
         return $completed === true
             ? $chunkFile->createUploadedFile($totalparts)
-            : $chunkFile->throwException([
-                'success' => true,
-                'uuid' => $uuid,
-            ]);
+            : $chunkFile->throwException(['success' => true, 'uuid' => $uuid]);
     }
 
-    /**
-     * completedResponse.
-     *
-     * @param \Illuminate\Http\JsonResponse $response
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function completedResponse(JsonResponse $response)
+    public function completedResponse(JsonResponse $response): JsonResponse
     {
         $data = $response->getData();
         $data->success = true;

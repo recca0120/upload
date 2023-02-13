@@ -3,77 +3,50 @@
 namespace Recca0120\Upload;
 
 use ErrorException;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
+use Recca0120\Upload\Exceptions\ResourceOpenException;
 
 class ChunkFile
 {
-    /**
-     * TMPFILE_EXTENSION.
-     *
-     * @var string
-     */
-    const TMPFILE_EXTENSION = '.part';
+    public const TMPFILE_EXTENSION = '.part';
 
     /**
-     * $files.
-     *
-     * @var \Recca0120\Upload\Filesystem
+     * @var Filesystem
      */
     protected $files;
 
     /**
-     * $token.
-     *
-     * @var string
+     * @var string|null
      */
     protected $token = null;
 
     /**
-     * $chunkPath.
-     *
-     * @var string
+     * @var string|null
      */
     protected $chunkPath = null;
 
     /**
-     * $storagePath.
-     *
-     * @var string
+     * @var string|null
      */
     protected $storagePath = null;
 
     /**
-     * $name.
-     *
-     * @var string
+     * @var string|null
      */
     protected $name = null;
 
     /**
-     * $mimeType.
-     *
-     * @var string
+     * @var string|null
      */
     protected $mimeType = null;
 
     /**
-     * $tmpfilename.
-     *
-     * @var string
+     * @var string|null
      */
     protected $tmpfilename = null;
 
-    /**
-     * __construct.
-     *
-     * @param string $name
-     * @param string $chunkPath
-     * @param string $storagePath
-     * @param string $mimeType
-     * @param string $token
-     * @param \Recca0120\Upload\Filesystem $files
-     */
-    public function __construct($name, $chunkPath, $storagePath, $token = null, $mimeType = null, Filesystem $files = null)
+    public function __construct(string $name, string $chunkPath, string $storagePath, string $token = null, string $mimeType = null, Filesystem $files = null)
     {
         $this->files = $files ?: new Filesystem();
         $this->name = $name;
@@ -83,28 +56,21 @@ class ChunkFile
         $this->mimeType = $mimeType;
     }
 
-    /**
-     * getMimeType.
-     *
-     * @return string
-     */
-    public function getMimeType()
+    public function getMimeType(): ?string
     {
         try {
             return $this->mimeType ?: $this->files->mimeType($this->name);
         } catch (ErrorException $e) {
-            return;
+            return null;
         }
     }
 
     /**
-     * throwException.
-     *
-     * @param mixed $message
-     * @param array $headers
-     * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
+     * @param  array|string  $message
+     * @param  array  $headers
+     * @return void
      */
-    public function throwException($message = '', $headers = [])
+    public function throwException($message = '', array $headers = []): void
     {
         throw new ChunkedResponseException($message, $headers);
     }
@@ -112,11 +78,13 @@ class ChunkFile
     /**
      * appendStream.
      *
-     * @param mixed $source
-     * @param int $offset
+     * @param  mixed  $source
+     * @param  int  $offset
      * @return $this
+     *
+     * @throws ResourceOpenException
      */
-    public function appendStream($source, $offset = 0)
+    public function appendStream($source, int $offset = 0)
     {
         $chunkFile = $this->chunkFile();
         $this->files->appendStream($chunkFile, $source, (int) $offset);
@@ -127,11 +95,13 @@ class ChunkFile
     /**
      * appendFile.
      *
-     * @param mixed $source
-     * @param int $index
+     * @param  mixed  $source
+     * @param  int  $index
      * @return $this
+     *
+     * @throws ResourceOpenException
      */
-    public function appendFile($source, $index = 0)
+    public function appendFile($source, int $index = 0): ChunkFile
     {
         $chunkFile = $this->chunkFile().'.'.$index;
         $this->files->appendStream($chunkFile, $source, 0);
@@ -140,9 +110,7 @@ class ChunkFile
     }
 
     /**
-     * createUploadedFile.
-     *
-     * @return \Illuminate\Http\UploadedFile
+     * @throws FileNotFoundException
      */
     public function createUploadedFile($chunks = null, $storageFile = null)
     {
@@ -167,12 +135,7 @@ class ChunkFile
         );
     }
 
-    /**
-     * tmpfilename.
-     *
-     * @return string
-     */
-    protected function tmpfilename()
+    protected function tmpfilename(): ?string
     {
         if (is_null($this->tmpfilename) === true) {
             $this->tmpfilename = $this->files->tmpfilename($this->name, $this->token);
@@ -181,22 +144,12 @@ class ChunkFile
         return $this->tmpfilename;
     }
 
-    /**
-     * chunkFile.
-     *
-     * @return string
-     */
-    protected function chunkFile()
+    protected function chunkFile(): string
     {
         return $this->chunkPath.$this->tmpfilename().static::TMPFILE_EXTENSION;
     }
 
-    /**
-     * storageFile.
-     *
-     * @return string
-     */
-    protected function storageFile()
+    protected function storageFile(): string
     {
         return $this->storagePath.$this->tmpfilename();
     }

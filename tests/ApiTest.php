@@ -2,103 +2,99 @@
 
 namespace Recca0120\Upload\Tests;
 
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Recca0120\Upload\Api as ApiBase;
+use Recca0120\Upload\Filesystem;
+use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 class ApiTest extends TestCase
 {
-    protected function tearDown()
-    {
-        parent::tearDown();
-        m::close();
-    }
+    use MockeryPHPUnitIntegration;
 
-    public function testDomain()
+    public function testDomain(): void
     {
-        $request = m::mock('Illuminate\Http\Request');
-        $request->shouldReceive('root')->once()->andReturn(null);
-        $api = new Api(
-            $config = ['domain' => $domain = 'foo/'],
-            $request,
-            $files = m::mock('Recca0120\Upload\Filesystem')
-        );
+        $request = m::mock(Request::class);
+        $request->allows('root')->once()->andReturn(null);
+
+        $api = new Api(['domain' => $domain = 'foo/'], $request, m::mock(Filesystem::class));
+
         $this->assertSame($domain, $api->domain());
     }
 
-    public function testPath()
+    public function testPath(): void
     {
-        $request = m::mock('Illuminate\Http\Request');
-        $request->shouldReceive('root')->once()->andReturn($root = 'root');
-        $api = new Api(
-            $config = ['path' => $path = 'foo/'],
-            $request,
-            $files = m::mock('Recca0120\Upload\Filesystem')
-        );
+        $request = m::mock(Request::class);
+        $request->allows('root')->once()->andReturn('root');
+
+        $api = new Api(['path' => $path = 'foo/'], $request, m::mock(Filesystem::class));
+
         $this->assertSame($path, $api->path());
     }
 
-    public function testMakeDirectory()
+    public function testMakeDirectory(): void
     {
-        $request = m::mock('Illuminate\Http\Request');
-        $request->shouldReceive('root')->once()->andReturn($root = 'root');
-        $api = new Api(
-            $config = ['chunks' => $chunksPath = 'foo/'],
-            $request,
-            $files = m::mock('Recca0120\Upload\Filesystem')
-        );
+        $request = m::mock(Request::class);
+        $request->allows('root')->once()->andReturn('root');
+
+        $files = m::mock(Filesystem::class);
         $path = __DIR__;
-        $files->shouldReceive('isDirectory')->once()->with($path)->andReturn(false);
-        $files->shouldReceive('makeDirectory')->once()->with($path, 0777, true, true)->andReturn(false);
+        $files->allows('isDirectory')->once()->with($path)->andReturn(false);
+        $files->allows('makeDirectory')->once()->with($path, 0777, true, true)->andReturn(false);
+
+        $api = new Api(['chunks' => 'foo/'], $request, $files);
+
         $this->assertSame($api, $api->makeDirectory($path));
     }
 
-    public function testCleanDirectory()
+    public function testCleanDirectory(): void
     {
-        $request = m::mock('Illuminate\Http\Request');
-        $request->shouldReceive('root')->once()->andReturn($root = 'root');
-        $api = new Api(
-            $config = ['chunks' => $chunksPath = 'foo/'],
-            $request,
-            $files = m::mock('Recca0120\Upload\Filesystem')
-        );
+        $request = m::mock(Request::class);
+        $request->allows('root')->once()->andReturn('root');
+
+        $files = m::mock(Filesystem::class);
         $path = __DIR__;
-        $files->shouldReceive('files')->once()->with($path)->andReturn([$file = __FILE__]);
-        $files->shouldReceive('isFile')->once()->with($file)->andReturn(true);
-        $files->shouldReceive('lastModified')->once()->with($file)->andReturn(time() - 86400);
-        $files->shouldReceive('delete')->once()->with($file);
+        $files->allows('files')->once()->with($path)->andReturn([$file = __FILE__]);
+        $files->allows('isFile')->once()->with($file)->andReturn(true);
+        $files->allows('lastModified')->once()->with($file)->andReturn(time() - 86400);
+        $files->allows('delete')->once()->with($file);
+
+        $api = new Api(['chunks' => 'foo/'], $request, $files);
+
         $this->assertSame($api, $api->cleanDirectory($path));
     }
 
-    public function testDeleteUploadedFile()
+    public function testDeleteUploadedFile(): void
     {
-        $request = m::mock('Illuminate\Http\Request');
-        $request->shouldReceive('root')->once()->andReturn($root = 'root');
-        $api = new Api(
-            $config = ['chunks' => $chunksPath = 'foo/'],
-            $request,
-            $files = m::mock('Recca0120\Upload\Filesystem')
-        );
-        $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile');
-        $uploadedFile->shouldReceive('getPathname')->once()->andReturn($file = __FILE__);
-        $files->shouldReceive('isDirectory')->once()->andReturn(true);
-        $files->shouldReceive('isFile')->once()->with($file)->andReturn(true);
-        $files->shouldReceive('delete')->once()->with($file);
-        $files->shouldReceive('files')->once()->andReturn([]);
+        $request = m::mock(Request::class);
+        $request->allows('root')->once()->andReturn('root');
+
+        $uploadedFile = m::mock(SymfonyUploadedFile::class);
+        $uploadedFile->allows('getPathname')->once()->andReturn($file = __FILE__);
+
+        $files = m::mock(Filesystem::class);
+        $files->allows('isDirectory')->once()->andReturn(true);
+        $files->allows('isFile')->once()->with($file)->andReturn(true);
+        $files->allows('delete')->once()->with($file);
+        $files->allows('files')->once()->andReturn([]);
+
+        $api = new Api(['chunks' => 'foo/'], $request, $files);
+
         $this->assertSame($api, $api->deleteUploadedFile($uploadedFile));
     }
 
-    public function testCompletedResponse()
+    public function testCompletedResponse(): void
     {
-        $request = m::mock('Illuminate\Http\Request');
-        $request->shouldReceive('root')->once()->andReturn($root = 'root');
-        $api = new Api(
-            $config = ['chunks' => $chunksPath = 'foo/'],
-            $request,
-            $files = m::mock('Recca0120\Upload\Filesystem')
-        );
+        $request = m::mock(Request::class);
+        $request->allows('root')->once()->andReturn('root');
 
-        $response = m::mock('Illuminate\Http\JsonResponse');
+        $api = new Api(['chunks' => 'foo/'], $request, m::mock(Filesystem::class));
+
+        $response = m::mock(JsonResponse::class);
 
         $this->assertSame($response, $api->completedResponse($response));
     }
@@ -106,7 +102,8 @@ class ApiTest extends TestCase
 
 class Api extends ApiBase
 {
-    public function receive($inputName)
+    public function receive(string $name): UploadedFile
     {
+        return m::mock(UploadedFile::class);
     }
 }

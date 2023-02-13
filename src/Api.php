@@ -2,31 +2,30 @@
 
 namespace Recca0120\Upload;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Recca0120\Upload\Contracts\Api as ApiContract;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 abstract class Api implements ApiContract
 {
     /**
      * $request.
      *
-     * @var \Illuminate\Http\Request
+     * @var Request
      */
     protected $request;
 
     /**
      * $files.
      *
-     * @var \Recca0120\Upload\Filesystem
+     * @var Filesystem
      */
     protected $files;
 
     /**
      * $chunkFile.
      *
-     * @var \Recca0120\Upload\ChunkFileFactory
+     * @var ChunkFileFactory
      */
     protected $ChunkFileFactory;
 
@@ -38,13 +37,10 @@ abstract class Api implements ApiContract
     protected $config;
 
     /**
-     * __construct.
-     *
-     * @param array $config
-     * @param \Illuminate\Http\Request $request
-     * @param \Recca0120\Upload\Filesystem $files
-     * @param \Recca0120\Upload\ChunkFileFactory $chunkFileFactory
+     * @var ChunkFileFactory
      */
+    protected $chunkFileFactory;
+
     public function __construct($config = [], Request $request = null, Filesystem $files = null, ChunkFileFactory $chunkFileFactory = null)
     {
         $this->request = $request ?: Request::capture();
@@ -58,32 +54,17 @@ abstract class Api implements ApiContract
         ], $config);
     }
 
-    /**
-     * domain.
-     *
-     * @return string
-     */
-    public function domain()
+    public function domain(): string
     {
         return rtrim($this->config['domain'], '/').'/';
     }
 
-    /**
-     * path.
-     *
-     * @return string
-     */
-    public function path()
+    public function path(): string
     {
         return rtrim($this->config['path'], '/').'/';
     }
 
-    /**
-     * makeDirectory.
-     *
-     * @return $this
-     */
-    public function makeDirectory($path)
+    public function makeDirectory(string $path): Api
     {
         if ($this->files->isDirectory($path) === false) {
             $this->files->makeDirectory($path, 0777, true, true);
@@ -92,13 +73,7 @@ abstract class Api implements ApiContract
         return $this;
     }
 
-    /**
-     * cleanDirectory.
-     *
-     * @param string $path
-     * @return $this
-     */
-    public function cleanDirectory($path)
+    public function cleanDirectory(string $path): Api
     {
         $time = time();
         $maxFileAge = 3600;
@@ -114,23 +89,9 @@ abstract class Api implements ApiContract
         return $this;
     }
 
-    /**
-     * receive.
-     *
-     * @param string $inputName
-     * @return \Symfony\Component\HttpFoundation\File\UploadedFile
-     *
-     * @throws \Recca0120\Upload\Exceptions\ChunkedResponseException
-     */
-    abstract public function receive($inputName);
+    abstract public function receive(string $name);
 
-    /**
-     * deleteUploadedFile.
-     *
-     * @param \Symfony\Component\HttpFoundation\File\UploadedFile
-     * @return $this
-     */
-    public function deleteUploadedFile(UploadedFile $uploadedFile)
+    public function deleteUploadedFile($uploadedFile)
     {
         $file = $uploadedFile->getPathname();
         if ($this->files->isFile($file) === true) {
@@ -141,49 +102,26 @@ abstract class Api implements ApiContract
         return $this;
     }
 
-    /**
-     * completedResponse.
-     *
-     * @param \Illuminate\Http\JsonResponse $response
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function completedResponse(JsonResponse $response)
+    public function completedResponse(JsonResponse $response): JsonResponse
     {
         return $response;
     }
 
-    /**
-     * chunkPath.
-     *
-     * @return string
-     */
-    protected function chunkPath()
+    protected function chunkPath(): string
     {
         $this->makeDirectory($this->config['chunks']);
 
         return rtrim($this->config['chunks'], '/').'/';
     }
 
-    /**
-     * storagePath.
-     *
-     * @return string
-     */
-    protected function storagePath()
+    protected function storagePath(): string
     {
         $this->makeDirectory($this->config['storage']);
 
         return rtrim($this->config['storage'], '/').'/';
     }
 
-    /**
-     * createChunkFile.
-     *
-     * @param string $name
-     * @param string $uuid
-     * @return \Recca0120\Upload\ChunkFile
-     */
-    protected function createChunkFile($name, $uuid = null, $mimeType = null)
+    protected function createChunkFile(string $name, string $uuid = null, string $mimeType = null): ChunkFile
     {
         return $this->chunkFileFactory->create(
             $name, $this->chunkPath(), $this->storagePath(), $uuid, $mimeType

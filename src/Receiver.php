@@ -2,48 +2,30 @@
 
 namespace Recca0120\Upload;
 
-use Illuminate\Support\Arr;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Arr;
 use Recca0120\Upload\Contracts\Api as ApiContract;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Response;
 
 class Receiver
 {
     /**
-     * $api.
-     *
-     * @var \Recca0120\Upload\Contracts\Api
+     * @var ApiContract
      */
     protected $api;
 
-    /**
-     * __construct.
-     *
-     * @param \Recca0120\Upload\Contracts\Api $api
-     */
     public function __construct(ApiContract $api)
     {
         $this->api = $api;
     }
 
-    /**
-     * receive.
-     *
-     * @param string $inputName
-     * @param callable $callback
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function receive($inputName = 'file', callable $callback = null)
+    public function receive(string $inputName = 'file', callable $callback = null): Response
     {
         try {
             $callback = $callback ?: [$this, 'callback'];
-            $response = call_user_func_array($callback, [
-                $uploadedFile = $this->api->receive($inputName),
-                $this->api->path(),
-                $this->api->domain(),
-                $this->api,
-            ]);
+            $response = $callback($uploadedFile = $this->api->receive($inputName), $this->api->path(), $this->api->domain(), $this->api);
 
             return $this->api->deleteUploadedFile($uploadedFile)->completedResponse($response);
         } catch (ChunkedResponseException $e) {
@@ -51,14 +33,7 @@ class Receiver
         }
     }
 
-    /**
-     * factory.
-     *
-     * @param array $config
-     * @param string $class
-     * @return \Recca0120\Upload\Contracts\Api
-     */
-    public static function factory($config = [], $class = FileAPI::class)
+    public static function factory(array $config = [], string $class = FileAPI::class): Receiver
     {
         $class = Arr::get([
             'dropzone' => Dropzone::class,
@@ -70,12 +45,7 @@ class Receiver
         return new static(new $class($config));
     }
 
-    /**
-     * callback.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    protected function callback(UploadedFile $uploadedFile, $path, $domain)
+    protected function callback(UploadedFile $uploadedFile, $path, $domain): JsonResponse
     {
         $clientPathInfo = $this->pathInfo($uploadedFile->getClientOriginalName());
         $basePathInfo = $this->pathInfo($uploadedFile->getBasename());
@@ -94,13 +64,13 @@ class Receiver
         return new JsonResponse($response);
     }
 
-    private function pathInfo($path)
+    private function pathInfo($path): array
     {
         $parts = [];
         $parts['dirname'] = rtrim(substr($path, 0, strrpos($path, '/')), '/').'/';
         $parts['basename'] = ltrim(substr($path, strrpos($path, '/')), '/');
         $parts['extension'] = strtolower(substr(strrchr($path, '.'), 1));
-        $parts['filename'] = ltrim(substr($parts['basename'], 0, strrpos($parts ['basename'], '.')), '/');
+        $parts['filename'] = ltrim(substr($parts['basename'], 0, strrpos($parts['basename'], '.')), '/');
 
         return $parts;
     }

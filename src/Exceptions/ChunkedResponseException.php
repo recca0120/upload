@@ -22,11 +22,9 @@ class ChunkedResponseException extends RuntimeException
     protected $headers;
 
     /**
-     * __construct.
-     *
-     * @param mixed $message
-     * @param array $headers
-     * @param int $code
+     * @param  mixed  $message
+     * @param  array  $headers
+     * @param  int  $code
      */
     public function __construct($message = '', $headers = [], $code = Response::HTTP_CREATED)
     {
@@ -37,12 +35,7 @@ class ChunkedResponseException extends RuntimeException
         $this->headers = $headers;
     }
 
-    /**
-     * getResponse.
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function getResponse()
+    public function getResponse(): Response
     {
         return new Response($this->getMessage(), $this->getCode(), $this->headers);
     }

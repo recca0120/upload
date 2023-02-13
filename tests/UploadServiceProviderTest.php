@@ -2,18 +2,25 @@
 
 namespace Recca0120\Upload\Tests;
 
+use Illuminate\Config\Repository;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Http\Request;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Container\Container;
+use Recca0120\Upload\UploadManager;
 use Recca0120\Upload\UploadServiceProvider;
 
 class UploadServiceProviderTest extends TestCase
 {
-    protected function setUp()
+    use MockeryPHPUnitIntegration;
+
+    protected function setUp(): void
     {
         parent::setUp();
         if (class_exists(Container::class)) {
-            $container = new Container;
+            $container = new Container();
             $container->instance('path.storage', __DIR__);
             $container->instance('path.public', __DIR__);
             $container->instance('path.config', __DIR__);
@@ -21,52 +28,34 @@ class UploadServiceProviderTest extends TestCase
         }
     }
 
-    protected function tearDown()
+    /**
+     * @throws BindingResolutionException
+     */
+    public function testRegister(): void
     {
-        parent::tearDown();
-        m::close();
-    }
+        $app = m::mock(new Container());
+        $app->instance('request', Request::capture());
+        $config = new Repository(['upload' => []]);
+        $app->instance('config', $config);
 
-    public function testRegister()
-    {
-        $serviceProvider = new UploadServiceProvider(
-            $app = m::mock('Illuminate\Contracts\Foundation\Application, ArrayAccess')
-        );
-        $app->shouldReceive('offsetGet')->twice()->with('config')->andReturn(
-            $config = m::mock('Illuminate\Contracts\Config\Repository, ArrayAccess')
-        );
-        $config->shouldReceive('get')->once()->with('upload', [])->andReturn([]);
-        $config->shouldReceive('set')->once()->with('upload', m::type('array'));
+        $serviceProvider = new UploadServiceProvider($app);
 
-        $app->shouldReceive('singleton')->once()->with(
-            'Recca0120\Upload\Filesystem', 'Recca0120\Upload\Filesystem'
-        );
-        $app->shouldReceive('singleton')->once()->with(
-            'Recca0120\Upload\UploadManager', m::on(function ($closure) use ($app) {
-                $app->shouldReceive('offsetGet')->once()->with('request')->andReturn(
-                    $request = m::mock('Illuminate\Http\Request')
-                );
-                $app->shouldReceive('make')->once()->with(
-                    'Recca0120\Upload\Filesystem'
-                )->andReturn(
-                    m::mock('Recca0120\Upload\Filesystem')
-                );
-                $this->assertInstanceOf('Recca0120\Upload\UploadManager', $closure($app));
-
-                return true;
-            })
-        );
         $serviceProvider->register();
+
+        self::assertInstanceOf(UploadManager::class, $app->make(UploadManager::class));
     }
 
-    public function testBoot()
+    public function testBoot(): void
     {
-        $serviceProvider = new UploadServiceProvider(
-            $app = m::mock('Illuminate\Contracts\Foundation\Application, ArrayAccess')
-        );
-        $app->shouldReceive('runningInConsole')->once()->andReturn(true);
+        $app = m::mock(new Container());
+        $app->instance('request', Request::capture());
+        $config = new Repository(['upload' => []]);
+        $app->instance('config', $config);
+        $app->allows('runningInConsole')->once()->andReturn(true);
+
+        $serviceProvider = new UploadServiceProvider($app);
         $serviceProvider->boot();
-        if (method_exists('Recca0120\Upload\UploadServiceProvider', 'publishableProviders') === true) {
+        if (method_exists(UploadServiceProvider::class, 'publishableProviders') === true) {
             $this->assertNotEmpty(UploadServiceProvider::publishableProviders());
         } else {
             $this->assertAttributeNotEmpty('publishes', $serviceProvider);

@@ -2,60 +2,59 @@
 
 namespace Recca0120\Upload\Tests;
 
+use Illuminate\Config\Repository;
+use Illuminate\Container\Container;
+use Illuminate\Http\Request;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Recca0120\Upload\Filesystem;
+use Recca0120\Upload\Receiver;
 use Recca0120\Upload\UploadManager;
 
 class UploadManagerTest extends TestCase
 {
-    protected function tearDown()
+    use MockeryPHPUnitIntegration;
+
+    public function testCreateDefaultDriver(): void
     {
-        parent::tearDown();
-        m::close();
+        $container = new Container();
+        $container->instance('config', new Repository(['upload' => []]));
+
+        $uploadManager = new UploadManager(
+            $container,
+            $request = m::mock(Request::class),
+            m::mock(Filesystem::class)
+        );
+        $request->allows('root')->andReturn('foo');
+        $this->assertInstanceOf(Receiver::class, $uploadManager->driver());
     }
 
-    public function testCreateDefaultDriver()
+    public function testCreatePluploadDriver(): void
     {
+        $container = new Container();
+        $container->instance('config', new Repository(['upload' => []]));
+
         $uploadManager = new UploadManager(
-            [
-                'config' => [
-                    'upload' => [],
-                ],
-            ],
-            $request = m::mock('Illuminate\Http\Request'),
-            $files = m::mock('Recca0120\Upload\Filesystem')
+            $container,
+            $request = m::mock(Request::class),
+            m::mock(Filesystem::class)
         );
-        $request->shouldReceive('root')->andReturn($root = 'foo');
-        $this->assertInstanceOf('Recca0120\Upload\Receiver', $uploadManager->driver());
+        $request->allows('root')->andReturn('foo');
+        $this->assertInstanceOf(Receiver::class, $uploadManager->driver('plupload'));
     }
 
-    public function testCreatePluploadDriver()
+    public function testCreateFineUploaderDriver(): void
     {
-        $uploadManager = new UploadManager(
-            [
-                'config' => [
-                    'upload' => [],
-                ],
-            ],
-            $request = m::mock('Illuminate\Http\Request'),
-            $files = m::mock('Recca0120\Upload\Filesystem')
-        );
-        $request->shouldReceive('root')->andReturn($root = 'foo');
-        $this->assertInstanceOf('Recca0120\Upload\Receiver', $uploadManager->driver('plupload'));
-    }
+        $container = new Container();
+        $container->instance('config', new Repository(['upload' => []]));
 
-    public function testCreateFineUploaderDriver()
-    {
         $uploadManager = new UploadManager(
-            [
-                'config' => [
-                    'upload' => [],
-                ],
-            ],
-            $request = m::mock('Illuminate\Http\Request'),
-            $files = m::mock('Recca0120\Upload\Filesystem')
+            $container,
+            $request = m::mock(Request::class),
+            m::mock(Filesystem::class)
         );
-        $request->shouldReceive('root')->andReturn($root = 'foo');
-        $this->assertInstanceOf('Recca0120\Upload\Receiver', $uploadManager->driver('fineuploader'));
+        $request->allows('root')->andReturn('foo');
+        $this->assertInstanceOf(Receiver::class, $uploadManager->driver('fineuploader'));
     }
 }

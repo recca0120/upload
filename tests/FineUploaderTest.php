@@ -2,120 +2,96 @@
 
 namespace Recca0120\Upload\Tests;
 
+use Exception;
+use Illuminate\Http\Request;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Recca0120\Upload\ChunkFile;
+use Recca0120\Upload\ChunkFileFactory;
+use Recca0120\Upload\Filesystem;
 use Recca0120\Upload\FineUploader;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FineUploaderTest extends TestCase
 {
-    protected function tearDown()
-    {
-        parent::tearDown();
-        m::close();
-    }
+    use MockeryPHPUnitIntegration;
 
-    public function testReceiveSingleFile()
+    public function testReceiveSingleFile(): void
     {
-        $request = m::mock('Illuminate\Http\Request');
-        $request->shouldReceive('root')->once()->andReturn($root = 'root');
+        $request = m::mock(Request::class);
+        $request->allows('root')->once()->andReturn('root');
+
         $api = new FineUploader(
-            $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
+            ['chunks' => 'foo/', 'storage' => 'foo/'],
             $request,
-            $files = m::mock('Recca0120\Upload\Filesystem'),
-            $chunkFileFactory = m::mock('Recca0120\Upload\ChunkFileFactory')
+            m::mock(Filesystem::class),
+            m::mock(ChunkFileFactory::class)
         );
+
         $inputName = 'qqfile';
-        $request->shouldReceive('file')->once()->with($inputName)->andReturn(
-            $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
-        );
-        $request->shouldReceive('has')->once()->with('qqtotalparts')->andReturn(false);
+        $request->allows('file')->once()->with($inputName)->andReturn($uploadedFile = m::mock(UploadedFile::class));
+        $request->allows('has')->once()->with('qqtotalparts')->andReturn(false);
 
         $this->assertSame($uploadedFile, $api->receive($inputName));
     }
 
-    public function testReceiveChunkedFile()
+    public function testReceiveChunkedFile(): void
     {
-        $request = m::mock('Illuminate\Http\Request');
-        $request->shouldReceive('root')->once()->andReturn($root = 'root');
+        $request = m::mock(Request::class);
+        $request->allows('root')->once()->andReturn('root');
+
         $api = new FineUploader(
-            $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
+            ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
-            $files = m::mock('Recca0120\Upload\Filesystem'),
-            $chunkFileFactory = m::mock('Recca0120\Upload\ChunkFileFactory')
+            $files = m::mock(Filesystem::class),
+            $chunkFileFactory = m::mock(ChunkFileFactory::class)
         );
-        $files->shouldReceive('isDirectory')->twice()->andReturn(true);
+        $files->allows('isDirectory')->twice()->andReturn(true);
         $inputName = 'qqfile';
-        $request->shouldReceive('file')->once()->with($inputName)->andReturn(null);
-        $request->shouldReceive('has')->once()->with('qqtotalparts')->andReturn(true);
-        $request->shouldReceive('get')->once()->with('qqfilename')->andReturn(
-            $originalName = 'foo.php'
-        );
-        $request->shouldReceive('get')->once()->with('qqtotalparts', 1)->andReturn(
-            $totalparts = '4'
-        );
-        $request->shouldReceive('get')->once()->with('qqpartindex')->andReturn(
-            $partindex = '3'
-        );
-        $request->shouldReceive('get')->once()->with('qquuid')->andReturn(
-            $uuid = 'foo.qquuid'
-        );
+        $request->allows('file')->once()->with($inputName)->andReturn(null);
+        $request->allows('has')->once()->with('qqtotalparts')->andReturn(true);
+        $request->allows('get')->once()->with('qqfilename')->andReturn($originalName = 'foo.php');
+        $request->allows('get')->once()->with('qqtotalparts', 1)->andReturn($totalparts = '4');
+        $request->allows('get')->once()->with('qqpartindex')->andReturn('3');
+        $request->allows('get')->once()->with('qquuid')->andReturn($uuid = 'foo.qquuid');
 
-        $chunkFileFactory->shouldReceive('create')->once()->with($originalName, $chunksPath, $storagePath, $uuid, null)->andReturn(
-            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
-        );
-
-        $chunkFile->shouldReceive('createUploadedFile')->once()->with($totalparts)->andReturn(
-            $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
-        );
+        $chunkFileFactory->allows('create')->once()->with($originalName, $chunksPath, $storagePath, $uuid, null)->andReturn($chunkFile = m::mock(ChunkFile::class));
+        $chunkFile->allows('createUploadedFile')->once()->with($totalparts)->andReturn($uploadedFile = m::mock(UploadedFile::class));
 
         $this->assertSame($uploadedFile, $api->receive($inputName));
     }
 
-    public function testReceiveChunkedFileWithParts()
+    public function testReceiveChunkedFileWithParts(): void
     {
-        $request = m::mock('Illuminate\Http\Request');
-        $request->shouldReceive('root')->once()->andReturn($root = 'root');
+        $this->expectException(Exception::class);
+
+        $request = m::mock(Request::class);
+        $request->allows('root')->once()->andReturn('root');
+
         $api = new FineUploader(
-            $config = ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
+            ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
             $request,
-            $files = m::mock('Recca0120\Upload\Filesystem'),
-            $chunkFileFactory = m::mock('Recca0120\Upload\ChunkFileFactory')
+            $files = m::mock(Filesystem::class),
+            $chunkFileFactory = m::mock(ChunkFileFactory::class)
         );
-        $files->shouldReceive('isDirectory')->twice()->andReturn(true);
+
+        $files->allows('isDirectory')->twice()->andReturn(true);
         $inputName = 'qqfile';
-        $request->shouldReceive('file')->once()->with($inputName)->andReturn(
-            $uploadedFile = m::mock('Symfony\Component\HttpFoundation\File\UploadedFile')
-        );
-        $request->shouldReceive('has')->once()->with('qqtotalparts')->andReturn(true);
-        $request->shouldReceive('get')->once()->with('qqfilename')->andReturn(
-            $originalName = 'foo.php'
-        );
-        $request->shouldReceive('get')->once()->with('qqtotalparts', 1)->andReturn(
-            $totalparts = '4'
-        );
-        $request->shouldReceive('get')->once()->with('qqpartindex')->andReturn(
-            $partindex = '3'
-        );
-        $request->shouldReceive('get')->once()->with('qquuid')->andReturn(
-            $uuid = 'foo.qquuid'
-        );
-        $uploadedFile->shouldReceive('getRealPath')->once()->andReturn(
-            $realPath = 'foo.realpath'
-        );
+        $request->allows('file')->once()->with($inputName)->andReturn($uploadedFile = m::mock(UploadedFile::class));
+        $request->allows('has')->once()->with('qqtotalparts')->andReturn(true);
+        $request->allows('get')->once()->with('qqfilename')->andReturn($originalName = 'foo.php');
+        $request->allows('get')->once()->with('qqtotalparts', 1)->andReturn('4');
+        $request->allows('get')->once()->with('qqpartindex')->andReturn($partindex = '3');
+        $request->allows('get')->once()->with('qquuid')->andReturn($uuid = 'foo.qquuid');
 
-        $chunkFileFactory->shouldReceive('create')->once()->with($originalName, $chunksPath, $storagePath, $uuid, null)->andReturn(
-            $chunkFile = m::mock('Recca0120\Upload\ChunkFile')
-        );
+        $uploadedFile->allows('getRealPath')->once()->andReturn($realPath = 'foo.realpath');
 
-        $chunkFile->shouldReceive('appendFile')->once()->with($realPath, (int) $partindex)->andReturnSelf();
+        $chunkFileFactory->allows('create')->once()->with($originalName, $chunksPath, $storagePath, $uuid, null)->andReturn($chunkFile = m::mock(ChunkFile::class));
+        $chunkFile->allows('appendFile')->once()->with($realPath, (int) $partindex)->andReturnSelf();
 
-        $chunkFile->shouldReceive('throwException')->once()->with([
-            'success' => true,
-            'uuid' => $uuid,
-        ])->andReturn(
-            $exception = m::mock('stdClass')
-        );
+        $chunkFile->allows('throwException')->once()->with(['success' => true, 'uuid' => $uuid])->andThrow(new Exception());
 
-        $this->assertSame($exception, $api->receive($inputName));
+        $api->receive($inputName);
     }
 }

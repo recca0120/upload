@@ -5,21 +5,16 @@ namespace Recca0120\Upload;
 class ChunkFileFactory
 {
     /**
-     * __construct.
-     *
-     * @param \Recca0120\Upload\Filesystem $files
+     * @var Filesystem
      */
+    private $files;
+
     public function __construct(Filesystem $files = null)
     {
         $this->files = $files ?: new Filesystem();
     }
 
-    /**
-     * create.
-     *
-     * @return \Recca0120\Upload\ChunkFile
-     */
-    public function create($name, $chunksPath, $storagePath, $token = null, $mimeType = null)
+    public function create(string $name, string $chunksPath, string $storagePath, string $token = null, string $mimeType = null): ChunkFile
     {
         return new ChunkFile($name, $chunksPath, $storagePath, $token, $mimeType, $this->files);
     }
