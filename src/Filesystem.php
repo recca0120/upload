@@ -53,8 +53,6 @@ class Filesystem extends IlluminateFilesystem
      * convertToResource.
      *
      * @param  mixed  $resource
-     * @param  string  $mode
-     * @param  string  $type
      * @return resource
      *
      * @throws ResourceOpenException

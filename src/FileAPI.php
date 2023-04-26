@@ -3,6 +3,7 @@
 namespace Recca0120\Upload;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Recca0120\Upload\Exceptions\ChunkedResponseException;
 use Recca0120\Upload\Exceptions\ResourceOpenException;
 
 class FileAPI extends Api
@@ -27,11 +28,17 @@ class FileAPI extends Api
         $chunkFile = $this->createChunkFile($originalName, $mimeType, $uuid);
         $chunkFile->appendStream('php://input', $start);
 
-        return $completed === true
-            ? $chunkFile->createUploadedFile()
-            : $chunkFile->throwException([
-                'files' => ['name' => $originalName, 'size' => $end, 'type' => $chunkFile->getMimeType()],
+        if ($completed !== true) {
+            throw new ChunkedResponseException([
+                'files' => [
+                    'name' => $originalName,
+                    'size' => $end,
+                    'type' => $chunkFile->getMimeType(),
+                ],
             ], ['X-Last-Known-Byte' => $end]);
+        }
+
+        return $chunkFile->createUploadedFile();
     }
 
     protected function getOriginalName(string $contentDisposition): string
@@ -61,7 +68,9 @@ class FileAPI extends Api
     {
         $contentRange = $this->request->header('content-range');
         if (empty($contentRange) === false) {
-            return sscanf($contentRange, 'bytes %d-%d/%d');
+            [$start, $end, $total] = sscanf($contentRange, 'bytes %d-%d/%d');
+
+            return [$start, $end, $total];
         }
 
         $total = $end = (int) $this->request->header('content-length');

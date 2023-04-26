@@ -14,7 +14,6 @@ interface Api
     public function path(): string;
 
     /**
-     * @param  string  $path
      * @return self
      */
     public function makeDirectory(string $path);

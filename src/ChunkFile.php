@@ -4,7 +4,6 @@ namespace Recca0120\Upload;
 
 use ErrorException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Recca0120\Upload\Exceptions\ChunkedResponseException;
 use Recca0120\Upload\Exceptions\ResourceOpenException;
 
 class ChunkFile
@@ -46,8 +45,14 @@ class ChunkFile
      */
     protected $tmpfilename = null;
 
-    public function __construct(string $name, string $chunkPath, string $storagePath, string $token = null, string $mimeType = null, Filesystem $files = null)
-    {
+    public function __construct(
+        string $name,
+        string $chunkPath,
+        string $storagePath,
+        string $token = null,
+        string $mimeType = null,
+        Filesystem $files = null
+    ) {
         $this->files = $files ?: new Filesystem();
         $this->name = $name;
         $this->chunkPath = $chunkPath;
@@ -66,20 +71,9 @@ class ChunkFile
     }
 
     /**
-     * @param  array|string  $message
-     * @param  array  $headers
-     * @return void
-     */
-    public function throwException($message = '', array $headers = []): void
-    {
-        throw new ChunkedResponseException($message, $headers);
-    }
-
-    /**
      * appendStream.
      *
      * @param  mixed  $source
-     * @param  int  $offset
      * @return $this
      *
      * @throws ResourceOpenException
@@ -96,7 +90,6 @@ class ChunkFile
      * appendFile.
      *
      * @param  mixed  $source
-     * @param  int  $index
      * @return $this
      *
      * @throws ResourceOpenException

@@ -2,7 +2,6 @@
 
 namespace Recca0120\Upload\Tests;
 
-use Exception;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\Request;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
@@ -10,6 +9,7 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Recca0120\Upload\ChunkFile;
 use Recca0120\Upload\ChunkFileFactory;
+use Recca0120\Upload\Exceptions\ChunkedResponseException;
 use Recca0120\Upload\Exceptions\ResourceOpenException;
 use Recca0120\Upload\FileAPI;
 use Recca0120\Upload\Filesystem;
@@ -66,7 +66,8 @@ class FileAPITest extends TestCase
         $request->allows('header')->once()->with('content-type')->andReturn($mimeType = 'foo');
         $request->allows('get')->once()->with('token')->andReturn($token = 'foo');
 
-        $chunkFileFactory->allows('create')->once()->with($originalName, $chunksPath, $storagePath, $mimeType, $token)->andReturn(
+        $chunkFileFactory->allows('create')->once()->with($originalName, $chunksPath, $storagePath, $mimeType,
+            $token)->andReturn(
             $chunkFile = m::mock(ChunkFile::class)
         );
 
@@ -97,7 +98,8 @@ class FileAPITest extends TestCase
         $request->allows('header')->once()->with('content-type')->andReturn($mimeType = 'foo');
         $request->allows('get')->once()->with('token')->andReturn($token = 'foo');
 
-        $chunkFileFactory->allows('create')->once()->with($originalName, $chunksPath, $storagePath, $mimeType, $token)->andReturn(
+        $chunkFileFactory->allows('create')->once()->with($originalName, $chunksPath, $storagePath, $mimeType,
+            $token)->andReturn(
             $chunkFile = m::mock(ChunkFile::class)
         );
 
@@ -109,13 +111,10 @@ class FileAPITest extends TestCase
         $this->assertSame($uploadedFile, $api->receive($inputName = 'foo'));
     }
 
-    /**
-     * @throws FileNotFoundException
-     * @throws ResourceOpenException
-     */
     public function testReceiveChunkedFileAndThrowChunkedResponseException(): void
     {
-        $this->expectException(Exception::class);
+        $this->expectException(ChunkedResponseException::class);
+        $this->expectExceptionMessage('{"files":{"name":"foo.php","size":5767167,"type":"foo.mimeType"}}');
 
         $request = m::mock(Request::class);
         $request->allows('root')->once()->andReturn('root');
@@ -143,20 +142,14 @@ class FileAPITest extends TestCase
 
         $request->allows('get')->once()->with('token')->andReturn($token = 'foo');
 
-        $chunkFileFactory->allows('create')->once()->with($originalName, $chunksPath, $storagePath, $mimeType, $token)->andReturn(
-            $chunkFile = m::mock(ChunkFile::class)
-        );
+        $chunkFileFactory
+            ->allows('create')
+            ->once()
+            ->with($originalName, $chunksPath, $storagePath, $mimeType, $token)
+            ->andReturn($chunkFile = m::mock(ChunkFile::class));
 
         $chunkFile->allows('appendStream')->once()->with('php://input', $start)->andReturnSelf();
         $chunkFile->allows('getMimeType')->andReturn($mimeType = 'foo.mimeType');
-
-        $chunkFile->allows('throwException')->once()->with([
-            'files' => [
-                'name' => $originalName,
-                'size' => $end,
-                'type' => $mimeType,
-            ],
-        ], ['X-Last-Known-Byte' => $end])->andThrow(new Exception());
 
         $api->receive('foo');
     }

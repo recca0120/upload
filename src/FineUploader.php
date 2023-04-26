@@ -2,10 +2,17 @@
 
 namespace Recca0120\Upload;
 
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Recca0120\Upload\Exceptions\ChunkedResponseException;
+use Recca0120\Upload\Exceptions\ResourceOpenException;
 
 class FineUploader extends Api
 {
+    /**
+     * @throws FileNotFoundException
+     * @throws ResourceOpenException
+     */
     public function receive(string $name)
     {
         $file = $this->request->file($name);
@@ -23,11 +30,10 @@ class FineUploader extends Api
 
         if ($completed === false) {
             $chunkFile->appendFile($file->getRealPath(), $partindex);
+            throw new ChunkedResponseException(['success' => true, 'uuid' => $uuid], []);
         }
 
-        return $completed === true
-            ? $chunkFile->createUploadedFile($totalparts)
-            : $chunkFile->throwException(['success' => true, 'uuid' => $uuid]);
+        return $chunkFile->createUploadedFile($totalparts);
     }
 
     public function completedResponse(JsonResponse $response): JsonResponse

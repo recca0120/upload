@@ -2,7 +2,6 @@
 
 namespace Recca0120\Upload\Tests;
 
-use Exception;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -11,6 +10,7 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Recca0120\Upload\ChunkFile;
 use Recca0120\Upload\ChunkFileFactory;
+use Recca0120\Upload\Exceptions\ChunkedResponseException;
 use Recca0120\Upload\Exceptions\ResourceOpenException;
 use Recca0120\Upload\Filesystem;
 use Recca0120\Upload\Plupload;
@@ -62,7 +62,8 @@ class PluploadTest extends TestCase
         $request->allows('header')->once()->with('content-length')->andReturn($contentLength = 1049073);
         $request->allows('get')->once()->with('token')->andReturn($token = 'foo');
 
-        $chunkFileFactory->allows('create')->once()->with($originalName, $chunksPath, $storagePath, $token, null)->andReturn($chunkFile = m::mock(ChunkFile::class));
+        $chunkFileFactory->allows('create')->once()->with($originalName, $chunksPath, $storagePath, $token,
+            null)->andReturn($chunkFile = m::mock(ChunkFile::class));
 
         $chunkFile->allows('appendStream')->once()->with($pathname, $chunk * $contentLength)->andReturnSelf();
         $chunkFile->allows('createUploadedFile')->once()->andReturn($uploadedFile = m::mock(UploadedFile::class));
@@ -70,9 +71,14 @@ class PluploadTest extends TestCase
         $this->assertSame($uploadedFile, $api->receive($inputName));
     }
 
+    /**
+     * @throws FileNotFoundException
+     * @throws ResourceOpenException
+     */
     public function testReceiveChunkedFileAndThrowChunkedResponseException(): void
     {
-        $this->expectException(Exception::class);
+        $this->expectException(ChunkedResponseException::class);
+        $this->expectExceptionMessage('');
 
         $request = m::mock(Request::class);
         $request->allows('root')->once()->andReturn($root = 'root');
@@ -94,10 +100,12 @@ class PluploadTest extends TestCase
 
         $request->allows('get')->once()->with('token')->andReturn($token = 'foo');
 
-        $chunkFileFactory->allows('create')->once()->with($originalName, $chunksPath, $storagePath, $token, null)->andReturn($chunkFile = m::mock(ChunkFile::class));
+        $chunkFileFactory->allows('create')
+            ->once()
+            ->with($originalName, $chunksPath, $storagePath, $token, null)
+            ->andReturn($chunkFile = m::mock(ChunkFile::class));
 
         $chunkFile->allows('appendStream')->once()->with($pathname, $chunk * $contentLength)->andReturnSelf();
-        $chunkFile->allows('throwException')->once()->andThrow(new Exception());
 
         $api->receive($inputName);
     }

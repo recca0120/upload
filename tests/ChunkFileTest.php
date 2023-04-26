@@ -34,8 +34,9 @@ class ChunkFileTest extends TestCase
         $offset = 0;
         $files->allows('tmpfilename')->once()->with($name, $token)->andReturn($tmpfilename = 'foo.php');
         $files->allows('appendStream')->once()->with($chunkPath.$tmpfilename.'.part', $source, $offset);
+        $chunkFile->appendStream($source, $offset);
 
-        $chunkFile->appendStream($source, $offset)->throwException();
+        throw new ChunkedResponseException('', []);
     }
 
     public function testAppendFile(): void
@@ -57,8 +58,9 @@ class ChunkFileTest extends TestCase
         $index = 0;
         $files->allows('tmpfilename')->once()->with($name, $token)->andReturn($tmpfilename = 'foo.php');
         $files->allows('appendStream')->once()->with($chunkPath.$tmpfilename.'.part.'.$index, $source, 0);
+        $chunkFile->appendFile($source, $index);
 
-        $chunkFile->appendFile($source, $index)->throwException();
+        throw new ChunkedResponseException('', []);
     }
 
     /**
@@ -84,28 +86,5 @@ class ChunkFileTest extends TestCase
             ->andReturn($uploadedFile = m::mock(UploadedFile::class));
 
         $this->assertSame($uploadedFile, $chunkFile->createUploadedFile());
-    }
-
-    public function testThrowException(): void
-    {
-        $files = m::mock(Filesystem::class);
-
-        $chunkFile = new ChunkFile(
-            __FILE__,
-            'storage/chunk/',
-            'storage/',
-            uniqid('', true),
-            'text/plain',
-            $files
-        );
-
-        try {
-            $chunkFile->throwException(['foo' => 'bar'], ['foo' => 'bar']);
-        } catch (ChunkedResponseException $e) {
-            $response = $e->getResponse();
-            $this->assertSame(201, $response->getStatusCode());
-            $this->assertSame(json_encode(['foo' => 'bar']), $e->getMessage());
-            $this->assertSame('bar', $response->headers->get('foo'));
-        }
     }
 }

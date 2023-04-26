@@ -25,7 +25,12 @@ class Receiver
     {
         try {
             $callback = $callback ?: [$this, 'callback'];
-            $response = $callback($uploadedFile = $this->api->receive($inputName), $this->api->path(), $this->api->domain(), $this->api);
+            $response = $callback(
+                $uploadedFile = $this->api->receive($inputName),
+                $this->api->path(),
+                $this->api->domain(),
+                $this->api
+            );
 
             return $this->api->deleteUploadedFile($uploadedFile)->completedResponse($response);
         } catch (ChunkedResponseException $e) {
@@ -35,12 +40,14 @@ class Receiver
 
     public static function factory(array $config = [], string $class = FileAPI::class): Receiver
     {
-        $class = Arr::get([
+        $lookup = [
             'dropzone' => Dropzone::class,
             'fileapi' => FileAPI::class,
             'fineuploader' => FineUploader::class,
             'plupload' => Plupload::class,
-        ], strtolower($class), $class);
+        ];
+
+        $class = Arr::get($lookup, strtolower($class), $class);
 
         return new static(new $class($config));
     }
@@ -50,18 +57,15 @@ class Receiver
         $clientPathInfo = $this->pathInfo($uploadedFile->getClientOriginalName());
         $basePathInfo = $this->pathInfo($uploadedFile->getBasename());
         $filename = md5($basePathInfo['basename']).'.'.$clientPathInfo['extension'];
-        $mimeType = $uploadedFile->getMimeType();
-        $size = $uploadedFile->getSize();
         $uploadedFile->move($path, $filename);
-        $response = [
+
+        return new JsonResponse([
             'name' => $clientPathInfo['filename'].'.'.$clientPathInfo['extension'],
             'tmp_name' => $path.$filename,
-            'type' => $mimeType,
-            'size' => $size,
+            'type' => $uploadedFile->getMimeType(),
+            'size' => $uploadedFile->getSize(),
             'url' => $domain.$path.$filename,
-        ];
-
-        return new JsonResponse($response);
+        ]);
     }
 
     private function pathInfo($path): array

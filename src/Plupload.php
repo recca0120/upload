@@ -4,6 +4,7 @@ namespace Recca0120\Upload;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Recca0120\Upload\Exceptions\ChunkedResponseException;
 use Recca0120\Upload\Exceptions\ResourceOpenException;
 
 class Plupload extends Api
@@ -19,8 +20,8 @@ class Plupload extends Api
         if (empty($chunks) === true) {
             return $uploadedFile;
         }
-        $chunk = $this->request->get('chunk');
 
+        $chunk = $this->request->get('chunk');
         $originalName = $this->request->get('name');
         $start = $chunk * $this->request->header('content-length');
         $uuid = $this->request->get('token');
@@ -29,7 +30,11 @@ class Plupload extends Api
         $chunkFile = $this->createChunkFile($originalName, $uuid);
         $chunkFile->appendStream($uploadedFile->getPathname(), $start);
 
-        return $completed === true ? $chunkFile->createUploadedFile() : $chunkFile->throwException();
+        if ($completed !== true) {
+            throw new ChunkedResponseException('', []);
+        }
+
+        return $chunkFile->createUploadedFile();
     }
 
     public function completedResponse(JsonResponse $response): JsonResponse

@@ -4,6 +4,7 @@ namespace Recca0120\Upload;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Recca0120\Upload\Exceptions\ChunkedResponseException;
 use Recca0120\Upload\Exceptions\ResourceOpenException;
 
 class Dropzone extends FineUploader
@@ -29,9 +30,11 @@ class Dropzone extends FineUploader
 
         $completed = $totalparts - 1 === $partindex;
 
-        return $completed === true
-            ? $chunkFile->createUploadedFile($totalparts)
-            : $chunkFile->throwException(['success' => true, 'uuid' => $uuid]);
+        if ($completed !== true) {
+            throw new ChunkedResponseException(['success' => true, 'uuid' => $uuid], []);
+        }
+
+        return $chunkFile->createUploadedFile($totalparts);
     }
 
     public function completedResponse(JsonResponse $response): JsonResponse
