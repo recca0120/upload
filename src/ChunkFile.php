@@ -2,7 +2,6 @@
 
 namespace Recca0120\Upload;
 
-use ErrorException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Recca0120\Upload\Exceptions\ResourceOpenException;
 
@@ -46,28 +45,19 @@ class ChunkFile
     protected $tmpfilename;
 
     public function __construct(
+        Filesystem $files,
         string $name,
         string $chunkPath,
         string $storagePath,
         string $token = null,
-        string $mimeType = null,
-        Filesystem $files = null
+        string $mimeType = null
     ) {
-        $this->files = $files ?: new Filesystem();
+        $this->files = $files;
         $this->name = $name;
         $this->chunkPath = $chunkPath;
         $this->storagePath = $storagePath;
         $this->token = $token;
         $this->mimeType = $mimeType;
-    }
-
-    public function getMimeType(): ?string
-    {
-        try {
-            return $this->mimeType ?: $this->files->mimeType($this->name);
-        } catch (ErrorException $e) {
-            return null;
-        }
     }
 
     /**
@@ -124,7 +114,7 @@ class ChunkFile
         return $this->files->createUploadedFile($storageFile, $this->name, $this->files->mimeType($storageFile));
     }
 
-    protected function tmpfilename(): ?string
+    private function tmpfilename(): ?string
     {
         if (is_null($this->tmpfilename) === true) {
             $this->tmpfilename = $this->files->tmpfilename($this->name, $this->token);
@@ -133,12 +123,12 @@ class ChunkFile
         return $this->tmpfilename;
     }
 
-    protected function chunkFile(): string
+    private function chunkFile(): string
     {
         return $this->chunkPath.$this->tmpfilename().static::TMPFILE_EXTENSION;
     }
 
-    protected function storageFile(): string
+    private function storageFile(): string
     {
         return $this->storagePath.$this->tmpfilename();
     }

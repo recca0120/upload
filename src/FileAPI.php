@@ -20,8 +20,8 @@ class FileAPI extends Api
         }
 
         [$start, $end, $total] = $this->parseContentRange();
-        $originalName = $this->getOriginalName($contentDisposition);
-        $mimeType = $this->getMimeType($originalName);
+        $originalName = $this->parseOriginalName($contentDisposition);
+        $mimeType = $this->request->header('content-type');
         $uuid = $this->request->get('token');
         $completed = $end >= $total - 1;
 
@@ -41,24 +41,14 @@ class FileAPI extends Api
         return $chunkFile->createUploadedFile();
     }
 
-    protected function getOriginalName(string $contentDisposition): string
+    protected function parseOriginalName(string $contentDisposition): string
     {
         $originalName = (string) $this->request->get('name');
         if (empty($originalName) === true) {
             [$originalName] = sscanf($contentDisposition, 'attachment; filename=%s');
         }
 
-        return preg_replace('/[\'"]/', '', $originalName);
-    }
-
-    protected function getMimeType(string $originalName): string
-    {
-        $mimeType = (string) $this->request->header('content-type');
-        if (empty($mimeType) === true) {
-            $mimeType = $this->files->mimeType($originalName);
-        }
-
-        return $mimeType;
+        return rawurldecode(preg_replace('/[\'"]/', '', $originalName));
     }
 
     protected function parseContentRange(): array

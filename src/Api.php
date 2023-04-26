@@ -36,16 +36,10 @@ abstract class Api implements ApiContract
      */
     protected $config;
 
-    /**
-     * @var ChunkFileFactory
-     */
-    protected $chunkFileFactory;
-
-    public function __construct($config = [], Request $request = null, Filesystem $files = null, ChunkFileFactory $chunkFileFactory = null)
+    public function __construct($config = [], Request $request = null, Filesystem $files = null)
     {
         $this->request = $request ?: Request::capture();
         $this->files = $files ?: new Filesystem();
-        $this->chunkFileFactory = $chunkFileFactory ?: new ChunkFileFactory($this->files);
         $this->config = array_merge([
             'chunks' => sys_get_temp_dir().'/chunks',
             'storage' => 'storage/temp',
@@ -123,8 +117,6 @@ abstract class Api implements ApiContract
 
     protected function createChunkFile(string $name, string $uuid = null, string $mimeType = null): ChunkFile
     {
-        return $this->chunkFileFactory->create(
-            $name, $this->chunkPath(), $this->storagePath(), $uuid, $mimeType
-        );
+        return new ChunkFile($this->files, $name, $this->chunkPath(), $this->storagePath(), $uuid, $mimeType);
     }
 }

@@ -41,8 +41,7 @@ class Dropzone extends FineUploader
         $data = $response->getData();
         $data->success = true;
         $data->uuid = $this->request->get('dzuuid');
-        $response->setData($data);
 
-        return $response;
+        return $response->setData($data);
     }
 }

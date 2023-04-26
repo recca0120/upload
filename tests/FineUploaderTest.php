@@ -4,7 +4,6 @@ namespace Recca0120\Upload\Tests;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
-use Recca0120\Upload\ChunkFileFactory;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 use Recca0120\Upload\Exceptions\ResourceOpenException;
 use Recca0120\Upload\FineUploader;
@@ -15,11 +14,7 @@ class FineUploaderTest extends TestCase
     {
         parent::setUp();
 
-        $this->api = new FineUploader(
-            $this->config,
-            $this->request,
-            new ChunkFileFactory($this->files)
-        );
+        $this->api = new FineUploader($this->config, $this->request, $this->files);
     }
 
     public function testReceiveSingleFile(): void
@@ -75,6 +70,6 @@ class FineUploaderTest extends TestCase
             'qqfilename' => $this->uploadedFile->getClientOriginalName(),
         ]);
 
-        self::assertTrue($this->api->receive('foo')->isValid());
+        $this->api->receive('foo');
     }
 }

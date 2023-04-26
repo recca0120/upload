@@ -4,7 +4,6 @@ namespace Recca0120\Upload\Tests;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
-use Recca0120\Upload\ChunkFileFactory;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 use Recca0120\Upload\Exceptions\ResourceOpenException;
 use Recca0120\Upload\FileAPI;
@@ -15,12 +14,7 @@ class FileAPITest extends TestCase
     {
         parent::setUp();
 
-        $this->api = new FileAPI(
-            $this->config,
-            $this->request,
-            $this->files,
-            new ChunkFileFactory($this->files)
-        );
+        $this->api = new FileAPI($this->config, $this->request, $this->files);
     }
 
     /**
@@ -49,6 +43,7 @@ class FileAPITest extends TestCase
         $this->request->headers->replace([
             'content-disposition' => 'attachment; filename="'.($this->uploadedFile->getClientOriginalName()).'"',
             'content-range' => "bytes {$start}-{$end}/${total}",
+            'content-type' => 'image/png',
         ]);
 
         self::assertTrue($this->api->receive('foo')->isValid());
@@ -63,6 +58,7 @@ class FileAPITest extends TestCase
         $this->request->headers->replace([
             'content-disposition' => 'attachment; filename="'.($this->uploadedFile->getClientOriginalName()).'"',
             'content-length' => $this->uploadedFile->getSize(),
+            'content-type' => 'image/png',
         ]);
 
         self::assertTrue($this->api->receive('foo')->isValid());

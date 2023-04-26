@@ -85,7 +85,7 @@ class FilesystemTest extends TestCase
 
         $this->assertInstanceOf(
             UploadedFile::class,
-            $files->createUploadedFile($file->url(), basename($file->url()))
+            $files->createUploadedFile($file->url(), basename($file->url()), $files->mimeType($file->url()))
         );
     }
 }

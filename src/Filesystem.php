@@ -39,11 +39,9 @@ class Filesystem extends IlluminateFilesystem
         fclose($input);
     }
 
-    public function createUploadedFile(string $path, string $originalName, string $mimeType = null, int $size = null)
+    public function createUploadedFile(string $path, string $originalName, string $mimeType)
     {
         $class = class_exists(UploadedFile::class) === true ? UploadedFile::class : SymfonyUploadedFile::class;
-
-        $mimeType = $mimeType ?: $this->mimeType($path);
 
         return new $class($path, $originalName, $mimeType, UPLOAD_ERR_OK, true);
     }

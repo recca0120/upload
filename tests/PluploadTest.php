@@ -4,7 +4,6 @@ namespace Recca0120\Upload\Tests;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
-use Recca0120\Upload\ChunkFileFactory;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 use Recca0120\Upload\Exceptions\ResourceOpenException;
 use Recca0120\Upload\Plupload;
@@ -15,12 +14,7 @@ class PluploadTest extends TestCase
     {
         parent::setUp();
 
-        $this->api = new Plupload(
-            $this->config,
-            $this->request,
-            $this->files,
-            new ChunkFileFactory($this->files)
-        );
+        $this->api = new Plupload($this->config, $this->request, $this->files);
     }
 
     /**
@@ -59,7 +53,7 @@ class PluploadTest extends TestCase
     public function testReceiveChunkedFileAndThrowChunkedResponseException(): void
     {
         $this->expectException(ChunkedResponseException::class);
-        $this->expectExceptionMessage('');
+        $this->expectExceptionMessage('{"jsonrpc":"2.0","result":false}');
 
         $this->request->replace(['chunk' => 0, 'chunks' => 2]);
         $this->request->headers->replace(['content-length' => $this->uploadedFile->getSize()]);

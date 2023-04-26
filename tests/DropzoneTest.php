@@ -4,7 +4,6 @@ namespace Recca0120\Upload\Tests;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
-use Recca0120\Upload\ChunkFileFactory;
 use Recca0120\Upload\Dropzone;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 use Recca0120\Upload\Exceptions\ResourceOpenException;
@@ -15,12 +14,7 @@ class DropzoneTest extends TestCase
     {
         parent::setUp();
 
-        $this->api = new Dropzone(
-            $this->config,
-            $this->request,
-            $this->files,
-            new ChunkFileFactory($this->files)
-        );
+        $this->api = new Dropzone($this->config, $this->request, $this->files);
     }
 
     /**

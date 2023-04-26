@@ -32,7 +32,7 @@ class Plupload extends Api
         $chunkFile->appendStream($uploadedFile->getPathname(), $start);
 
         if ($completed !== true) {
-            throw new ChunkedResponseException('', []);
+            throw new ChunkedResponseException(['jsonrpc' => '2.0', 'result' => false]);
         }
 
         return $chunkFile->createUploadedFile();
