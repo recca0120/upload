@@ -41,8 +41,7 @@ class FineUploader extends Api
         $data = $response->getData();
         $data->success = true;
         $data->uuid = $this->request->get('qquuid');
-        $response->setData($data);
 
-        return $response;
+        return $response->setData($data);
     }
 }

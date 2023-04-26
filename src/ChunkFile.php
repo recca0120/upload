@@ -18,32 +18,32 @@ class ChunkFile
     /**
      * @var string|null
      */
-    protected $token = null;
+    protected $token;
 
     /**
      * @var string|null
      */
-    protected $chunkPath = null;
+    protected $chunkPath;
 
     /**
      * @var string|null
      */
-    protected $storagePath = null;
+    protected $storagePath;
 
     /**
      * @var string|null
      */
-    protected $name = null;
+    protected $name;
 
     /**
      * @var string|null
      */
-    protected $mimeType = null;
+    protected $mimeType;
 
     /**
      * @var string|null
      */
-    protected $tmpfilename = null;
+    protected $tmpfilename;
 
     public function __construct(
         string $name,
@@ -78,10 +78,10 @@ class ChunkFile
      *
      * @throws ResourceOpenException
      */
-    public function appendStream($source, int $offset = 0)
+    public function appendStream($source, int $offset = 0): ChunkFile
     {
         $chunkFile = $this->chunkFile();
-        $this->files->appendStream($chunkFile, $source, (int) $offset);
+        $this->files->appendStream($chunkFile, $source, $offset);
 
         return $this;
     }
