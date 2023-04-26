@@ -8,7 +8,6 @@ use Recca0120\Upload\ChunkFileFactory;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 use Recca0120\Upload\Exceptions\ResourceOpenException;
 use Recca0120\Upload\FileAPI;
-use Recca0120\Upload\Filesystem;
 
 class FileAPITest extends TestCase
 {
@@ -19,8 +18,8 @@ class FileAPITest extends TestCase
         $this->api = new FileAPI(
             $this->config,
             $this->request,
-            new Filesystem(),
-            new ChunkFileFactory(new Filesystem())
+            $this->files,
+            new ChunkFileFactory($this->files)
         );
     }
 
@@ -73,6 +72,10 @@ class FileAPITest extends TestCase
         self::assertEquals('{}', $response->getContent());
     }
 
+    /**
+     * @throws FileNotFoundException
+     * @throws ResourceOpenException
+     */
     public function testReceiveChunkedFileAndThrowChunkedResponseException(): void
     {
         $this->expectException(ChunkedResponseException::class);

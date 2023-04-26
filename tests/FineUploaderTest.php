@@ -7,7 +7,6 @@ use Illuminate\Http\JsonResponse;
 use Recca0120\Upload\ChunkFileFactory;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 use Recca0120\Upload\Exceptions\ResourceOpenException;
-use Recca0120\Upload\Filesystem;
 use Recca0120\Upload\FineUploader;
 
 class FineUploaderTest extends TestCase
@@ -19,8 +18,7 @@ class FineUploaderTest extends TestCase
         $this->api = new FineUploader(
             $this->config,
             $this->request,
-            new Filesystem(),
-            new ChunkFileFactory(new Filesystem())
+            new ChunkFileFactory($this->files)
         );
     }
 

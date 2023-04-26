@@ -27,7 +27,6 @@ class Dropzone extends FineUploader
 
         $chunkFile = $this->createChunkFile($originalName, $uuid);
         $chunkFile->appendFile($file->getRealPath(), $partindex);
-
         $completed = $totalparts - 1 === $partindex;
 
         if ($completed !== true) {
