@@ -57,13 +57,15 @@ class Receiver
         $clientPathInfo = $this->pathInfo($uploadedFile->getClientOriginalName());
         $basePathInfo = $this->pathInfo($uploadedFile->getBasename());
         $filename = md5($basePathInfo['basename']).'.'.$clientPathInfo['extension'];
+        $mimeType = $uploadedFile->getMimeType();
+        $size = $uploadedFile->getSize();
         $uploadedFile->move($path, $filename);
 
         return new JsonResponse([
             'name' => $clientPathInfo['filename'].'.'.$clientPathInfo['extension'],
             'tmp_name' => $path.$filename,
-            'type' => $uploadedFile->getMimeType(),
-            'size' => $uploadedFile->getSize(),
+            'type' => $mimeType,
+            'size' => $size,
             'url' => $domain.$path.$filename,
         ]);
     }

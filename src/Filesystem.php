@@ -44,9 +44,8 @@ class Filesystem extends IlluminateFilesystem
         $class = class_exists(UploadedFile::class) === true ? UploadedFile::class : SymfonyUploadedFile::class;
 
         $mimeType = $mimeType ?: $this->mimeType($path);
-        $size = $size ?: $this->size($path);
 
-        return new $class($path, $originalName, $mimeType, $size, UPLOAD_ERR_OK, true);
+        return new $class($path, $originalName, $mimeType, UPLOAD_ERR_OK, true);
     }
 
     /**

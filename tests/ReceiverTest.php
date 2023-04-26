@@ -32,10 +32,13 @@ class ReceiverTest extends TestCase
         $uploadedFile->allows('getBasename')->once()->andReturn($basename = 'foo');
         $uploadedFile->allows('getMimeType')->once()->andReturn($mimeType = 'foo');
         $uploadedFile->allows('getSize')->once()->andReturn($size = 1000);
-        $uploadedFile->allows('move')->once()->with($path, $filename = md5($basename).'.'.strtolower($clientOriginalExtension));
+        $uploadedFile->allows('move')->once()->with($path,
+            $filename = md5($basename).'.'.strtolower($clientOriginalExtension));
 
         $api->allows('deleteUploadedFile')->once()->with($uploadedFile)->andReturnSelf();
-        $api->allows('completedResponse')->once()->with(m::type(JsonResponse::class))->andReturnUsing(function ($response) {
+        $api->allows('completedResponse')->once()->with(m::type(JsonResponse::class))->andReturnUsing(function (
+            $response
+        ) {
             return $response;
         });
 

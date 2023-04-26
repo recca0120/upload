@@ -108,24 +108,20 @@ class ChunkFile
     public function createUploadedFile($chunks = null, $storageFile = null)
     {
         $chunkFile = $this->chunkFile();
+
         $storageFile = $storageFile ?: $this->storageFile();
 
         if (is_null($chunks) === false) {
             for ($i = 0; $i < $chunks; $i++) {
                 $chunk = $chunkFile.'.'.$i;
-                $this->files->append(
-                    $storageFile,
-                    $this->files->get($chunk)
-                );
+                $this->files->append($storageFile, $this->files->get($chunk));
                 $this->files->delete($chunk);
             }
         } else {
             $this->files->move($chunkFile, $storageFile);
         }
 
-        return $this->files->createUploadedFile(
-            $storageFile, $this->name, $this->getMimeType()
-        );
+        return $this->files->createUploadedFile($storageFile, $this->name, $this->files->mimeType($storageFile));
     }
 
     protected function tmpfilename(): ?string

@@ -23,6 +23,7 @@ class Plupload extends Api
 
         $chunk = $this->request->get('chunk');
         $originalName = $this->request->get('name');
+        $originalName = empty($originalName) ? $uploadedFile->getClientOriginalName() : $originalName;
         $start = $chunk * $this->request->header('content-length');
         $uuid = $this->request->get('token');
         $completed = $chunk >= $chunks - 1;
@@ -39,9 +40,9 @@ class Plupload extends Api
 
     public function completedResponse(JsonResponse $response): JsonResponse
     {
-        $data = $response->getData();
-        $response->setData(['jsonrpc' => '2.0', 'result' => $data]);
-
-        return $response;
+        return $response->setData([
+            'jsonrpc' => '2.0',
+            'result' => $response->getData(),
+        ]);
     }
 }

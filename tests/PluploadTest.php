@@ -5,36 +5,54 @@ namespace Recca0120\Upload\Tests;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use Mockery as m;
+use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
-use Recca0120\Upload\ChunkFile;
 use Recca0120\Upload\ChunkFileFactory;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 use Recca0120\Upload\Exceptions\ResourceOpenException;
 use Recca0120\Upload\Filesystem;
 use Recca0120\Upload\Plupload;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class PluploadTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
+    private $request;
+
+    private $uploadedFile;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $root = vfsStream::setup('root', null, [
+            'chunks' => [],
+            'storage' => [],
+        ]);
+
+        $this->uploadedFile = UploadedFile::fake()->image('test.png');
+
+        $this->request = Request::createFromGlobals();
+        $this->request->files->replace(['foo' => $this->uploadedFile]);
+
+        $config = ['chunks' => $root->url().'/chunks', 'storage' => $root->url().'/storage'];
+
+        $this->api = new Plupload(
+            $config,
+            $this->request,
+            new Filesystem(),
+            new ChunkFileFactory(new Filesystem())
+        );
+    }
+
+    /**
+     * @throws FileNotFoundException
+     * @throws ResourceOpenException
+     */
     public function testReceiveUploadSingleFile(): void
     {
-        $request = m::mock(Request::class);
-        $request->allows('root')->once()->andReturn('root');
-        $api = new Plupload(
-            ['chunks' => $chunksPath = 'foo/', 'storage' => 'foo/'],
-            $request,
-            m::mock(Filesystem::class),
-            m::mock(ChunkFileFactory::class)
-        );
-        $inputName = 'foo';
-        $request->allows('file')->once()->with($inputName)->andReturn($uploadedFile = m::mock(UploadedFile::class));
-        $request->allows('get')->once()->with('chunks')->andReturn('');
-
-        $this->assertSame($uploadedFile, $api->receive($inputName));
+        $this->assertSame($this->uploadedFile, $this->api->receive('foo'));
     }
 
     /**
@@ -43,32 +61,12 @@ class PluploadTest extends TestCase
      */
     public function testReceiveChunkedFile(): void
     {
-        $request = m::mock(Request::class);
-        $request->allows('root')->once()->andReturn('root');
-        $api = new Plupload(
-            ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
-            $request,
-            $files = m::mock(Filesystem::class),
-            $chunkFileFactory = m::mock(ChunkFileFactory::class)
-        );
-        $files->allows('isDirectory')->twice()->andReturn(true);
+        $this->request->replace(['chunk' => 0, 'chunks' => 1, 'name' => '']);
+        $this->request->headers->replace(['content-length' => $this->uploadedFile->getSize()]);
 
-        $inputName = 'foo';
-        $request->allows('file')->once()->with($inputName)->andReturn($uploadedFile = m::mock(UploadedFile::class));
-        $request->allows('get')->once()->with('chunks')->andReturn($chunks = 8);
-        $request->allows('get')->once()->with('chunk')->andReturn($chunk = 8);
-        $request->allows('get')->once()->with('name')->andReturn($originalName = 'foo.php');
-        $uploadedFile->allows('getPathname')->once()->andReturn($pathname = 'foo');
-        $request->allows('header')->once()->with('content-length')->andReturn($contentLength = 1049073);
-        $request->allows('get')->once()->with('token')->andReturn($token = 'foo');
+        $uploadedFile = $this->api->receive('foo');
 
-        $chunkFileFactory->allows('create')->once()->with($originalName, $chunksPath, $storagePath, $token,
-            null)->andReturn($chunkFile = m::mock(ChunkFile::class));
-
-        $chunkFile->allows('appendStream')->once()->with($pathname, $chunk * $contentLength)->andReturnSelf();
-        $chunkFile->allows('createUploadedFile')->once()->andReturn($uploadedFile = m::mock(UploadedFile::class));
-
-        $this->assertSame($uploadedFile, $api->receive($inputName));
+        self::assertEquals($this->uploadedFile->getSize(), $uploadedFile->getSize());
     }
 
     /**
@@ -80,50 +78,22 @@ class PluploadTest extends TestCase
         $this->expectException(ChunkedResponseException::class);
         $this->expectExceptionMessage('');
 
-        $request = m::mock(Request::class);
-        $request->allows('root')->once()->andReturn($root = 'root');
-        $api = new Plupload(
-            ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
-            $request,
-            $files = m::mock(Filesystem::class),
-            $chunkFileFactory = m::mock(ChunkFileFactory::class)
-        );
-        $files->allows('isDirectory')->twice()->andReturn(true);
+        $this->request->replace(['chunk' => 0, 'chunks' => 2]);
+        $this->request->headers->replace(['content-length' => $this->uploadedFile->getSize()]);
 
-        $inputName = 'foo';
-        $request->allows('file')->once()->with($inputName)->andReturn($uploadedFile = m::mock(UploadedFile::class));
-        $request->allows('get')->once()->with('chunks')->andReturn(8);
-        $request->allows('get')->once()->with('chunk')->andReturn($chunk = 6);
-        $request->allows('get')->once()->with('name')->andReturn($originalName = 'foo.php');
-        $uploadedFile->allows('getPathname')->once()->andReturn($pathname = 'foo');
-        $request->allows('header')->once()->with('content-length')->andReturn($contentLength = 1049073);
-
-        $request->allows('get')->once()->with('token')->andReturn($token = 'foo');
-
-        $chunkFileFactory->allows('create')
-            ->once()
-            ->with($originalName, $chunksPath, $storagePath, $token, null)
-            ->andReturn($chunkFile = m::mock(ChunkFile::class));
-
-        $chunkFile->allows('appendStream')->once()->with($pathname, $chunk * $contentLength)->andReturnSelf();
-
-        $api->receive($inputName);
+        self::assertTrue($this->api->receive('foo')->isValid());
     }
 
+    /**
+     * @throws FileNotFoundException
+     * @throws ResourceOpenException
+     */
     public function testCompletedResponse()
     {
-        $request = m::mock(Request::class);
-        $request->allows('root')->once()->andReturn('root');
-        $api = new Plupload(
-            ['chunks' => 'foo/', 'storage' => 'foo/'],
-            $request,
-            m::mock(Filesystem::class),
-            m::mock(ChunkFileFactory::class)
-        );
-        $response = m::mock(JsonResponse::class);
-        $response->allows('getData')->once()->andReturn($data = []);
-        $response->allows('setData')->once()->with(['jsonrpc' => '2.0', 'result' => $data])->andReturnSelf();
+        self::assertTrue($this->api->receive('foo')->isValid());
 
-        $this->assertSame($response, $api->completedResponse($response));
+        $response = $this->api->completedResponse(new JsonResponse());
+
+        self::assertEquals('{"jsonrpc":"2.0","result":{}}', $response->getContent());
     }
 }
