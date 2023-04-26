@@ -3,21 +3,26 @@
 namespace Recca0120\Upload\Tests;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Illuminate\Http\Request;
-use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Recca0120\Upload\ChunkFile;
+use Illuminate\Http\JsonResponse;
 use Recca0120\Upload\ChunkFileFactory;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 use Recca0120\Upload\Exceptions\ResourceOpenException;
 use Recca0120\Upload\FileAPI;
 use Recca0120\Upload\Filesystem;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileAPITest extends TestCase
 {
-    use MockeryPHPUnitIntegration;
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->api = new FileAPI(
+            $this->config,
+            $this->request,
+            new Filesystem(),
+            new ChunkFileFactory(new Filesystem())
+        );
+    }
 
     /**
      * @throws FileNotFoundException
@@ -25,18 +30,11 @@ class FileAPITest extends TestCase
      */
     public function testReceiveSingleFile(): void
     {
-        $request = m::mock(Request::class);
-        $request->allows('root')->once()->andReturn('root');
-        $api = new FileAPI(
-            ['chunks' => 'foo/', 'storage' => 'foo/'],
-            $request,
-            m::mock(Filesystem::class),
-            m::mock(ChunkFileFactory::class)
-        );
-        $request->allows('header')->once()->with('content-disposition')->andReturn('');
-        $inputName = 'foo';
-        $request->allows('file')->once()->with($inputName)->andReturn($uploadedFile = m::mock(UploadedFile::class));
-        $this->assertSame($uploadedFile, $api->receive($inputName));
+        $this->assertSame($this->uploadedFile, $this->api->receive('foo'));
+
+        $response = $this->api->completedResponse(new JsonResponse());
+
+        self::assertEquals('{}', $response->getContent());
     }
 
     /**
@@ -45,112 +43,51 @@ class FileAPITest extends TestCase
      */
     public function testReceiveChunkedFile(): void
     {
-        $request = m::mock(Request::class);
-        $request->allows('root')->once()->andReturn('root');
-        $api = new FileAPI(
-            ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
-            $request,
-            $files = m::mock(Filesystem::class),
-            $chunkFileFactory = m::mock(ChunkFileFactory::class)
-        );
-        $files->allows('isDirectory')->twice()->andReturn(true);
+        $start = 0;
+        $end = $this->uploadedFile->getSize();
+        $total = $this->uploadedFile->getSize();
 
-        $start = 5242880;
-        $end = 7845180;
-        $total = 7845180;
-        $request->allows('get')->once()->with('name')->andReturn('');
-        $request->allows('header')->once()->with('content-disposition')->andReturn(
-            'attachment; filename="'.($originalName = 'foo.php').'"'
-        );
-        $request->allows('header')->once()->with('content-range')->andReturn('bytes '.$start.'-'.$end.'/'.$total);
-        $request->allows('header')->once()->with('content-type')->andReturn($mimeType = 'foo');
-        $request->allows('get')->once()->with('token')->andReturn($token = 'foo');
+        $this->request->headers->replace([
+            'content-disposition' => 'attachment; filename="'.($this->uploadedFile->getClientOriginalName()).'"',
+            'content-range' => "bytes {$start}-{$end}/${total}",
+        ]);
 
-        $chunkFileFactory->allows('create')->once()->with($originalName, $chunksPath, $storagePath, $mimeType,
-            $token)->andReturn(
-            $chunkFile = m::mock(ChunkFile::class)
-        );
+        self::assertTrue($this->api->receive('foo')->isValid());
 
-        $chunkFile->allows('appendStream')->once()->with('php://input', $start)->andReturnSelf();
-        $chunkFile->allows('createUploadedFile')->once()->andReturn($uploadedFile = m::mock(UploadedFile::class));
+        $response = $this->api->completedResponse(new JsonResponse());
 
-        $this->assertSame($uploadedFile, $api->receive('foo'));
+        self::assertEquals('{}', $response->getContent());
     }
 
     public function testReceiveChunkedFileWithoutContentRange(): void
     {
-        $request = m::mock(Request::class);
-        $request->allows('root')->once()->andReturn($root = 'root');
-        $api = new FileAPI(
-            ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
-            $request,
-            $files = m::mock(Filesystem::class),
-            $chunkFileFactory = m::mock(ChunkFileFactory::class)
-        );
-        $files->allows('isDirectory')->twice()->andReturn(true);
+        $this->request->headers->replace([
+            'content-disposition' => 'attachment; filename="'.($this->uploadedFile->getClientOriginalName()).'"',
+            'content-length' => $this->uploadedFile->getSize(),
+        ]);
 
-        $request->allows('header')->once()->with('content-range')->andReturn(null);
-        $request->allows('header')->once()->with('content-length')->andReturn(7845180);
-        $request->allows('get')->once()->with('name')->andReturn('');
-        $request->allows('header')->once()->with('content-disposition')->andReturn(
-            'attachment; filename="'.($originalName = 'foo.php').'"'
-        );
-        $request->allows('header')->once()->with('content-type')->andReturn($mimeType = 'foo');
-        $request->allows('get')->once()->with('token')->andReturn($token = 'foo');
+        self::assertTrue($this->api->receive('foo')->isValid());
 
-        $chunkFileFactory->allows('create')->once()->with($originalName, $chunksPath, $storagePath, $mimeType,
-            $token)->andReturn(
-            $chunkFile = m::mock(ChunkFile::class)
-        );
+        $response = $this->api->completedResponse(new JsonResponse());
 
-        $chunkFile->allows('appendStream')->once()->with('php://input', 0)->andReturnSelf();
-        $chunkFile->allows('createUploadedFile')->once()->andReturn(
-            $uploadedFile = m::mock(UploadedFile::class)
-        );
-
-        $this->assertSame($uploadedFile, $api->receive($inputName = 'foo'));
+        self::assertEquals('{}', $response->getContent());
     }
 
     public function testReceiveChunkedFileAndThrowChunkedResponseException(): void
     {
         $this->expectException(ChunkedResponseException::class);
-        $this->expectExceptionMessage('{"files":{"name":"foo.php","size":5767167,"type":"foo.mimeType"}}');
+        $this->expectExceptionMessage('{"files":{"name":"test.png","size":10,"type":"image\/png"}}');
 
-        $request = m::mock(Request::class);
-        $request->allows('root')->once()->andReturn('root');
-        $api = new FileAPI(
-            ['chunks' => $chunksPath = 'foo/', 'storage' => $storagePath = 'foo/'],
-            $request,
-            $files = m::mock(Filesystem::class),
-            $chunkFileFactory = m::mock(ChunkFileFactory::class)
-        );
-        $files->allows('isDirectory')->twice()->andReturn(true);
+        $start = 0;
+        $end = 10;
+        $total = $this->uploadedFile->getSize();
 
-        $start = 5242880;
-        $end = 5767167;
-        $total = 7845180;
-        $request->allows('header')->once()->with('content-range')->andReturn(
-            'bytes '.$start.'-'.$end.'/'.$total
-        );
-        $request->allows('get')->once()->with('name')->andReturn('');
-        $request->allows('header')->once()->with('content-disposition')->andReturn(
-            'attachment; filename='.($originalName = 'foo.php')
-        );
-        $request->allows('header')->once()->with('content-type')->andReturn(
-            $mimeType = 'foo'
-        );
+        $this->request->headers->replace([
+            'content-disposition' => 'attachment; filename="'.($this->uploadedFile->getClientOriginalName()).'"',
+            'content-range' => "bytes {$start}-{$end}/${total}",
+            'content-type' => 'image/png',
+        ]);
 
-        $request->allows('get')->once()->with('token')->andReturn($token = 'foo');
-
-        $chunkFileFactory
-            ->allows('create')
-            ->once()
-            ->with($originalName, $chunksPath, $storagePath, $mimeType, $token)
-            ->andReturn($chunkFile = m::mock(ChunkFile::class));
-
-        $chunkFile->allows('appendStream')->once()->with('php://input', $start)->andReturnSelf();
-        $chunkFile->allows('getMimeType')->andReturn($mimeType = 'foo.mimeType');
-
-        $api->receive('foo');
+        $this->api->receive('foo');
     }
 }

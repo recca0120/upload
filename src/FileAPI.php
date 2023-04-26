@@ -33,7 +33,7 @@ class FileAPI extends Api
                 'files' => [
                     'name' => $originalName,
                     'size' => $end,
-                    'type' => $chunkFile->getMimeType(),
+                    'type' => $mimeType,
                 ],
             ], ['X-Last-Known-Byte' => $end]);
         }
@@ -45,10 +45,7 @@ class FileAPI extends Api
     {
         $originalName = (string) $this->request->get('name');
         if (empty($originalName) === true) {
-            [$originalName] = sscanf(
-                $contentDisposition,
-                'attachment; filename=%s'
-            );
+            [$originalName] = sscanf($contentDisposition, 'attachment; filename=%s');
         }
 
         return preg_replace('/[\'"]/', '', $originalName);
