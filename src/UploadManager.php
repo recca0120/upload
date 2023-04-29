@@ -49,4 +49,9 @@ class UploadManager extends Manager
     {
         return new Receiver(new Plupload($this->container['config']['upload'], $this->request, $this->files));
     }
+
+    protected function createFilePond(): Receiver
+    {
+        return new Receiver(new FilePond($this->container['config']['upload'], $this->request, $this->files));
+    }
 }

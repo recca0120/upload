@@ -41,7 +41,7 @@ class FileAPITest extends TestCase
         $total = $this->uploadedFile->getSize();
 
         $this->request->headers->replace([
-            'content-disposition' => 'attachment; filename="'.($this->uploadedFile->getClientOriginalName()).'"',
+            'content-disposition' => 'attachment; filename="'.$this->uploadedFile->getClientOriginalName().'"',
             'content-range' => "bytes {$start}-{$end}/${total}",
             'content-type' => 'image/png',
         ]);
@@ -53,10 +53,14 @@ class FileAPITest extends TestCase
         self::assertEquals('{}', $response->getContent());
     }
 
+    /**
+     * @throws FileNotFoundException
+     * @throws ResourceOpenException
+     */
     public function testReceiveChunkedFileWithoutContentRange(): void
     {
         $this->request->headers->replace([
-            'content-disposition' => 'attachment; filename="'.($this->uploadedFile->getClientOriginalName()).'"',
+            'content-disposition' => 'attachment; filename="'.$this->uploadedFile->getClientOriginalName().'"',
             'content-length' => $this->uploadedFile->getSize(),
             'content-type' => 'image/png',
         ]);
@@ -82,7 +86,7 @@ class FileAPITest extends TestCase
         $total = $this->uploadedFile->getSize();
 
         $this->request->headers->replace([
-            'content-disposition' => 'attachment; filename="'.($this->uploadedFile->getClientOriginalName()).'"',
+            'content-disposition' => 'attachment; filename="'.$this->uploadedFile->getClientOriginalName().'"',
             'content-range' => "bytes {$start}-{$end}/${total}",
             'content-type' => 'image/png',
         ]);

@@ -45,6 +45,7 @@ class Receiver
             'fileapi' => FileAPI::class,
             'fineuploader' => FineUploader::class,
             'plupload' => Plupload::class,
+            'filepond' => FilePond::class,
         ];
 
         $class = Arr::get($lookup, strtolower($class), $class);

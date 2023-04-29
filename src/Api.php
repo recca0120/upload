@@ -23,13 +23,6 @@ abstract class Api implements ApiContract
     protected $files;
 
     /**
-     * $chunkFile.
-     *
-     * @var ChunkFileFactory
-     */
-    protected $ChunkFileFactory;
-
-    /**
      * $config.
      *
      * @var array

@@ -30,7 +30,8 @@ class FineUploader extends Api
 
         if ($completed === false) {
             $chunkFile->appendFile($file->getRealPath(), $partindex);
-            throw new ChunkedResponseException(['success' => true, 'uuid' => $uuid], []);
+
+            throw new ChunkedResponseException(['success' => true, 'uuid' => $uuid]);
         }
 
         return $chunkFile->createUploadedFile($totalparts);

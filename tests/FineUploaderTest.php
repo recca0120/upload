@@ -17,6 +17,10 @@ class FineUploaderTest extends TestCase
         $this->api = new FineUploader($this->config, $this->request, $this->files);
     }
 
+    /**
+     * @throws FileNotFoundException
+     * @throws ResourceOpenException
+     */
     public function testReceiveSingleFile(): void
     {
         $this->assertSame($this->uploadedFile, $this->api->receive('foo'));

@@ -76,12 +76,10 @@ class ReceiverTest extends TestCase
         $receiver = new Receiver($api = m::mock(Api::class));
         $inputName = 'foo';
         $api->allows('receive')->once()->with($inputName)->andThrow(new ChunkedResponseException());
+        $callback = function () {
+        };
 
-        $this->assertInstanceOf(
-            Response::class,
-            $receiver->receive($inputName, function () {
-            })
-        );
+        $this->assertInstanceOf(Response::class, $receiver->receive($inputName, $callback));
     }
 
     public function testFactory(): void
