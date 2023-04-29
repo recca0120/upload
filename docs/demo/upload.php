@@ -31,6 +31,26 @@ switch ($api) {
         $receiver = new Receiver(new Dropzone($config));
         break;
 
+    case 'file-pond':
+        if (! empty($_POST['file'])) {
+            echo '12345.png';
+//            var_dump($_SERVER['HTTP_UPLOAD_LENGTH']);
+            exit;
+        }
+        if ($_GET['patch']) {
+            var_dump($_SERVER['HTTP_UPLOAD_NAME']);
+            var_dump($_SERVER['HTTP_UPLOAD_LENGTH']);
+            var_dump($_SERVER['HTTP_UPLOAD_OFFSET']);
+            var_dump($_SERVER['HTTP_CONTENT_TYPE']);
+            $mode = $_SERVER['HTTP_UPLOAD_OFFSET'] === '0' ? 'wb+' : 'ab+';
+            $fp = fopen(__DIR__.'/test.png', $mode);
+            fseek($fp, $_SERVER['HTTP_UPLOAD_OFFSET']);
+            fwrite($fp, file_get_contents('php://input'));
+            fclose($fp);
+        }
+        exit;
+        break;
+
     default:
         $receiver = new Receiver(new FileAPI($config));
         break;

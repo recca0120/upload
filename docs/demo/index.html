@@ -7,6 +7,7 @@
     <title>DEMO</title>
     <link href="js/fine-uploader/fine-uploader-gallery.min.css" rel="stylesheet"/>
     <link href="js/dropzone/dropzone.min.css" rel="stylesheet"/>
+    <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet"/>
     <style>
         html, body {
             font-size: 14px;
@@ -60,6 +61,7 @@
 <script src="js/fileupload/jquery.fileupload.js"></script>
 <script src="js/fine-uploader/fine-uploader.min.js"></script>
 <script src="js/dropzone/dropzone.min.js"></script>
+<script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
 
 <script>
     function humanFileSize(size) {
@@ -333,6 +335,23 @@
             chunking: true,
             chunkSize: 1024000,
             maxFilesize: 10240
+        });
+    </script>
+</section>
+
+<section>
+    <h2>FilePond</h2>
+    <input type="file" class="file-pond"/>
+
+
+    <script>
+        document.querySelectorAll('.file-pond').forEach(function (input) {
+            FilePond.create(input, {
+                name: 'file',
+                server: './upload.php?api=file-pond',
+                chunkUploads: true,
+                chunkSize: 500000
+            });
         });
     </script>
 </section>
