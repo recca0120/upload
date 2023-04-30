@@ -28,19 +28,15 @@ class Plupload extends Api
     protected function receiveChunked(string $name)
     {
         $uploadedFile = $this->request->file($name);
-        $chunk = $this->request->get('chunk');
         $originalName = $this->request->get('name');
         $originalName = empty($originalName) ? $uploadedFile->getClientOriginalName() : $originalName;
-        $start = $chunk * $this->request->header('content-length');
-        $uuid = $this->request->get('token');
-
-        $chunkFile = $this->createChunkFile($originalName, $uuid);
-        $chunkFile->appendStream($uploadedFile->getPathname(), $start);
+        $chunkFile = $this->createChunkFile($originalName, $this->request->get('token'));
+        $chunkFile->appendFile($uploadedFile->getRealPath(), $this->request->get('chunk'));
 
         if (! $this->isCompleted($name)) {
             throw new ChunkedResponseException(['jsonrpc' => '2.0', 'result' => false]);
         }
 
-        return $chunkFile->createUploadedFile();
+        return $chunkFile->createUploadedFile($this->request->get('chunks'));
     }
 }

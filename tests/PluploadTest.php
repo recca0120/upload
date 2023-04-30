@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 use Recca0120\Upload\Exceptions\ResourceOpenException;
 use Recca0120\Upload\Plupload;
+use ReflectionException;
 
 class PluploadTest extends TestCase
 {
@@ -24,40 +25,43 @@ class PluploadTest extends TestCase
     public function testReceiveUploadSingleFile(): void
     {
         $this->assertSame($this->uploadedFile, $this->api->receive('foo'));
-
-        $response = $this->api->completedResponse(new JsonResponse());
-
-        self::assertEquals('{"jsonrpc":"2.0","result":{}}', $response->getContent());
     }
 
     /**
      * @throws FileNotFoundException
      * @throws ResourceOpenException
+     * @throws ReflectionException
      */
     public function testReceiveChunkedFile(): void
     {
-        $this->request->replace(['chunk' => 0, 'chunks' => 1, 'name' => '']);
-        $this->request->headers->replace(['content-length' => $this->uploadedFile->getSize()]);
+        $size = $this->uploadedFile->getSize();
 
-        self::assertTrue($this->api->receive('foo')->isValid());
+        $this->chunkUpload(3, function ($offset, $chunkSize, $index, $totalCount) use ($size) {
+            $this->request->headers->replace([
+                'Content-Length' => $chunkSize,
+            ]);
+            $this->request->replace([
+                'name' => $this->uploadedFile->getClientOriginalName(),
+                'chunk' => $index,
+                'chunks' => $totalCount,
+            ]);
 
+            try {
+                $uploadedFile = $this->api->receive('foo');
+                self::assertEquals($size, $uploadedFile->getSize());
+            } catch (ChunkedResponseException $e) {
+                self::assertStringMatchesFormat(
+                    '{"jsonrpc":"2.0","result":false}',
+                    $e->getMessage()
+                );
+            }
+        });
+    }
+
+    public function testResponse(): void
+    {
         $response = $this->api->completedResponse(new JsonResponse());
 
         self::assertEquals('{"jsonrpc":"2.0","result":{}}', $response->getContent());
-    }
-
-    /**
-     * @throws FileNotFoundException
-     * @throws ResourceOpenException
-     */
-    public function testReceiveChunkedFileAndThrowChunkedResponseException(): void
-    {
-        $this->expectException(ChunkedResponseException::class);
-        $this->expectExceptionMessage('{"jsonrpc":"2.0","result":false}');
-
-        $this->request->replace(['chunk' => 0, 'chunks' => 2]);
-        $this->request->headers->replace(['content-length' => $this->uploadedFile->getSize()]);
-
-        self::assertTrue($this->api->receive('foo')->isValid());
     }
 }
