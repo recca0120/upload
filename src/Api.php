@@ -114,4 +114,6 @@ abstract class Api implements ApiContract
     }
 
     abstract protected function isChunked(string $name);
+
+    abstract protected function isCompleted(string $name);
 }

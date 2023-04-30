@@ -19,8 +19,7 @@ class FineUploader extends Api
             return $this->request->file($name);
         }
 
-        $file = $this->request->file($name);
-        $completed = is_null($file) === true;
+        $uploadedFile = $this->request->file($name);
         $originalName = $this->request->get('qqfilename');
         $totalparts = (int) $this->request->get('qqtotalparts', 1);
         $partindex = (int) $this->request->get('qqpartindex');
@@ -28,8 +27,8 @@ class FineUploader extends Api
 
         $chunkFile = $this->createChunkFile($originalName, $uuid);
 
-        if ($completed === false) {
-            $chunkFile->appendFile($file->getRealPath(), $partindex);
+        if (! $this->isCompleted($name)) {
+            $chunkFile->appendFile($uploadedFile->getRealPath(), $partindex);
 
             throw new ChunkedResponseException(['success' => true, 'uuid' => $uuid]);
         }
@@ -49,5 +48,10 @@ class FineUploader extends Api
     protected function isChunked(string $name): bool
     {
         return $this->request->has('qqtotalparts');
+    }
+
+    protected function isCompleted(string $name): bool
+    {
+        return ! $this->request->hasFile($name);
     }
 }

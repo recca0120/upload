@@ -27,9 +27,8 @@ class Dropzone extends FineUploader
 
         $chunkFile = $this->createChunkFile($originalName, $uuid);
         $chunkFile->appendFile($uploadedFile->getRealPath(), $partindex);
-        $completed = $totalparts - 1 === $partindex;
 
-        if ($completed !== true) {
+        if (! $this->isCompleted($name)) {
             throw new ChunkedResponseException(['success' => true, 'uuid' => $uuid], []);
         }
 
@@ -48,5 +47,13 @@ class Dropzone extends FineUploader
     protected function isChunked(string $name): bool
     {
         return $this->request->has('dztotalchunkcount');
+    }
+
+    protected function isCompleted(string $name): bool
+    {
+        $totalparts = (int) $this->request->get('dztotalchunkcount', 1);
+        $partindex = (int) $this->request->get('dzchunkindex');
+
+        return $totalparts - 1 === $partindex;
     }
 }

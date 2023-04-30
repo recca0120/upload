@@ -26,12 +26,11 @@ class Plupload extends Api
         $originalName = empty($originalName) ? $uploadedFile->getClientOriginalName() : $originalName;
         $start = $chunk * $this->request->header('content-length');
         $uuid = $this->request->get('token');
-        $completed = $chunk >= $chunks - 1;
 
         $chunkFile = $this->createChunkFile($originalName, $uuid);
         $chunkFile->appendStream($uploadedFile->getPathname(), $start);
 
-        if ($completed !== true) {
+        if (! $this->isCompleted($name)) {
             throw new ChunkedResponseException(['jsonrpc' => '2.0', 'result' => false]);
         }
 
@@ -46,5 +45,13 @@ class Plupload extends Api
     protected function isChunked(string $name): bool
     {
         return empty($this->request->get('chunks'));
+    }
+
+    protected function isCompleted(string $name): bool
+    {
+        $chunks = $this->request->get('chunks');
+        $chunk = $this->request->get('chunk');
+
+        return $chunk >= $chunks - 1;
     }
 }

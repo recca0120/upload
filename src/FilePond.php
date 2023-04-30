@@ -29,23 +29,24 @@ class FilePond extends Api
         $chunkFile = $this->createChunkFile($originalName, $uuid);
         $chunkFile->appendStream($this->request->getContent(true), $offset);
 
-        if (! $this->completed($offset)) {
+        if (! $this->isCompleted($name)) {
             throw new ChunkedResponseException('', [], 204);
         }
 
         return $chunkFile->createUploadedFile();
     }
 
-    private function completed(int $offset): bool
+    protected function isChunked(string $name): bool
     {
+        return empty($this->request->file($name));
+    }
+
+    protected function isCompleted(string $name): bool
+    {
+        $offset = (int) $this->request->header('Upload-Offset');
         $size = (int) $this->request->header('Upload-Length');
         $length = (int) $this->request->header('Content-Length');
 
         return $size === $offset + $length;
-    }
-
-    protected function isChunked(string $name): bool
-    {
-        return empty($this->request->file($name));
     }
 }

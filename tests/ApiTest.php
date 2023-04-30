@@ -5,8 +5,8 @@ namespace Recca0120\Upload\Tests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
-use Mockery as m;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Recca0120\Upload\Api as ApiBase;
 use Recca0120\Upload\Filesystem;
@@ -110,5 +110,10 @@ class Api extends ApiBase
     protected function isChunked(string $name): bool
     {
         return false;
+    }
+
+    protected function isCompleted(string $name): bool
+    {
+        return true;
     }
 }
