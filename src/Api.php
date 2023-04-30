@@ -112,4 +112,6 @@ abstract class Api implements ApiContract
     {
         return new ChunkFile($this->files, $name, $this->chunkPath(), $this->storagePath(), $uuid, $mimeType);
     }
+
+    abstract protected function isChunked(string $name);
 }

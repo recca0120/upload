@@ -14,11 +14,11 @@ class FileAPI extends Api
      */
     public function receive(string $name)
     {
-        $contentDisposition = (string) $this->request->header('content-disposition');
-        if (empty($contentDisposition) === true) {
+        if (! $this->isChunked($name)) {
             return $this->request->file($name);
         }
 
+        $contentDisposition = (string) $this->request->header('content-disposition');
         [$start, $end, $total] = $this->parseContentRange();
         $originalName = $this->parseOriginalName($contentDisposition);
         $mimeType = $this->request->header('content-type');
@@ -63,5 +63,10 @@ class FileAPI extends Api
         $total = $end = (int) $this->request->header('content-length');
 
         return [0, $end, $total];
+    }
+
+    protected function isChunked(string $name): bool
+    {
+        return ! empty($this->request->header('content-disposition'));
     }
 }

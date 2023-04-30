@@ -15,11 +15,11 @@ class FineUploader extends Api
      */
     public function receive(string $name)
     {
-        $file = $this->request->file($name);
-        if ($this->request->has('qqtotalparts') === false) {
-            return $file;
+        if (! $this->isChunked($name)) {
+            return $this->request->file($name);
         }
 
+        $file = $this->request->file($name);
         $completed = is_null($file) === true;
         $originalName = $this->request->get('qqfilename');
         $totalparts = (int) $this->request->get('qqtotalparts', 1);
@@ -44,5 +44,10 @@ class FineUploader extends Api
         $data->uuid = $this->request->get('qquuid');
 
         return $response->setData($data);
+    }
+
+    protected function isChunked(string $name): bool
+    {
+        return $this->request->has('qqtotalparts');
     }
 }

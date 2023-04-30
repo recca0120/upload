@@ -14,9 +14,8 @@ class FilePond extends Api
      */
     public function receive(string $name)
     {
-        $uploadedFile = $this->request->file($name);
-        if (! empty($uploadedFile)) {
-            return $uploadedFile;
+        if (! $this->isChunked($name)) {
+            return $this->request->file($name);
         }
 
         if (! $this->request->headers->has('Upload-Name')) {
@@ -43,5 +42,10 @@ class FilePond extends Api
         $length = (int) $this->request->header('Content-Length');
 
         return $size === $offset + $length;
+    }
+
+    protected function isChunked(string $name): bool
+    {
+        return empty($this->request->file($name));
     }
 }

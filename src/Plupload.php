@@ -15,12 +15,12 @@ class Plupload extends Api
      */
     public function receive(string $name)
     {
-        $uploadedFile = $this->request->file($name);
-        $chunks = $this->request->get('chunks');
-        if (empty($chunks) === true) {
-            return $uploadedFile;
+        if ($this->isChunked($name)) {
+            return $this->request->file($name);
         }
 
+        $uploadedFile = $this->request->file($name);
+        $chunks = $this->request->get('chunks');
         $chunk = $this->request->get('chunk');
         $originalName = $this->request->get('name');
         $originalName = empty($originalName) ? $uploadedFile->getClientOriginalName() : $originalName;
@@ -40,9 +40,11 @@ class Plupload extends Api
 
     public function completedResponse(JsonResponse $response): JsonResponse
     {
-        return $response->setData([
-            'jsonrpc' => '2.0',
-            'result' => $response->getData(),
-        ]);
+        return $response->setData(['jsonrpc' => '2.0', 'result' => $response->getData()]);
+    }
+
+    protected function isChunked(string $name): bool
+    {
+        return empty($this->request->get('chunks'));
     }
 }
