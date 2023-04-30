@@ -23,7 +23,7 @@ class FineUploader extends Api
 
     protected function isCompleted(string $name): bool
     {
-        return ! $this->request->hasFile($name);
+        return empty($this->request->file($name));
     }
 
     protected function receiveChunked(string $name)

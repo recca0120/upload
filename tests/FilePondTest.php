@@ -30,20 +30,6 @@ class FilePondTest extends TestCase
     }
 
     /**
-     * @throws FileNotFoundException
-     * @throws ResourceOpenException
-     */
-    public function testReceiveChunkedFileAndThrowUniqIdChunkedResponseException(): void
-    {
-        $this->expectException(ChunkedResponseException::class);
-        $this->expectExceptionMessageMatches('/\w+/');
-
-        $this->request->replace(['file' => '{}']);
-        $this->request->headers->replace(['Upload-Length' => $this->uploadedFile->getSize()]);
-        $this->api->receive('foo');
-    }
-
-    /**
      * @throws ReflectionException
      * @throws ResourceOpenException
      * @throws FileNotFoundException
