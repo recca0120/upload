@@ -19,7 +19,7 @@
 - Support Chunks [Dropzone](https://fineuploader.com/) $driver = 'dropzone';
 - Support Chunks [FileApi](http://mailru.github.io/FileAPI/) $driver = 'fileapi';
 - Support Chunks [Fine Uploader](https://fineuploader.com/) $driver = 'fine-uploader';
-- Support Chunks [Plupload](http://www.plupload.com/) $driver = 'plupload';
+- Support Chunks [Plupload](https://www.plupload.com/) $driver = 'plupload';
 - Support Chunks [Filepond](https://github.com/pqina/filepond) $driver = 'filepond'
 
 ## Installing

@@ -19,6 +19,10 @@ class FilePondTest extends TestCase
         $this->request->files->remove('foo');
     }
 
+    /**
+     * @throws FileNotFoundException
+     * @throws ResourceOpenException
+     */
     public function testReceiveSingleFile(): void
     {
         $this->request->files->replace(['foo' => $this->uploadedFile]);
@@ -26,6 +30,10 @@ class FilePondTest extends TestCase
         $this->assertSame($this->uploadedFile, $this->api->receive('foo'));
     }
 
+    /**
+     * @throws FileNotFoundException
+     * @throws ResourceOpenException
+     */
     public function testReceiveChunkedFileAndThrowUniqIdChunkedResponseException(): void
     {
         $this->expectException(ChunkedResponseException::class);
@@ -55,7 +63,7 @@ class FilePondTest extends TestCase
         $offset = 0;
         for ($i = 0; $i < $loop; $i++) {
             $offset = $i * $length;
-            $this->setProperty(substr($content, $offset, $length));
+            $this->setRequestContent(substr($content, $offset, $length));
             $this->request->headers->replace([
                 'Upload-Length' => $size,
                 'Upload-Name' => $name,
@@ -66,11 +74,12 @@ class FilePondTest extends TestCase
             try {
                 $this->api->receive('foo');
             } catch (ChunkedResponseException $e) {
+                self::assertEquals(204, $e->getResponse()->getStatusCode());
             }
         }
 
         $offset *= $loop;
-        $this->setProperty(substr($content, $offset));
+        $this->setRequestContent(substr($content, $offset));
         $this->request->headers->replace([
             'Upload-Length' => $size,
             'Upload-Name' => $name,
@@ -86,11 +95,11 @@ class FilePondTest extends TestCase
     /**
      * @throws ReflectionException
      */
-    private function setProperty($value): void
+    private function setRequestContent($content): void
     {
         $reflectedClass = new ReflectionClass($this->request);
         $reflection = $reflectedClass->getProperty('content');
         $reflection->setAccessible(true);
-        $reflection->setValue($this->request, $value);
+        $reflection->setValue($this->request, $content);
     }
 }
