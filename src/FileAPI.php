@@ -26,7 +26,7 @@ class FileAPI extends Api
         $completed = $end >= $total - 1;
 
         $chunkFile = $this->createChunkFile($originalName, $mimeType, $uuid);
-        $chunkFile->appendStream('php://input', $start);
+        $chunkFile->appendStream($this->request->getContent(true), $start);
 
         if ($completed !== true) {
             throw new ChunkedResponseException([
