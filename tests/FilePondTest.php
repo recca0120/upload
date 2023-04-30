@@ -6,7 +6,6 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 use Recca0120\Upload\Exceptions\ResourceOpenException;
 use Recca0120\Upload\FilePond;
-use ReflectionClass;
 use ReflectionException;
 
 class FilePondTest extends TestCase
@@ -51,55 +50,23 @@ class FilePondTest extends TestCase
      */
     public function testReceiveChunkedFile(): void
     {
+        $size = $this->uploadedFile->getSize();
         $this->request->setMethod('patch');
         $this->request->replace(['patch' => $this->uuid]);
-        $content = $this->uploadedFile->getContent();
 
-        $size = $this->uploadedFile->getSize();
-        $name = $this->uploadedFile->getClientOriginalName();
-
-        $length = 10;
-        $loop = 2;
-        $offset = 0;
-        for ($i = 0; $i < $loop; $i++) {
-            $offset = $i * $length;
-            $this->setRequestContent(substr($content, $offset, $length));
+        $this->chunkUpload(3, function ($offset, $chunkSize) use ($size) {
             $this->request->headers->replace([
                 'Upload-Length' => $size,
-                'Upload-Name' => $name,
+                'Upload-Name' => $this->uploadedFile->getClientOriginalName(),
                 'Upload-Offset' => $offset,
-                'Content-Length' => $length,
+                'Content-Length' => $chunkSize,
             ]);
-
             try {
-                $this->api->receive('foo');
+                $uploadedFile = $this->api->receive('foo');
+                self::assertEquals($size, $uploadedFile->getSize());
             } catch (ChunkedResponseException $e) {
                 self::assertEquals(204, $e->getResponse()->getStatusCode());
             }
-        }
-
-        $offset *= $loop;
-        $this->setRequestContent(substr($content, $offset));
-        $this->request->headers->replace([
-            'Upload-Length' => $size,
-            'Upload-Name' => $name,
-            'Upload-Offset' => $offset,
-            'Content-Length' => $size - $offset,
-        ]);
-
-        $uploadedFile = $this->api->receive('foo');
-        self::assertTrue($uploadedFile->isValid());
-        self::assertEquals($size, $uploadedFile->getSize());
-    }
-
-    /**
-     * @throws ReflectionException
-     */
-    private function setRequestContent($content): void
-    {
-        $reflectedClass = new ReflectionClass($this->request);
-        $reflection = $reflectedClass->getProperty('content');
-        $reflection->setAccessible(true);
-        $reflection->setValue($this->request, $content);
+        });
     }
 }

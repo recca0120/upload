@@ -24,46 +24,41 @@ class DropzoneTest extends TestCase
     public function testReceiveSingleFile(): void
     {
         $this->assertSame($this->uploadedFile, $this->api->receive('foo'));
-
-        $response = $this->api->completedResponse(new JsonResponse());
-
-        self::assertEquals('{"success":true,"uuid":null}', $response->getContent());
     }
 
     /**
      * @throws FileNotFoundException
      * @throws ResourceOpenException
+     * @throws \ReflectionException
      */
     public function testReceiveChunkedFile(): void
     {
-        $this->request->replace([
-            'dztotalchunkcount' => 1,
-            'dzchunkindex' => 0,
-            'dzuuid' => $this->uuid,
-        ]);
-
-        self::assertTrue($this->api->receive('foo')->isValid());
-
-        $response = $this->api->completedResponse(new JsonResponse());
-
-        self::assertEquals('{"success":true,"uuid":"'.$this->uuid.'"}', $response->getContent());
+        $size = $this->uploadedFile->getSize();
+        $this->chunkUpload(3, function ($offset, $chunkSize, $index, $totalCount) use ($size) {
+            $this->request->replace([
+                'dzuuid' => $this->uuid,
+                'dzchunkindex' => $index,
+                'dztotalfilesize' => $size,
+                'dzchunksize' => $chunkSize,
+                'dztotalchunkcount' => $totalCount,
+                'dzchunkbyteoffset' => $offset,
+            ]);
+            try {
+                $uploadedFile = $this->api->receive('foo');
+                self::assertEquals($size, $uploadedFile->getSize());
+            } catch (ChunkedResponseException $e) {
+                self::assertStringMatchesFormat(
+                    '{"success":true,"uuid":"'.$this->uuid.'"}',
+                    $e->getMessage()
+                );
+            }
+        });
     }
 
-    /**
-     * @throws FileNotFoundException
-     * @throws ResourceOpenException
-     */
-    public function testReceiveChunkedFileWithParts(): void
+    public function testResponse(): void
     {
-        $this->expectException(ChunkedResponseException::class);
-        $this->expectExceptionMessage('{"success":true,"uuid":"'.$this->uuid.'"}');
+        $response = $this->api->completedResponse(new JsonResponse());
 
-        $this->request->replace([
-            'dztotalchunkcount' => 2,
-            'dzchunkindex' => 0,
-            'dzuuid' => $this->uuid,
-        ]);
-
-        $this->api->receive('foo');
+        self::assertEquals('{"success":true,"uuid":null}', $response->getContent());
     }
 }
