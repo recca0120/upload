@@ -51,7 +51,6 @@ class FilePondTest extends TestCase
     public function testReceiveChunkedFile(): void
     {
         $size = $this->uploadedFile->getSize();
-
         $this->request->replace(['file' => '{}']);
         $this->request->headers->replace(['Upload-Length' => $this->uploadedFile->getSize()]);
         $uuid = '';

@@ -29,19 +29,16 @@ class FineUploader extends Api
     protected function receiveChunked(string $name)
     {
         $uploadedFile = $this->request->file($name);
-        $originalName = $this->request->get('qqfilename');
-        $totalparts = (int) $this->request->get('qqtotalparts', 1);
-        $partindex = (int) $this->request->get('qqpartindex');
         $uuid = $this->request->get('qquuid');
 
-        $chunkFile = $this->createChunkFile($originalName, $uuid);
+        $chunkFile = $this->createChunkFile($this->request->get('qqfilename'), $uuid);
 
         if (! $this->isCompleted($name)) {
-            $chunkFile->appendFile($uploadedFile->getRealPath(), $partindex);
+            $chunkFile->appendFile($uploadedFile->getRealPath(), (int) $this->request->get('qqpartindex'));
 
             throw new ChunkedResponseException(['success' => true, 'uuid' => $uuid]);
         }
 
-        return $chunkFile->createUploadedFile($totalparts);
+        return $chunkFile->createUploadedFile((int) $this->request->get('qqtotalparts', 1));
     }
 }

@@ -85,11 +85,9 @@ abstract class Api implements ApiContract
      */
     public function receive(string $name)
     {
-        if (! $this->isChunked($name)) {
-            return $this->request->file($name);
-        }
-
-        return $this->receiveChunked($name);
+        return $this->isChunked($name)
+            ? $this->receiveChunked($name)
+            : $this->request->file($name);
     }
 
     public function deleteUploadedFile($uploadedFile)

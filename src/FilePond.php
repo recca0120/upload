@@ -17,7 +17,7 @@ class FilePond extends Api
         $size = (int) $this->request->header('Upload-Length');
         $length = (int) $this->request->header('Content-Length');
 
-        return $size === $offset + $length;
+        return $offset + $length >= $size;
     }
 
     protected function receiveChunked(string $name)

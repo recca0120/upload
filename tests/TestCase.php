@@ -57,29 +57,23 @@ abstract class TestCase extends BaseTestCase
     /**
      * @throws ReflectionException
      */
-    protected function chunkUpload(int $chunks, ?callable $callback): void
+    protected function chunkUpload(int $chunks, callable $callback): void
     {
         $content = $this->uploadedFile->getContent();
         $size = $this->uploadedFile->getSize();
-        $remainder = $size % $chunks;
-        $chunkSize = ($size - $remainder) / $chunks;
-        $totalCount = (int) ceil($size / $chunkSize);
+        $chunkLength = ($size - ($size % $chunks)) / $chunks + ($size % $chunks);
 
         $offset = 0;
-        for ($i = 0; $i < $chunks; $i++) {
+        $index = 0;
+        do {
+            $chunkSize = min($chunkLength, $size - $offset);
             $this->setRequestContent(substr($content, $offset, $chunkSize));
-            if (is_callable($callback)) {
-                $callback($offset, $chunkSize, $i, $totalCount);
-            }
-            $offset = (($i + 1) * $chunkSize);
-        }
-        if ($remainder > 0) {
-            $this->setRequestContent(substr($content, $offset, $remainder));
-            if (is_callable($callback)) {
-                $callback($offset, $remainder, $i, $totalCount);
-            }
-        }
+            $callback($offset, $chunkSize, $index, $chunks);
+            $offset += $chunkLength;
+            $index++;
+        } while ($offset <= $size);
         $this->setRequestContent($content);
+        self::assertEquals($chunks, $index);
     }
 
     /**
