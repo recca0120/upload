@@ -2,32 +2,39 @@
 
 namespace Recca0120\Upload;
 
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
-use Recca0120\Upload\Exceptions\ResourceOpenException;
 
 class FilePond extends Api
 {
-    /**
-     * @throws ResourceOpenException
-     * @throws FileNotFoundException
-     */
-    public function receive(string $name)
+    protected function isChunked(string $name): bool
     {
-        if (! $this->isChunked($name)) {
-            return $this->request->file($name);
-        }
+        return empty($this->request->file($name));
+    }
 
+    protected function isCompleted(string $name): bool
+    {
+        $offset = $this->offset();
+        $size = (int) $this->request->header('Upload-Length');
+        $length = (int) $this->request->header('Content-Length');
+
+        return $size === $offset + $length;
+    }
+
+    protected function receiveChunked(string $name)
+    {
         if (! $this->request->headers->has('Upload-Name')) {
             throw new ChunkedResponseException(md5(uniqid('file-pond-', true)));
         }
 
-        $originalName = $this->request->header('Upload-Name');
-        $uuid = $this->request->get('patch');
-        $offset = (int) $this->request->header('Upload-Offset');
+        $chunkFile = $this->createChunkFile(
+            $this->request->header('Upload-Name'),
+            $this->request->get('patch')
+        );
 
-        $chunkFile = $this->createChunkFile($originalName, $uuid);
-        $chunkFile->appendStream($this->request->getContent(true), $offset);
+        $chunkFile->appendStream(
+            $this->request->getContent(true),
+            $this->offset()
+        );
 
         if (! $this->isCompleted($name)) {
             throw new ChunkedResponseException('', [], 204);
@@ -36,17 +43,8 @@ class FilePond extends Api
         return $chunkFile->createUploadedFile();
     }
 
-    protected function isChunked(string $name): bool
+    private function offset(): int
     {
-        return empty($this->request->file($name));
-    }
-
-    protected function isCompleted(string $name): bool
-    {
-        $offset = (int) $this->request->header('Upload-Offset');
-        $size = (int) $this->request->header('Upload-Length');
-        $length = (int) $this->request->header('Content-Length');
-
-        return $size === $offset + $length;
+        return (int) $this->request->header('Upload-Offset');
     }
 }

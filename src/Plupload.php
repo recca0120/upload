@@ -2,25 +2,32 @@
 
 namespace Recca0120\Upload;
 
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
-use Recca0120\Upload\Exceptions\ResourceOpenException;
 
 class Plupload extends Api
 {
-    /**
-     * @throws FileNotFoundException
-     * @throws ResourceOpenException
-     */
-    public function receive(string $name)
+    public function completedResponse(JsonResponse $response): JsonResponse
     {
-        if ($this->isChunked($name)) {
-            return $this->request->file($name);
-        }
+        return $response->setData(['jsonrpc' => '2.0', 'result' => $response->getData()]);
+    }
 
-        $uploadedFile = $this->request->file($name);
+    protected function isChunked(string $name): bool
+    {
+        return ! empty($this->request->get('chunks'));
+    }
+
+    protected function isCompleted(string $name): bool
+    {
         $chunks = $this->request->get('chunks');
+        $chunk = $this->request->get('chunk');
+
+        return $chunk >= $chunks - 1;
+    }
+
+    protected function receiveChunked(string $name)
+    {
+        $uploadedFile = $this->request->file($name);
         $chunk = $this->request->get('chunk');
         $originalName = $this->request->get('name');
         $originalName = empty($originalName) ? $uploadedFile->getClientOriginalName() : $originalName;
@@ -35,23 +42,5 @@ class Plupload extends Api
         }
 
         return $chunkFile->createUploadedFile();
-    }
-
-    public function completedResponse(JsonResponse $response): JsonResponse
-    {
-        return $response->setData(['jsonrpc' => '2.0', 'result' => $response->getData()]);
-    }
-
-    protected function isChunked(string $name): bool
-    {
-        return empty($this->request->get('chunks'));
-    }
-
-    protected function isCompleted(string $name): bool
-    {
-        $chunks = $this->request->get('chunks');
-        $chunk = $this->request->get('chunk');
-
-        return $chunk >= $chunks - 1;
     }
 }

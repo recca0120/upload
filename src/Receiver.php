@@ -14,7 +14,15 @@ class Receiver
     /**
      * @var ApiContract
      */
-    protected $api;
+    private $api;
+
+    private static $lookup = [
+        'dropzone' => Dropzone::class,
+        'fileapi' => FileAPI::class,
+        'fineuploader' => FineUploader::class,
+        'plupload' => Plupload::class,
+        'filepond' => FilePond::class,
+    ];
 
     public function __construct(ApiContract $api)
     {
@@ -40,15 +48,7 @@ class Receiver
 
     public static function factory(array $config = [], string $class = FileAPI::class): Receiver
     {
-        $lookup = [
-            'dropzone' => Dropzone::class,
-            'fileapi' => FileAPI::class,
-            'fineuploader' => FineUploader::class,
-            'plupload' => Plupload::class,
-            'filepond' => FilePond::class,
-        ];
-
-        $class = Arr::get($lookup, strtolower($class), $class);
+        $class = Arr::get(self::$lookup, strtolower($class), $class);
 
         return new static(new $class($config));
     }

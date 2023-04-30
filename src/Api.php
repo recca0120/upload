@@ -2,9 +2,12 @@
 
 namespace Recca0120\Upload;
 
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Recca0120\Upload\Contracts\Api as ApiContract;
+use Recca0120\Upload\Exceptions\ResourceOpenException;
 
 abstract class Api implements ApiContract
 {
@@ -76,7 +79,18 @@ abstract class Api implements ApiContract
         return $this;
     }
 
-    abstract public function receive(string $name);
+    /**
+     * @throws ResourceOpenException
+     * @throws FileNotFoundException
+     */
+    public function receive(string $name)
+    {
+        if (! $this->isChunked($name)) {
+            return $this->request->file($name);
+        }
+
+        return $this->receiveChunked($name);
+    }
 
     public function deleteUploadedFile($uploadedFile)
     {
@@ -116,4 +130,12 @@ abstract class Api implements ApiContract
     abstract protected function isChunked(string $name);
 
     abstract protected function isCompleted(string $name);
+
+    /**
+     * @return UploadedFile|\Symfony\Component\HttpFoundation\File\UploadedFile
+     *
+     * @throws FileNotFoundException
+     * @throws ResourceOpenException
+     */
+    abstract protected function receiveChunked(string $name);
 }

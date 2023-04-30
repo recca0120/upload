@@ -2,40 +2,10 @@
 
 namespace Recca0120\Upload;
 
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
-use Recca0120\Upload\Exceptions\ResourceOpenException;
 
 class FileAPI extends Api
 {
-    /**
-     * @throws ResourceOpenException
-     * @throws FileNotFoundException
-     */
-    public function receive(string $name)
-    {
-        if (! $this->isChunked($name)) {
-            return $this->request->file($name);
-        }
-
-        $contentDisposition = (string) $this->request->header('content-disposition');
-        [$start, $end] = $this->parseContentRange();
-        $originalName = $this->parseOriginalName($contentDisposition);
-        $mimeType = $this->request->header('content-type');
-        $uuid = $this->request->get('token');
-
-        $chunkFile = $this->createChunkFile($originalName, $mimeType, $uuid);
-        $chunkFile->appendStream($this->request->getContent(true), $start);
-
-        if (! $this->isCompleted($name)) {
-            $message = ['files' => ['name' => $originalName, 'size' => $end, 'type' => $mimeType]];
-
-            throw new ChunkedResponseException($message, ['X-Last-Known-Byte' => $end]);
-        }
-
-        return $chunkFile->createUploadedFile();
-    }
-
     protected function parseOriginalName(string $contentDisposition): string
     {
         $originalName = (string) $this->request->get('name');
@@ -70,5 +40,25 @@ class FileAPI extends Api
         [, $end, $total] = $this->parseContentRange();
 
         return $end >= $total - 1;
+    }
+
+    protected function receiveChunked(string $name)
+    {
+        $contentDisposition = (string) $this->request->header('content-disposition');
+        [$start, $end] = $this->parseContentRange();
+        $originalName = $this->parseOriginalName($contentDisposition);
+        $mimeType = $this->request->header('content-type');
+        $uuid = $this->request->get('token');
+
+        $chunkFile = $this->createChunkFile($originalName, $mimeType, $uuid);
+        $chunkFile->appendStream($this->request->getContent(true), $start);
+
+        if (! $this->isCompleted($name)) {
+            $message = ['files' => ['name' => $originalName, 'size' => $end, 'type' => $mimeType]];
+
+            throw new ChunkedResponseException($message, ['X-Last-Known-Byte' => $end]);
+        }
+
+        return $chunkFile->createUploadedFile();
     }
 }

@@ -116,4 +116,8 @@ class Api extends ApiBase
     {
         return true;
     }
+
+    protected function receiveChunked(string $name)
+    {
+    }
 }
