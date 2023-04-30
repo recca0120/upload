@@ -70,8 +70,7 @@ class ChunkFile
      */
     public function appendStream($source, int $offset = 0): ChunkFile
     {
-        $chunkFile = $this->chunkFile();
-        $this->files->appendStream($chunkFile, $source, $offset);
+        $this->files->appendStream($this->chunkFile(), $source, $offset);
 
         return $this;
     }
@@ -86,8 +85,7 @@ class ChunkFile
      */
     public function appendFile($source, int $index = 0): ChunkFile
     {
-        $chunkFile = $this->chunkFile().'.'.$index;
-        $this->files->appendStream($chunkFile, $source, 0);
+        $this->files->appendStream($this->chunkFile().'.'.$index, $source, 0);
 
         return $this;
     }

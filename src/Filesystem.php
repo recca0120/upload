@@ -24,7 +24,7 @@ class Filesystem extends IlluminateFilesystem
     /**
      * @throws ResourceOpenException
      */
-    public function appendStream($output, $input, int $offset = 0): void
+    public function appendStream($output, $input, int $offset): void
     {
         $mode = ($offset === 0) ? 'wb' : 'ab';
         $output = $this->convertToResource($output, $mode, 'output');

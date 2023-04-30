@@ -32,7 +32,7 @@ class UploadServiceProvider extends ServiceProvider
     /**
      * handle publishes.
      */
-    protected function handlePublishes()
+    protected function handlePublishes(): void
     {
         $this->publishes([
             __DIR__.'/../config/upload.php' => config_path('upload.php'),

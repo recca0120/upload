@@ -2,4 +2,8 @@
     "require": {
         "recca0120/upload": "dev-master"
     }
+    ,
+    "require-dev": {
+        "roave/security-advisories": "dev-latest"
+    }
 }

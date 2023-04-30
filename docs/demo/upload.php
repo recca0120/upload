@@ -2,11 +2,16 @@
 
 use Recca0120\Upload\Dropzone;
 use Recca0120\Upload\FileAPI;
+use Recca0120\Upload\FilePond;
 use Recca0120\Upload\FineUploader;
 use Recca0120\Upload\Plupload;
 use Recca0120\Upload\Receiver;
 
-include __DIR__.'/vendor/autoload.php';
+if (file_exists(__DIR__.'/../../vendor/autoload.php')) {
+    include __DIR__.'/../../vendor/autoload.php';
+} else {
+    include __DIR__.'/vendor/autoload.php';
+}
 
 $config = [
     'chunks' => 'temp/chunks',
@@ -29,6 +34,10 @@ switch ($api) {
 
     case 'dropzone':
         $receiver = new Receiver(new Dropzone($config));
+        break;
+
+    case 'filepond':
+        $receiver = new Receiver(new FilePond($config));
         break;
 
     default:
