@@ -54,7 +54,7 @@ abstract class Api implements ApiContract
         return rtrim($this->config['path'], '/').'/';
     }
 
-    public function makeDirectory(string $path): Api
+    public function makeDirectory(string $path): ApiContract
     {
         if ($this->files->isDirectory($path) === false) {
             $this->files->makeDirectory($path, 0777, true, true);
@@ -63,7 +63,7 @@ abstract class Api implements ApiContract
         return $this;
     }
 
-    public function cleanDirectory(string $path): Api
+    public function cleanDirectory(string $path): ApiContract
     {
         $time = time();
         $maxFileAge = 3600;
@@ -90,7 +90,7 @@ abstract class Api implements ApiContract
             : $this->request->file($name);
     }
 
-    public function deleteUploadedFile($uploadedFile)
+    public function deleteUploadedFile($uploadedFile): ApiContract
     {
         $file = $uploadedFile->getPathname();
         if ($this->files->isFile($file) === true) {

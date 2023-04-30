@@ -32,15 +32,14 @@ class ReceiverTest extends TestCase
         $uploadedFile->allows('getBasename')->once()->andReturn($basename = 'foo');
         $uploadedFile->allows('getMimeType')->once()->andReturn($mimeType = 'foo');
         $uploadedFile->allows('getSize')->once()->andReturn($size = 1000);
-        $uploadedFile->allows('move')->once()->with($path,
-            $filename = md5($basename).'.'.strtolower($clientOriginalExtension));
+        $uploadedFile->allows('move')->once()
+            ->with($path, $filename = md5($basename).'.'.strtolower($clientOriginalExtension));
 
         $api->allows('deleteUploadedFile')->once()->with($uploadedFile)->andReturnSelf();
-        $api->allows('completedResponse')->once()->with(m::type(JsonResponse::class))->andReturnUsing(function (
-            $response
-        ) {
-            return $response;
-        });
+        $api->allows('completedResponse')->once()
+            ->with(m::type(JsonResponse::class))->andReturnUsing(function ($response) {
+                return $response;
+            });
 
         $response = $receiver->receive($inputName);
         $this->assertSame([
@@ -63,12 +62,11 @@ class ReceiverTest extends TestCase
         $api->allows('deleteUploadedFile')->once()->with($uploadedFile)->andReturnSelf();
         $api->allows('completedResponse')->once()->with($response)->andReturn($response);
 
-        $this->assertSame(
-            $response,
-            $receiver->receive($inputName, function () use ($response) {
-                return $response;
-            })
-        );
+        $callback = function () use ($response) {
+            return $response;
+        };
+
+        $this->assertSame($response, $receiver->receive($inputName, $callback));
     }
 
     public function testReceiveAndThrowChunkedResponseException(): void
@@ -77,6 +75,7 @@ class ReceiverTest extends TestCase
         $inputName = 'foo';
         $api->allows('receive')->once()->with($inputName)->andThrow(new ChunkedResponseException());
         $callback = function () {
+            return new Response();
         };
 
         $this->assertInstanceOf(Response::class, $receiver->receive($inputName, $callback));

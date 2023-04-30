@@ -13,15 +13,9 @@ interface Api
 
     public function path(): string;
 
-    /**
-     * @return self
-     */
-    public function makeDirectory(string $path);
+    public function makeDirectory(string $path): Api;
 
-    /**
-     * @return self
-     */
-    public function cleanDirectory(string $path);
+    public function cleanDirectory(string $path): Api;
 
     /**
      * @return UploadedFile|SymfonyUploadedFile
@@ -32,9 +26,8 @@ interface Api
 
     /**
      * @param  UploadedFile|SymfonyUploadedFile  $uploadedFile
-     * @return self
      */
-    public function deleteUploadedFile($uploadedFile);
+    public function deleteUploadedFile($uploadedFile): Api;
 
     public function completedResponse(JsonResponse $response): JsonResponse;
 }
