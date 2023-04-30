@@ -48,6 +48,7 @@ abstract class TestCase extends BaseTestCase
         $this->uploadedFile = UploadedFile::fake()->image('test.png');
 
         $this->request = Request::createFromGlobals();
+        $this->request->setMethod('POST');
         $this->request->files->replace(['foo' => $this->uploadedFile]);
 
         $this->files = new Filesystem();

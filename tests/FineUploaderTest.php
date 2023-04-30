@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 use Recca0120\Upload\Exceptions\ResourceOpenException;
 use Recca0120\Upload\FineUploader;
+use ReflectionException;
 
 class FineUploaderTest extends TestCase
 {
@@ -24,56 +25,52 @@ class FineUploaderTest extends TestCase
     public function testReceiveSingleFile(): void
     {
         $this->assertSame($this->uploadedFile, $this->api->receive('foo'));
-
-        $response = $this->api->completedResponse(new JsonResponse());
-
-        self::assertEquals('{"success":true,"uuid":null}', $response->getContent());
     }
 
     /**
      * @throws FileNotFoundException
      * @throws ResourceOpenException
+     * @throws ReflectionException
      */
     public function testReceiveChunkedFile(): void
     {
+        $size = $this->uploadedFile->getSize();
+        $this->chunkUpload(4, function ($offset, $chunkSize, $index, $totalCount) use ($size) {
+            $this->request->replace([
+                'qqpartindex' => $index,
+                'qqpartbyteoffset' => $offset,
+                'qqchunksize' => $chunkSize,
+                'qqtotalparts' => $totalCount,
+                'qqtotalfilesize' => $size,
+                'qqfilename' => $this->uploadedFile->getClientOriginalName(),
+                'qquuid' => $this->uuid,
+            ]);
+
+            try {
+                $this->api->receive('foo');
+            } catch (ChunkedResponseException $e) {
+                self::assertStringMatchesFormat(
+                    '{"success":true,"uuid":"'.$this->uuid.'"}',
+                    $e->getMessage()
+                );
+            }
+        });
+
         $this->request->files->remove('foo');
-
-        $tmpFile = $this->files->tmpfilename($this->uploadedFile->getClientOriginalName(), $this->uuid);
-        for ($i = 0; $i < 3; $i++) {
-            file_put_contents($this->root->url().'/chunks/'.$tmpFile.'.part.'.$i, '');
-        }
-        file_put_contents($this->root->url().'/chunks/'.$tmpFile.'.part.'.$i, $this->uploadedFile->getContent());
-
         $this->request->replace([
-            'qqpartindex' => 3,
-            'qqtotalparts' => 4,
-            'qquuid' => $this->uuid,
+            'qqtotalfilesize' => $size,
             'qqfilename' => $this->uploadedFile->getClientOriginalName(),
+            'qquuid' => $this->uuid,
         ]);
 
-        self::assertTrue($this->api->receive('foo')->isValid());
-
-        $response = $this->api->completedResponse(new JsonResponse());
-
-        self::assertEquals('{"success":true,"uuid":"'.$this->uuid.'"}', $response->getContent());
+        $uploadedFile = $this->api->receive('foo');
+        self::assertEquals($size, $uploadedFile->getSize());
     }
 
-    /**
-     * @throws FileNotFoundException
-     * @throws ResourceOpenException
-     */
-    public function testReceiveChunkedFileWithParts(): void
+    public function testResponse(): void
     {
-        $this->expectException(ChunkedResponseException::class);
-        $this->expectExceptionMessage('{"success":true,"uuid":"'.$this->uuid.'"}');
+        $response = $this->api->completedResponse(new JsonResponse());
 
-        $this->request->replace([
-            'qqpartindex' => 3,
-            'qqtotalparts' => 4,
-            'qquuid' => $this->uuid,
-            'qqfilename' => $this->uploadedFile->getClientOriginalName(),
-        ]);
-
-        $this->api->receive('foo');
+        self::assertEquals('{"success":true,"uuid":null}', $response->getContent());
     }
 }

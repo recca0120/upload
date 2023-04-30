@@ -51,8 +51,19 @@ class FilePondTest extends TestCase
     public function testReceiveChunkedFile(): void
     {
         $size = $this->uploadedFile->getSize();
+
+        $this->request->replace(['file' => '{}']);
+        $this->request->headers->replace(['Upload-Length' => $this->uploadedFile->getSize()]);
+        $uuid = '';
+        try {
+            $this->api->receive('foo');
+        } catch (ChunkedResponseException $e) {
+            $uuid = $e->getMessage();
+        }
+        self::assertNotEmpty($uuid);
+
         $this->request->setMethod('patch');
-        $this->request->replace(['patch' => $this->uuid]);
+        $this->request->replace(['patch' => $uuid]);
 
         $this->chunkUpload(3, function ($offset, $chunkSize) use ($size) {
             $this->request->headers->replace([

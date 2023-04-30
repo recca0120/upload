@@ -290,7 +290,7 @@
     <div id="fine-uploader"></div>
     <script>
         // Some options to pass to the uploader are discussed on the next page
-        var uploader = new qq.FineUploader({
+        new qq.FineUploader({
             element: document.getElementById("fine-uploader"),
             debug: true,
             request: {
@@ -303,6 +303,7 @@
             // },
             chunking: {
                 enabled: true,
+                partSize: 500000,
                 concurrent: {
                     enabled: true
                 },
