@@ -51,7 +51,7 @@ class FileAPI extends Api
         $mimeType = $this->request->header('content-type');
         $uuid = $this->request->get('token');
 
-        $chunkFile = $this->createChunkFile($originalName, $mimeType, $uuid);
+        $chunkFile = $this->createChunkFile($originalName, $uuid, $mimeType);
         $chunkFile->appendStream($this->request->getContent(true), $start);
 
         if (! $this->isCompleted($name)) {

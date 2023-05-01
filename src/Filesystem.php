@@ -17,7 +17,11 @@ class Filesystem extends BaseFilesystem
 
     public function tmpfilename(string $path, string $hash = null): string
     {
-        return md5($path.$hash).'.'.strtolower($this->extension($path));
+        if (empty($hash)) {
+            $hash = md5($path);
+        }
+
+        return $hash.'.'.strtolower($this->extension($path));
     }
 
     /**

@@ -27,7 +27,7 @@ class FilesystemTest extends TestCase
         $path = __FILE__;
         $hash = uniqid('', true);
 
-        $this->assertSame(md5($path.$hash).'.php', $files->tmpfilename($path, $hash));
+        $this->assertSame($hash.'.php', $files->tmpfilename($path, $hash));
     }
 
     /**

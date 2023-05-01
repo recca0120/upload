@@ -94,11 +94,10 @@ class ChunkFile
     /**
      * @throws FileNotFoundException
      */
-    public function createUploadedFile($chunks = null, $storageFile = null): UploadedFile
+    public function createUploadedFile($chunks = null): UploadedFile
     {
         $chunkFile = $this->chunkFile();
-
-        $storageFile = $storageFile ?: $this->storageFile();
+        $storageFile = $this->storageFile();
 
         if (is_null($chunks) === false) {
             for ($i = 0; $i < $chunks; $i++) {
