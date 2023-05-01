@@ -3,6 +3,7 @@
 namespace Recca0120\Upload;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Http\UploadedFile;
 use Recca0120\Upload\Exceptions\ResourceOpenException;
 
 class ChunkFile
@@ -93,7 +94,7 @@ class ChunkFile
     /**
      * @throws FileNotFoundException
      */
-    public function createUploadedFile($chunks = null, $storageFile = null)
+    public function createUploadedFile($chunks = null, $storageFile = null): UploadedFile
     {
         $chunkFile = $this->chunkFile();
 

@@ -3,6 +3,7 @@
 namespace Recca0120\Upload;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\UploadedFile;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
 class Plupload extends Api
@@ -25,7 +26,7 @@ class Plupload extends Api
         return $chunk >= $chunks - 1;
     }
 
-    protected function receiveChunked(string $name)
+    protected function receiveChunked(string $name): UploadedFile
     {
         $uploadedFile = $this->request->file($name);
         $originalName = $this->request->get('name');

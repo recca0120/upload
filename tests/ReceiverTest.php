@@ -3,6 +3,7 @@
 namespace Recca0120\Upload\Tests;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\UploadedFile;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -12,7 +13,6 @@ use Recca0120\Upload\FileAPI;
 use Recca0120\Upload\Plupload;
 use Recca0120\Upload\Receiver;
 use ReflectionClass;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 
 class ReceiverTest extends TestCase

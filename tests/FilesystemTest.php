@@ -2,13 +2,13 @@
 
 namespace Recca0120\Upload\Tests;
 
+use Illuminate\Http\UploadedFile;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use org\bovigo\vfs\content\LargeFileContent;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 use Recca0120\Upload\Exceptions\ResourceOpenException;
 use Recca0120\Upload\Filesystem;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FilesystemTest extends TestCase
 {

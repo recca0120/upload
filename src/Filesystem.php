@@ -2,14 +2,13 @@
 
 namespace Recca0120\Upload;
 
-use Illuminate\Filesystem\Filesystem as IlluminateFilesystem;
+use Illuminate\Filesystem\Filesystem as BaseFilesystem;
 use Illuminate\Http\UploadedFile;
 use Recca0120\Upload\Exceptions\ResourceOpenException;
-use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use TypeError;
 use ValueError;
 
-class Filesystem extends IlluminateFilesystem
+class Filesystem extends BaseFilesystem
 {
     public function basename($path): string
     {
@@ -39,11 +38,9 @@ class Filesystem extends IlluminateFilesystem
         fclose($input);
     }
 
-    public function createUploadedFile(string $path, string $originalName, string $mimeType)
+    public function createUploadedFile(string $path, string $originalName, string $mimeType): UploadedFile
     {
-        $class = class_exists(UploadedFile::class) === true ? UploadedFile::class : SymfonyUploadedFile::class;
-
-        return new $class($path, $originalName, $mimeType, UPLOAD_ERR_OK, true);
+        return new UploadedFile($path, $originalName, $mimeType, UPLOAD_ERR_OK, true);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Recca0120\Upload;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\UploadedFile;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
 class Dropzone extends FineUploader
@@ -29,7 +30,7 @@ class Dropzone extends FineUploader
         return $totalChunkCount - 1 === $chunkIndex;
     }
 
-    protected function receiveChunked(string $name)
+    protected function receiveChunked(string $name): UploadedFile
     {
         $uploadedFile = $this->request->file($name);
         $originalName = $uploadedFile->getClientOriginalName();

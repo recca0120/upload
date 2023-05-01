@@ -83,14 +83,14 @@ abstract class Api implements ApiContract
      * @throws ResourceOpenException
      * @throws FileNotFoundException
      */
-    public function receive(string $name)
+    public function receive(string $name): UploadedFile
     {
         return $this->isChunked($name)
             ? $this->receiveChunked($name)
             : $this->request->file($name);
     }
 
-    public function deleteUploadedFile($uploadedFile): ApiContract
+    public function deleteUploadedFile(UploadedFile $uploadedFile): ApiContract
     {
         $file = $uploadedFile->getPathname();
         if ($this->files->isFile($file) === true) {
@@ -130,10 +130,8 @@ abstract class Api implements ApiContract
     abstract protected function isCompleted(string $name): bool;
 
     /**
-     * @return UploadedFile|\Symfony\Component\HttpFoundation\File\UploadedFile
-     *
      * @throws FileNotFoundException
      * @throws ResourceOpenException
      */
-    abstract protected function receiveChunked(string $name);
+    abstract protected function receiveChunked(string $name): UploadedFile;
 }

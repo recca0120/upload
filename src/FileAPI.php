@@ -2,6 +2,7 @@
 
 namespace Recca0120\Upload;
 
+use Illuminate\Http\UploadedFile;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
 class FileAPI extends Api
@@ -42,7 +43,7 @@ class FileAPI extends Api
         return $end >= $total - 1;
     }
 
-    protected function receiveChunked(string $name)
+    protected function receiveChunked(string $name): UploadedFile
     {
         $contentDisposition = (string) $this->request->header('content-disposition');
         [$start, $end] = $this->parseContentRange();

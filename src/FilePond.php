@@ -2,6 +2,7 @@
 
 namespace Recca0120\Upload;
 
+use Illuminate\Http\UploadedFile;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 
 class FilePond extends Api
@@ -20,7 +21,7 @@ class FilePond extends Api
         return $offset + $length >= $size;
     }
 
-    protected function receiveChunked(string $name)
+    protected function receiveChunked(string $name): UploadedFile
     {
         if (! $this->request->headers->has('Upload-Name')) {
             throw new ChunkedResponseException(md5(uniqid('file-pond-', true)));

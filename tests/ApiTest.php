@@ -10,7 +10,6 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Recca0120\Upload\Api as ApiBase;
 use Recca0120\Upload\Filesystem;
-use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 class ApiTest extends TestCase
 {
@@ -73,7 +72,7 @@ class ApiTest extends TestCase
         $request = m::mock(Request::class);
         $request->allows('root')->once()->andReturn('root');
 
-        $uploadedFile = m::mock(SymfonyUploadedFile::class);
+        $uploadedFile = m::mock(UploadedFile::class);
         $uploadedFile->allows('getPathname')->once()->andReturn($file = __FILE__);
 
         $files = m::mock(Filesystem::class);
@@ -117,7 +116,8 @@ class Api extends ApiBase
         return true;
     }
 
-    protected function receiveChunked(string $name)
+    protected function receiveChunked(string $name): UploadedFile
     {
+        return UploadedFile::fake()->create('test.png');
     }
 }

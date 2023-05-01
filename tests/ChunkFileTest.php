@@ -3,13 +3,13 @@
 namespace Recca0120\Upload\Tests;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Http\UploadedFile;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Recca0120\Upload\ChunkFile;
 use Recca0120\Upload\Exceptions\ResourceOpenException;
 use Recca0120\Upload\Filesystem;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ChunkFileTest extends TestCase
 {
