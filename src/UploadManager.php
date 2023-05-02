@@ -5,6 +5,11 @@ namespace Recca0120\Upload;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Http\Request;
 use Illuminate\Support\Manager;
+use Recca0120\Upload\Drivers\Dropzone;
+use Recca0120\Upload\Drivers\FileAPI;
+use Recca0120\Upload\Drivers\FilePond;
+use Recca0120\Upload\Drivers\FineUploader;
+use Recca0120\Upload\Drivers\Plupload;
 
 class UploadManager extends Manager
 {
@@ -32,26 +37,36 @@ class UploadManager extends Manager
 
     protected function createDropzoneDriver(): Receiver
     {
-        return new Receiver(new Dropzone($this->container['config']['upload'], $this->request, $this->files));
+        return $this->makeReceiver(Dropzone::class);
     }
 
     protected function createFileapiDriver(): Receiver
     {
-        return new Receiver(new FileAPI($this->container['config']['upload'], $this->request, $this->files));
+        return $this->makeReceiver(FileAPI::class);
     }
 
     protected function createFineUploaderDriver(): Receiver
     {
-        return new Receiver(new FineUploader($this->container['config']['upload'], $this->request, $this->files));
+        return $this->makeReceiver(FineUploader::class);
     }
 
     protected function createPluploadDriver(): Receiver
     {
-        return new Receiver(new Plupload($this->container['config']['upload'], $this->request, $this->files));
+        return $this->makeReceiver(Plupload::class);
     }
 
     protected function createFilePond(): Receiver
     {
-        return new Receiver(new FilePond($this->container['config']['upload'], $this->request, $this->files));
+        return $this->makeReceiver(FilePond::class);
+    }
+
+    private function makeReceiver($class): Receiver
+    {
+        return new Receiver(new $class($this->getConfig(), $this->request, $this->files));
+    }
+
+    private function getConfig()
+    {
+        return $this->container['config']['upload'];
     }
 }

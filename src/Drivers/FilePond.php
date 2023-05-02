@@ -1,6 +1,6 @@
 <?php
 
-namespace Recca0120\Upload;
+namespace Recca0120\Upload\Drivers;
 
 use Illuminate\Http\UploadedFile;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;

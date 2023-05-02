@@ -1,6 +1,6 @@
 <?php
 
-namespace Recca0120\Upload\Tests;
+namespace Recca0120\Upload\Tests\Drivers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\UploadedFile;
@@ -8,9 +8,9 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Recca0120\Upload\Contracts\Api;
+use Recca0120\Upload\Drivers\FileAPI;
+use Recca0120\Upload\Drivers\Plupload;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
-use Recca0120\Upload\FileAPI;
-use Recca0120\Upload\Plupload;
 use Recca0120\Upload\Receiver;
 use ReflectionClass;
 use Symfony\Component\HttpFoundation\Response;

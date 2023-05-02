@@ -90,21 +90,15 @@ $config = [
     'path' => 'web_path'
 ];
 
-$inputName = 'file';
-$storagePath = 'relative path';
-$api = 'fileapi'; // or plupload
-
-Receiver::factory($config, $api)->receive($inputName)->send();
+Receiver::factory($config, 'fileapi')->receive('file')->send();
 ```
 
 ## Standalone
 
 ```php
 
+use Recca0120\Upload\Drivers\FileAPI;
 use Recca0120\Upload\Receiver;
-use Recca0120\Upload\FileAPI;
-use Recca0120\Upload\Plupload;
-use Illuminate\Http\JsonResponse;
 
 require __DIR__.'/vendor/autoload.php';
 
@@ -115,11 +109,8 @@ $config = [
     'path' => 'web_path'
 ];
 
-$inputName = 'file';
-$storagePath = 'relative path';
-
 // if use Plupload, new Recca0120\Upload\Plupload
 $receiver = new Receiver(new FileAPI($config));
-// save to $config['base_path'].'/'.$storagePath;
-$receiver->receive($inputName)->send();
+// save to $config['storage'];
+$receiver->receive('file')->send();
 ```

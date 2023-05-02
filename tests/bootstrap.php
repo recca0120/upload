@@ -35,20 +35,23 @@ date_default_timezone_set('UTC');
 Carbon::setTestNow(Carbon::now());
 
 if (! function_exists('storage_path')) {
-    function storage_path()
+    function storage_path(string $name): string
     {
+        return $name;
     }
 }
 
 if (! function_exists('public_path')) {
-    function public_path()
+    function public_path(string $name): string
     {
+        return $name;
     }
 }
 
 if (! function_exists('config_path')) {
-    function config_path()
+    function config_path($name)
     {
+        return $name;
     }
 }
 

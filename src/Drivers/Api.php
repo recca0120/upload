@@ -1,13 +1,15 @@
 <?php
 
-namespace Recca0120\Upload;
+namespace Recca0120\Upload\Drivers;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Recca0120\Upload\ChunkFile;
 use Recca0120\Upload\Contracts\Api as ApiContract;
 use Recca0120\Upload\Exceptions\ResourceOpenException;
+use Recca0120\Upload\Filesystem;
 
 abstract class Api implements ApiContract
 {

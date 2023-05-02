@@ -1,10 +1,10 @@
 <?php
 
-use Recca0120\Upload\Dropzone;
-use Recca0120\Upload\FileAPI;
-use Recca0120\Upload\FilePond;
-use Recca0120\Upload\FineUploader;
-use Recca0120\Upload\Plupload;
+use Recca0120\Upload\Drivers\Dropzone;
+use Recca0120\Upload\Drivers\FileAPI;
+use Recca0120\Upload\Drivers\FilePond;
+use Recca0120\Upload\Drivers\FineUploader;
+use Recca0120\Upload\Drivers\Plupload;
 use Recca0120\Upload\Receiver;
 
 if (file_exists(__DIR__.'/../../vendor/autoload.php')) {
@@ -21,7 +21,7 @@ $config = [
 ];
 
 $inputName = 'file';
-$api = isset($_GET['api']) ? $_GET['api'] : null;
+$api = $_GET['api'] ?? null;
 
 switch ($api) {
     case 'plupload':

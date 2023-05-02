@@ -1,11 +1,12 @@
 <?php
 
-namespace Recca0120\Upload\Tests;
+namespace Recca0120\Upload\Tests\Drivers;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Recca0120\Upload\Drivers\FilePond;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 use Recca0120\Upload\Exceptions\ResourceOpenException;
-use Recca0120\Upload\FilePond;
+use Recca0120\Upload\Tests\TestCase;
 use ReflectionException;
 
 class FilePondTest extends TestCase

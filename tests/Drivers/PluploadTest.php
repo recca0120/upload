@@ -1,12 +1,13 @@
 <?php
 
-namespace Recca0120\Upload\Tests;
+namespace Recca0120\Upload\Tests\Drivers;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Recca0120\Upload\Drivers\Plupload;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 use Recca0120\Upload\Exceptions\ResourceOpenException;
-use Recca0120\Upload\Plupload;
+use Recca0120\Upload\Tests\TestCase;
 use ReflectionException;
 
 class PluploadTest extends TestCase

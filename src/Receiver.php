@@ -6,6 +6,11 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Recca0120\Upload\Contracts\Api as ApiContract;
+use Recca0120\Upload\Drivers\Dropzone;
+use Recca0120\Upload\Drivers\FileAPI;
+use Recca0120\Upload\Drivers\FilePond;
+use Recca0120\Upload\Drivers\FineUploader;
+use Recca0120\Upload\Drivers\Plupload;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
 use Symfony\Component\HttpFoundation\Response;
 
