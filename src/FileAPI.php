@@ -46,10 +46,10 @@ class FileAPI extends Api
     protected function receiveChunked(string $name): UploadedFile
     {
         $contentDisposition = (string) $this->request->header('content-disposition');
-        [$start, $end] = $this->parseContentRange();
+        [$start, $end, $total] = $this->parseContentRange();
         $originalName = $this->parseOriginalName($contentDisposition);
         $mimeType = $this->request->header('content-type');
-        $uuid = $this->request->get('token');
+        $uuid = $this->request->get('token') ?? md5($originalName.$total);
 
         $chunkFile = $this->createChunkFile($originalName, $uuid, $mimeType);
         $chunkFile->appendStream($this->request->getContent(true), $start);

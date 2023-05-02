@@ -25,7 +25,7 @@ class ReceiverTest extends TestCase
         $path = 'temp';
         $domain = 'https://foo.bar/';
 
-        $uploadedFile = UploadedFile::fake()->create('test.php');
+        $uploadedFile = UploadedFile::fake()->create('中文.php');
 
         $api = m::spy(Api::class);
         $api->allows('path')->andReturn($path);

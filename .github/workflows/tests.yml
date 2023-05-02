@@ -9,9 +9,10 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
         php: [ '7.3', '7.4', '8.0', '8.1', '8.2' ]
 
-    name: PHP ${{ matrix.php }}
+    name: ${{ matrix.os }} PHP ${{ matrix.php }}
     env:
       extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, grpc
       key: cache-v1 # can be any string, change to clear the extension cache.
