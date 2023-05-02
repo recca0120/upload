@@ -21,7 +21,7 @@ interface Api
      */
     public function receive(string $name): UploadedFile;
 
-    public function deleteUploadedFile(UploadedFile $uploadedFile): Api;
+    public function clearTempDirectories(): Api;
 
     public function completedResponse(JsonResponse $response): JsonResponse;
 }

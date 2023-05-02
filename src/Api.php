@@ -67,7 +67,7 @@ abstract class Api implements ApiContract
     {
         $time = time();
         $maxFileAge = 3600;
-        $files = (array) $this->files->files($path);
+        $files = $this->files->files($path);
         foreach ($files as $file) {
             if ($this->files->isFile($file) === true &&
                 $this->files->lastModified($file) < ($time - $maxFileAge)
@@ -90,13 +90,10 @@ abstract class Api implements ApiContract
             : $this->request->file($name);
     }
 
-    public function deleteUploadedFile(UploadedFile $uploadedFile): ApiContract
+    public function clearTempDirectories(): ApiContract
     {
-        $file = $uploadedFile->getPathname();
-        if ($this->files->isFile($file) === true) {
-            $this->files->delete($file);
-        }
         $this->cleanDirectory($this->chunkPath());
+        $this->cleanDirectory($this->storagePath());
 
         return $this;
     }

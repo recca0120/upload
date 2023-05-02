@@ -45,8 +45,8 @@ Controller
 ```php
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\UploadedFile;
 use Recca0120\Upload\UploadManager;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class UploadController extends Controller
 {
@@ -61,19 +61,13 @@ class UploadController extends Controller
         return $manager
             ->driver($driver)
             ->receive($inputName, function (UploadedFile $uploadedFile, $path, $domain, $api) {
-                $clientOriginalName = $uploadedFile->getClientOriginalName();
-                $clientOriginalExtension = strtolower($uploadedFile->getClientOriginalExtension());
-                $basename = pathinfo($uploadedFile->getBasename(), PATHINFO_FILENAME);
-                $filename = md5($basename).'.'.$clientOriginalExtension;
-                $mimeType = $uploadedFile->getMimeType();
-                $size = $uploadedFile->getSize();
-                $uploadedFile->move($path, $filename);
+                $filename = $uploadedFile->getBasename();
 
                 return new JsonResponse([
-                    'name' => pathinfo($clientOriginalName, PATHINFO_FILENAME).'.'.$clientOriginalExtension,
+                    'name' => $uploadedFile->getClientOriginalName(),
                     'tmp_name' => $path.$filename,
-                    'type' => $mimeType,
-                    'size' => $size,
+                    'type' => $uploadedFile->getMimeType(),
+                    'size' => $uploadedFile->getSize(),
                     'url' => $domain.$path.$filename,
                 ]);
             });

@@ -67,25 +67,6 @@ class ApiTest extends TestCase
         $this->assertSame($api, $api->cleanDirectory($path));
     }
 
-    public function testDeleteUploadedFile(): void
-    {
-        $request = m::mock(Request::class);
-        $request->allows('root')->once()->andReturn('root');
-
-        $uploadedFile = m::mock(UploadedFile::class);
-        $uploadedFile->allows('getPathname')->once()->andReturn($file = __FILE__);
-
-        $files = m::mock(Filesystem::class);
-        $files->allows('isDirectory')->once()->andReturn(true);
-        $files->allows('isFile')->once()->with($file)->andReturn(true);
-        $files->allows('delete')->once()->with($file);
-        $files->allows('files')->once()->andReturn([]);
-
-        $api = new Api(['chunks' => 'foo/'], $request, $files);
-
-        $this->assertSame($api, $api->deleteUploadedFile($uploadedFile));
-    }
-
     public function testCompletedResponse(): void
     {
         $request = m::mock(Request::class);

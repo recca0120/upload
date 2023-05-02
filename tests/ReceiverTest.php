@@ -21,33 +21,31 @@ class ReceiverTest extends TestCase
 
     public function testReceive(): void
     {
-        $receiver = new Receiver($api = m::mock(Api::class));
         $inputName = 'foo';
-        $api->allows('receive')->once()->with($inputName)->andReturn($uploadedFile = m::mock(UploadedFile::class));
-        $api->allows('domain')->once()->andReturn($domain = 'foo/');
-        $api->allows('path')->once()->andReturn($path = 'foo/');
-        $uploadedFile->allows('getClientOriginalName')->once()->andReturn($clientOriginalName = 'foo.PHP');
-        $clientOriginalExtension = 'PHP';
+        $path = 'temp';
+        $domain = 'https://foo.bar/';
 
-        $uploadedFile->allows('getBasename')->once()->andReturn($basename = 'foo');
-        $uploadedFile->allows('getMimeType')->once()->andReturn($mimeType = 'foo');
-        $uploadedFile->allows('getSize')->once()->andReturn($size = 1000);
-        $uploadedFile->allows('move')->once()
-            ->with($path, $filename = md5($basename).'.'.strtolower($clientOriginalExtension));
+        $uploadedFile = UploadedFile::fake()->create('test.php');
 
-        $api->allows('deleteUploadedFile')->once()->with($uploadedFile)->andReturnSelf();
-        $api->allows('completedResponse')->once()
-            ->with(m::type(JsonResponse::class))->andReturnUsing(function ($response) {
-                return $response;
-            });
+        $api = m::spy(Api::class);
+        $api->allows('path')->andReturn($path);
+        $api->allows('domain')->andReturn($domain);
+        $api->allows('receive')->with($inputName)->andReturn($uploadedFile)->once();
+        $api->allows('clearTempDirectories')->andReturnSelf();
+        $api->allows('completedResponse')->with(m::type(JsonResponse::class))->andReturnUsing(function ($response) {
+            return $response;
+        });
+
+        $receiver = new Receiver($api);
 
         $response = $receiver->receive($inputName);
+
         $this->assertSame([
-            'name' => pathinfo($clientOriginalName, PATHINFO_FILENAME).'.'.strtolower($clientOriginalExtension),
-            'tmp_name' => $path.$filename,
-            'type' => $mimeType,
-            'size' => $size,
-            'url' => $domain.$path.$filename,
+            'name' => $uploadedFile->getClientOriginalName(),
+            'tmp_name' => $path.$uploadedFile->getBasename(),
+            'type' => $uploadedFile->getMimeType(),
+            'size' => $uploadedFile->getSize(),
+            'url' => $domain.$path.$uploadedFile->getBasename(),
         ], (array) $response->getData());
     }
 
@@ -59,7 +57,7 @@ class ReceiverTest extends TestCase
         $api->allows('domain')->once()->andReturn($domain = 'foo/');
         $api->allows('path')->once()->andReturn($path = 'foo/');
         $response = m::mock(JsonResponse::class);
-        $api->allows('deleteUploadedFile')->once()->with($uploadedFile)->andReturnSelf();
+        $api->allows('clearTempDirectories')->once()->andReturnSelf();
         $api->allows('completedResponse')->once()->with($response)->andReturn($response);
 
         $callback = function () use ($response) {

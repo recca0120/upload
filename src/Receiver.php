@@ -34,13 +34,13 @@ class Receiver
         try {
             $callback = $callback ?: [$this, 'callback'];
             $response = $callback(
-                $uploadedFile = $this->api->receive($inputName),
+                $this->api->receive($inputName),
                 $this->api->path(),
                 $this->api->domain(),
                 $this->api
             );
 
-            return $this->api->deleteUploadedFile($uploadedFile)->completedResponse($response);
+            return $this->api->clearTempDirectories()->completedResponse($response);
         } catch (ChunkedResponseException $e) {
             return $e->getResponse();
         }
@@ -55,30 +55,14 @@ class Receiver
 
     protected function callback(UploadedFile $uploadedFile, $path, $domain): JsonResponse
     {
-        $clientPathInfo = $this->pathInfo($uploadedFile->getClientOriginalName());
-        $basePathInfo = $this->pathInfo($uploadedFile->getBasename());
-        $filename = md5($basePathInfo['basename']).'.'.$clientPathInfo['extension'];
-        $mimeType = $uploadedFile->getMimeType();
-        $size = $uploadedFile->getSize();
-        $uploadedFile->move($path, $filename);
+        $filename = $uploadedFile->getBasename();
 
         return new JsonResponse([
-            'name' => $clientPathInfo['filename'].'.'.$clientPathInfo['extension'],
+            'name' => $uploadedFile->getClientOriginalName(),
             'tmp_name' => $path.$filename,
-            'type' => $mimeType,
-            'size' => $size,
+            'type' => $uploadedFile->getMimeType(),
+            'size' => $uploadedFile->getSize(),
             'url' => $domain.$path.$filename,
         ]);
-    }
-
-    private function pathInfo($path): array
-    {
-        $parts = [];
-        $parts['dirname'] = rtrim(substr($path, 0, strrpos($path, '/')), '/').'/';
-        $parts['basename'] = ltrim(substr($path, strrpos($path, '/')), '/');
-        $parts['extension'] = strtolower(substr(strrchr($path, '.'), 1));
-        $parts['filename'] = ltrim(substr($parts['basename'], 0, strrpos($parts['basename'], '.')), '/');
-
-        return $parts;
     }
 }
