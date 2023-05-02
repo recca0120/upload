@@ -32,7 +32,7 @@ class UploadManager extends Manager
 
     public function getDefaultDriver(): string
     {
-        return 'fileapi';
+        return $this->getConfig()['driver'] ?? 'fileapi';
     }
 
     protected function createDropzoneDriver(): Receiver
