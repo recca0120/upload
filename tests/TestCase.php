@@ -45,7 +45,8 @@ abstract class TestCase extends BaseTestCase
             'storage' => $this->root->url().'/storage',
         ];
 
-        $this->uploadedFile = UploadedFile::fake()->image('test.png');
+        $newUploadedFile = $this->givenUploadedFile();
+        $this->uploadedFile = $newUploadedFile;
 
         $this->request = Request::createFromGlobals();
         $this->request->setMethod('POST');
@@ -85,6 +86,21 @@ abstract class TestCase extends BaseTestCase
         $reflection = $reflectedClass->getProperty('content');
         $reflection->setAccessible(true);
         $reflection->setValue($this->request, $content);
-        file_put_contents($this->uploadedFile->getRealPath(), $content);
+        file_put_contents($this->uploadedFile->getPathname(), $content);
+    }
+
+    private function givenUploadedFile(): UploadedFile
+    {
+        $name = 'test.png';
+        $temp = $this->root->url().'/temp/';
+        $file = $temp.$name;
+        mkdir($temp);
+
+        ob_start();
+        $image = imagecreatetruecolor(10, 10);
+        imagepng($image);
+        file_put_contents($file, ob_get_clean());
+
+        return new UploadedFile($file, $name, 'image/png', null, true);
     }
 }

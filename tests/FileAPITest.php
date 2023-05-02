@@ -24,7 +24,7 @@ class FileAPITest extends TestCase
      */
     public function testReceiveSingleFile(): void
     {
-        $this->assertSame($this->uploadedFile, $this->api->receive('foo'));
+        $this->assertTrue($this->api->receive('foo')->isFile());
     }
 
     /**
@@ -52,7 +52,7 @@ class FileAPITest extends TestCase
                 self::assertEquals($size, $uploadedFile->getSize());
             } catch (ChunkedResponseException $e) {
                 self::assertStringMatchesFormat(
-                    '{"files":{"name":"test.png","size":%d,"type":"image\/png"}}',
+                    '{"files":{"name":"test.png","size":%d,"type":"%s"}}',
                     $e->getMessage()
                 );
             }

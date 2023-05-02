@@ -32,7 +32,7 @@ class Plupload extends Api
         $originalName = $this->request->get('name');
         $originalName = empty($originalName) ? $uploadedFile->getClientOriginalName() : $originalName;
         $chunkFile = $this->createChunkFile($originalName, $this->request->get('token'));
-        $chunkFile->appendFile($uploadedFile->getRealPath(), $this->request->get('chunk'));
+        $chunkFile->appendFile($uploadedFile->getPathname(), $this->request->get('chunk'));
 
         if (! $this->isCompleted($name)) {
             throw new ChunkedResponseException(['jsonrpc' => '2.0', 'result' => false]);

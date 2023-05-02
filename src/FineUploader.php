@@ -35,7 +35,7 @@ class FineUploader extends Api
         $chunkFile = $this->createChunkFile($this->request->get('qqfilename'), $uuid);
 
         if (! $this->isCompleted($name)) {
-            $chunkFile->appendFile($uploadedFile->getRealPath(), (int) $this->request->get('qqpartindex'));
+            $chunkFile->appendFile($uploadedFile->getPathname(), (int) $this->request->get('qqpartindex'));
 
             throw new ChunkedResponseException(['success' => true, 'uuid' => $uuid]);
         }

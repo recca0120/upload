@@ -26,7 +26,7 @@ class FilePondTest extends TestCase
     {
         $this->request->files->replace(['foo' => $this->uploadedFile]);
 
-        $this->assertSame($this->uploadedFile, $this->api->receive('foo'));
+        $this->assertTrue($this->api->receive('foo')->isFile());
     }
 
     /**

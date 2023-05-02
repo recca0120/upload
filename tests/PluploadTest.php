@@ -24,7 +24,7 @@ class PluploadTest extends TestCase
      */
     public function testReceiveUploadSingleFile(): void
     {
-        $this->assertSame($this->uploadedFile, $this->api->receive('foo'));
+        $this->assertTrue($this->api->receive('foo')->isFile());
     }
 
     /**

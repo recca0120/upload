@@ -88,7 +88,7 @@
                 url: './upload.php?api=fileapi',
                 dataType: 'json',
                 autoUpload: false,
-                multipart: false,
+                multipart: true,
                 singleFileUploads: true,
                 maxChunkSize: 1000000,
             }).on('fileuploadadd', function (e, data) {

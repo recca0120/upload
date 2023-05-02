@@ -23,7 +23,7 @@ class DropzoneTest extends TestCase
      */
     public function testReceiveSingleFile(): void
     {
-        $this->assertSame($this->uploadedFile, $this->api->receive('foo'));
+        $this->assertTrue($this->api->receive('foo')->isFile());
     }
 
     /**

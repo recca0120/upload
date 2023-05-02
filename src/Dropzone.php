@@ -39,7 +39,7 @@ class Dropzone extends FineUploader
 
         $chunkFile = $this->createChunkFile($originalName, $uuid);
         $chunkFile->appendFile(
-            $uploadedFile->getRealPath(),
+            $uploadedFile->getPathname(),
             (int) $this->request->get('dzchunkindex')
         );
 

@@ -3,10 +3,10 @@
 namespace Recca0120\Upload;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Recca0120\Upload\Contracts\Api as ApiContract;
 use Recca0120\Upload\Exceptions\ChunkedResponseException;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 
 class Receiver

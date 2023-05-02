@@ -52,7 +52,7 @@ class FileAPI extends Api
         $uuid = $this->request->get('token') ?? md5($originalName.$total);
 
         $chunkFile = $this->createChunkFile($originalName, $uuid, $mimeType);
-        $chunkFile->appendStream($this->request->getContent(true), $start);
+        $chunkFile->appendStream($this->getResource($name), $start);
 
         if (! $this->isCompleted($name)) {
             $message = ['files' => ['name' => $originalName, 'size' => $end, 'type' => $mimeType]];
@@ -61,5 +61,16 @@ class FileAPI extends Api
         }
 
         return $chunkFile->createUploadedFile();
+    }
+
+    private function getResource(string $name)
+    {
+        $resource = $this->request->file($name);
+
+        if (! $resource) {
+            $resource = $this->request->getContent(true);
+        }
+
+        return $resource;
     }
 }

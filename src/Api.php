@@ -85,9 +85,18 @@ abstract class Api implements ApiContract
      */
     public function receive(string $name): UploadedFile
     {
-        return $this->isChunked($name)
-            ? $this->receiveChunked($name)
-            : $this->request->file($name);
+        if ($this->isChunked($name)) {
+            return $this->receiveChunked($name);
+        }
+
+        $uploadedFile = $this->request->file($name);
+        $originalName = $uploadedFile->getClientOriginalName();
+        $extension = $uploadedFile->getClientOriginalExtension();
+        $mimeType = $uploadedFile->getMimeType();
+        $target = md5($uploadedFile->getBasename()).'.'.$extension;
+        $file = $uploadedFile->move($this->storagePath(), $target);
+
+        return new UploadedFile($file->getPathname(), $originalName, $mimeType, null, true);
     }
 
     public function clearTempDirectories(): ApiContract
