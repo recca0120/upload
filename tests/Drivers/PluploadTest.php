@@ -12,6 +12,11 @@ use ReflectionException;
 
 class PluploadTest extends TestCase
 {
+    /**
+     * @var Plupload
+     */
+    private $api;
+
     protected function setUp(): void
     {
         parent::setUp();

@@ -12,6 +12,11 @@ use ReflectionException;
 
 class FileAPITest extends TestCase
 {
+    /**
+     * @var FileAPI
+     */
+    private $api;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -43,7 +48,7 @@ class FileAPITest extends TestCase
 
             $this->request->headers->replace([
                 'content-disposition' => 'attachment; filename="'.$this->uploadedFile->getClientOriginalName().'"',
-                'content-range' => "bytes {$start}-{$end}/${total}",
+                'content-range' => "bytes {$start}-{$end}/{$total}",
                 'content-type' => $this->uploadedFile->getMimeType(),
                 'content-length' => $chunkSize,
             ]);

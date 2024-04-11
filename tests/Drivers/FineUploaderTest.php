@@ -12,6 +12,11 @@ use ReflectionException;
 
 class FineUploaderTest extends TestCase
 {
+    /**
+     * @var FineUploader
+     */
+    private $api;
+
     protected function setUp(): void
     {
         parent::setUp();

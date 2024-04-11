@@ -11,6 +11,11 @@ use ReflectionException;
 
 class FilePondTest extends TestCase
 {
+    /**
+     * @var FilePond
+     */
+    private $api;
+
     protected function setUp(): void
     {
         parent::setUp();

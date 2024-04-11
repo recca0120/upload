@@ -12,6 +12,11 @@ use ReflectionException;
 
 class DropzoneTest extends TestCase
 {
+    /**
+     * @var Dropzone
+     */
+    private $api;
+
     protected function setUp(): void
     {
         parent::setUp();
